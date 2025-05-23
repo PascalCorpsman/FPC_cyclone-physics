@@ -34,10 +34,79 @@ Type
     Constructor create(); overload;
     Constructor create(aX, aY, aZ: float); overload;
 
+    Function componentProduct(Const v: Vector3): Vector3;
+    Procedure componentProductUpdate(Const v: Vector3);
+    Function scalarProduct(Const v: Vector3): Real;
+    Procedure addScaledVector(Const v: Vector3; s: Real);
+    Function VectorProduct(Const v: Vector3): Vector3;
+    Function Magnitude(): Real;
+    Function squareMagnitude(): Real;
+    Procedure Normalize;
     Procedure Invert;
   End;
 
+Operator * (v: Vector3; s: Real): Vector3;
+Operator * (s: Real; v: Vector3): Vector3;
+Operator * (a, b: Vector3): Real;
+Operator Mod (a, b: Vector3): Vector3;
+
+Operator + (a, b: Vector3): Vector3;
+Operator - (a, b: Vector3): Vector3;
+
+Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
+
 Implementation
+
+Operator * (v: Vector3; s: Real): Vector3;
+Begin
+  result.x := v.x * s;
+  result.y := v.y * s;
+  result.z := v.z * s;
+End;
+
+Operator * (s: Real; v: Vector3): Vector3;
+Begin
+  result.x := v.x * s;
+  result.y := v.y * s;
+  result.z := v.z * s;
+End;
+
+Operator * (a, b: Vector3): Real;
+Begin
+  result := a.x * b.x + a.y * b.y + a.z * b.z;
+End;
+
+Operator Mod (a, b: Vector3): Vector3;
+Begin
+  result.create(
+    a.y * b.z - a.z * b.y,
+    a.z * b.x - a.x * b.z,
+    a.x * b.y - a.y * b.x
+    );
+End;
+
+Operator + (a, b: Vector3): Vector3;
+Begin
+  result.x := a.x + b.x;
+  result.y := a.y + b.y;
+  result.z := a.z + b.z;
+End;
+
+Operator - (a, b: Vector3): Vector3;
+Begin
+  result.x := a.x - b.x;
+  result.y := a.y - b.y;
+  result.z := a.z - b.z;
+End;
+
+Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
+Begin
+  a.Normalize;
+  c := a Mod b;
+  If c.squareMagnitude = 0 Then exit; // Error ?
+  c.Normalize;
+  b := c Mod a;
+End;
 
 { Vector3 }
 
@@ -48,12 +117,64 @@ Begin
   z := 0;
 End;
 
-Constructor Vector3.create(aX, aY, aZ: Single);
+Constructor Vector3.create(aX, aY, aZ: float);
 Begin
   x := aX;
   y := aY;
   z := aZ;
+End;
 
+Function Vector3.componentProduct(Const v: Vector3): Vector3;
+Begin
+  result.create(x * v.x, y * v.y, z * v.z);
+End;
+
+Procedure Vector3.componentProductUpdate(Const v: Vector3);
+Begin
+  x := x * v.x;
+  y := y * v.y;
+  z := z * v.z;
+End;
+
+Function Vector3.scalarProduct(Const v: Vector3): Real;
+Begin
+  result := v.x * x + v.y * y + v.z * z;
+End;
+
+Procedure Vector3.addScaledVector(Const v: Vector3; s: Real);
+Begin
+  x := x + v.x * s;
+  y := y + v.y * s;
+  z := z + v.z * s;
+End;
+
+Function Vector3.VectorProduct(Const v: Vector3): Vector3;
+Begin
+  result.create(
+    y * v.z - z * v.y,
+    z * v.x - x * v.z,
+    x * v.y - y * v.x
+    );
+End;
+
+Function Vector3.Magnitude: Real;
+Begin
+  result := sqrt(sqr(x) + sqr(y) + sqr(z));
+End;
+
+Function Vector3.squareMagnitude: Real;
+Begin
+  result := sqr(x) + sqr(y) + sqr(z);
+End;
+
+Procedure Vector3.Normalize;
+Var
+  l: real;
+Begin
+  l := Magnitude();
+  If (l > 0) Then Begin
+    self := self * (1 / l);
+  End;
 End;
 
 Procedure Vector3.Invert;
