@@ -8,7 +8,7 @@ FPC cyclone-physics is a 3D physics game engine. It is developed in the book [Ga
 
 Ian Millington starts from scratch in his book, and so do i here in this repository. The plan is to read trough the book and implement step by step the whole engine in FreePascal (aka crossporting the C++ code given in the book).
 
-Goal is to have at the end a fully working 3D physics library (the same as in the book) and maybe some examples that prove that it is working.
+Goal is to have at the end a fully working 3D physics library (the same as in the book) and also port the [Demos](src/Demos).
 
 If you do not wan't to wait up until i finished reading the book you can try look at the books github repository which is located [here](https://github.com/idmillington/cyclone-physics).
 
