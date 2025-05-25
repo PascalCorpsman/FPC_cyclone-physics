@@ -12,14 +12,14 @@
 (*               source file of the project.                                  *)
 (*                                                                            *)
 (******************************************************************************)
-Unit core;
+Unit ucore;
 
 {$MODE ObjFPC}{$H+}
 
 Interface
 
 Uses
-  Classes, SysUtils, precision;
+  Classes, SysUtils, uprecision;
 
 Type
 
@@ -36,18 +36,19 @@ Type
 
     Function componentProduct(Const v: Vector3): Vector3;
     Procedure componentProductUpdate(Const v: Vector3);
-    Function scalarProduct(Const v: Vector3): Real;
-    Procedure addScaledVector(Const v: Vector3; s: Real);
+    Function scalarProduct(Const v: Vector3): Float;
+    Procedure addScaledVector(Const v: Vector3; s: Float);
     Function VectorProduct(Const v: Vector3): Vector3;
-    Function Magnitude(): Real;
-    Function squareMagnitude(): Real;
+    Function Magnitude(): Float;
+    Function squareMagnitude(): Float;
     Procedure Normalize;
     Procedure Invert;
+    Procedure Clear;
   End;
 
-Operator * (v: Vector3; s: Real): Vector3;
-Operator * (s: Real; v: Vector3): Vector3;
-Operator * (a, b: Vector3): Real;
+Operator * (v: Vector3; s: Float): Vector3;
+Operator * (s: Float; v: Vector3): Vector3;
+Operator * (a, b: Vector3): Float;
 Operator Mod (a, b: Vector3): Vector3;
 
 Operator + (a, b: Vector3): Vector3;
@@ -57,21 +58,21 @@ Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 
 Implementation
 
-Operator * (v: Vector3; s: Real): Vector3;
+Operator * (v: Vector3; s: Float): Vector3;
 Begin
   result.x := v.x * s;
   result.y := v.y * s;
   result.z := v.z * s;
 End;
 
-Operator * (s: Real; v: Vector3): Vector3;
+Operator * (s: Float; v: Vector3): Vector3;
 Begin
   result.x := v.x * s;
   result.y := v.y * s;
   result.z := v.z * s;
 End;
 
-Operator * (a, b: Vector3): Real;
+Operator * (a, b: Vector3): Float;
 Begin
   result := a.x * b.x + a.y * b.y + a.z * b.z;
 End;
@@ -136,12 +137,12 @@ Begin
   z := z * v.z;
 End;
 
-Function Vector3.scalarProduct(Const v: Vector3): Real;
+Function Vector3.scalarProduct(Const v: Vector3): Float;
 Begin
   result := v.x * x + v.y * y + v.z * z;
 End;
 
-Procedure Vector3.addScaledVector(Const v: Vector3; s: Real);
+Procedure Vector3.addScaledVector(Const v: Vector3; s: Float);
 Begin
   x := x + v.x * s;
   y := y + v.y * s;
@@ -157,19 +158,19 @@ Begin
     );
 End;
 
-Function Vector3.Magnitude: Real;
+Function Vector3.Magnitude: Float;
 Begin
   result := sqrt(sqr(x) + sqr(y) + sqr(z));
 End;
 
-Function Vector3.squareMagnitude: Real;
+Function Vector3.squareMagnitude: Float;
 Begin
   result := sqr(x) + sqr(y) + sqr(z);
 End;
 
 Procedure Vector3.Normalize;
 Var
-  l: real;
+  l: Float;
 Begin
   l := Magnitude();
   If (l > 0) Then Begin
@@ -182,6 +183,13 @@ Begin
   x := -x;
   y := -y;
   z := -z;
+End;
+
+Procedure Vector3.Clear;
+Begin
+  x := 0;
+  y := 0;
+  z := 0;
 End;
 
 End.

@@ -5,7 +5,7 @@ Unit TestCase1;
 Interface
 
 Uses
-  Classes, SysUtils, fpcunit, testutils, testregistry, core, precision;
+  Classes, SysUtils, fpcunit, testutils, testregistry, ucore, uprecision;
 
 Type
 
@@ -32,13 +32,9 @@ Type
     Procedure Mul;
     Procedure Add;
     Procedure Sub;
-
   End;
 
 Implementation
-
-Const
-  Epsilon = 1 / 256;
 
 Procedure TCore.CreateZero;
 Var
@@ -156,10 +152,9 @@ Begin
   AssertTrue(a.z = 0);
   a.create(1, 1, 0);
   a.Normalize;
-  AssertTrue((a.x - 1 / sqrt(2)) < Epsilon);
-  AssertTrue((a.y - 1 / sqrt(2)) < Epsilon);
-  AssertTrue((a.z - 0) < Epsilon);
-
+  AssertTrue((a.x - 1 / sqrt(2)) < REAL_Epsilon);
+  AssertTrue((a.y - 1 / sqrt(2)) < REAL_Epsilon);
+  AssertTrue((a.z - 0) < REAL_Epsilon);
 End;
 
 Procedure TCore.Invert;
@@ -179,7 +174,7 @@ Var
 Begin
   a.create(1, 0, 0);
   b.create(1, 1, 0);
-  core.makeOrthonormalBasis(a, b, c);
+  ucore.makeOrthonormalBasis(a, b, c);
   AssertTrue(a.x = 1);
   AssertTrue(a.y = 0);
   AssertTrue(a.z = 0);
@@ -192,7 +187,7 @@ Begin
 
   a.create(10, 0, 0);
   b.create(10, 5, 0);
-  core.makeOrthonormalBasis(a, b, c);
+  ucore.makeOrthonormalBasis(a, b, c);
   AssertTrue(a.x = 1);
   AssertTrue(a.y = 0);
   AssertTrue(a.z = 0);

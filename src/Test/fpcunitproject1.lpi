@@ -40,7 +40,11 @@
         <UnitName Value="TestCase1"/>
       </Unit>
       <Unit>
-        <Filename Value="../core.pas"/>
+        <Filename Value="../ucore.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="../uprecision.pas"/>
         <IsPartOfProject Value="True"/>
       </Unit>
     </Units>
