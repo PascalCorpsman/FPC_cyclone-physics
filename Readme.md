@@ -22,3 +22,4 @@ Now you have everything to compile the engine.
 ### Progress
 - 2025.05.23: created repository, readme.md and license.md
 - 2025.05.25: demo ballistic
+- 2025.05.26: demo fireworks

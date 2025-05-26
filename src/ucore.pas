@@ -54,9 +54,26 @@ Operator Mod (a, b: Vector3): Vector3;
 Operator + (a, b: Vector3): Vector3;
 Operator - (a, b: Vector3): Vector3;
 
+Var
+  GRAVITY: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  HIGH_GRAVITY: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  UP: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  RIGHT: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  OUT_OF_SCREEN: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  X: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  Y: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+  Z: Vector3; // ist eigentlich "Const", werden in Initialization gesetzt.
+
 Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 
+Function V3(x, y, z: float): Vector3;
+
 Implementation
+
+Function V3(x, y, z: float): Vector3;
+Begin
+  result.create(x, y, z);
+End;
 
 Operator * (v: Vector3; s: Float): Vector3;
 Begin
@@ -191,6 +208,18 @@ Begin
   y := 0;
   z := 0;
 End;
+
+Initialization
+
+  GRAVITY.create(0, -9.81, 0);
+  HIGH_GRAVITY.create(0, -19.62, 0);
+  UP.create(0, 1, 0);
+  RIGHT.create(1, 0, 0);
+  OUT_OF_SCREEN.create(0, 0, 1);
+  x.create(0, 1, 0);
+  y.create(1, 0, 0);
+  z.create(0, 0, 1);
+
 
 End.
 

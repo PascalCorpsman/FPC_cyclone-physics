@@ -25,7 +25,7 @@ Uses
   OpenGlcontext,
   dglOpenGL // http://wiki.delphigl.com/index.php/dglOpenGL.pas
   , uapp
-  , uballistic
+  , ufireworks
   ;
 
 Type
