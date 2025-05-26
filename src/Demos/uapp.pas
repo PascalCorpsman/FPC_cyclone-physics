@@ -36,6 +36,8 @@ Type
   public
     Constructor Create(); virtual;
 
+    Function GetWindowDimension: TPoint; virtual;
+
     Function GetTitle: String; virtual;
     Procedure initGraphics(); virtual;
     Procedure setView(); virtual;
@@ -94,6 +96,11 @@ Constructor Application.Create;
 Begin
   width := 1;
   Height := 1;
+End;
+
+Function Application.GetWindowDimension: TPoint;
+Begin
+  result := point(640, 480);
 End;
 
 Function Application.GetTitle: String;

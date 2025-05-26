@@ -49,6 +49,7 @@ Type
     Procedure fire();
   public
     Constructor Create(); override;
+    Function GetWindowDimension: TPoint; override;
 
     Function GetTitle: String; override;
     Procedure Update; override;
@@ -156,6 +157,11 @@ Begin
   For i := 0 To high(ammo) Do Begin
     ammo[i]._type := unused;
   End;
+End;
+
+Function BallisticDemo.GetWindowDimension: TPoint;
+Begin
+  Result := point(640, 320);
 End;
 
 Function BallisticDemo.GetTitle: String;
