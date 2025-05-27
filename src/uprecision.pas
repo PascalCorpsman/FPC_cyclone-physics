@@ -43,16 +43,45 @@ Const
 
 Type
   float = single; // use single in order to be OpenGL compatible !
+{$ENDIF}
 
 Function real_pow(base, exp: float): Float;
-
-{$ENDIF}
+Function real_sqrt(a: float): float;
+Function real_cos(a: FLoat): float;
+Function real_sin(a: FLoat): float;
+Function real_exp(a: FLoat): float;
+Function real_abs(a: FLoat): float;
 
 Implementation
 
 Function real_pow(base, exp: float): Float;
 Begin
   result := Power(base, exp);
+End;
+
+Function real_sqrt(a: float): float;
+Begin
+  result := Sqrt(a);
+End;
+
+Function real_cos(a: FLoat): float;
+Begin
+  result := cos(a);
+End;
+
+Function real_sin(a: FLoat): float;
+Begin
+  result := sin(a);
+End;
+
+Function real_exp(a: FLoat): float;
+Begin
+  result := exp(a);
+End;
+
+Function real_abs(a: FLoat): float;
+Begin
+  result := abs(a);
 End;
 
 End.

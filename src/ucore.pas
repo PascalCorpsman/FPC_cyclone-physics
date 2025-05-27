@@ -46,6 +46,8 @@ Type
     Procedure Clear;
   End;
 
+  PVector3 = ^Vector3;
+
 Operator * (v: Vector3; s: Float): Vector3;
 Operator * (s: Float; v: Vector3): Vector3;
 Operator * (a, b: Vector3): Float;

@@ -68,6 +68,8 @@ Type
     Procedure addForce(Const aForce: Vector3);
   End;
 
+  PParticle = ^Particle;
+
 Implementation
 
 { Particle }
