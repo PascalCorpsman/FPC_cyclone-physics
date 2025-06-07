@@ -19,7 +19,7 @@ Unit uApp;
 Interface
 
 Uses
-  Classes, SysUtils;
+  Classes, SysUtils, upworld, uparticle;
 
 Const
   // State for mouse Event
@@ -50,6 +50,24 @@ Type
     Procedure RenderText(x, y: Single; text: String);
 
     Procedure mouse(button, state, x, y: integer); virtual;
+  End;
+
+
+  { MassAggregateApplication }
+
+  MassAggregateApplication = Class(Application)
+  private
+  protected
+    world: ParticleWorld;
+    particleArray: Array Of Particle;
+    groundContactGenerator: GroundContacts;
+  public
+    Constructor Create(particleCount: integer); virtual; reintroduce;
+    Destructor Destroy(); override;
+
+    Procedure Update; override;
+    Procedure initGraphics(); override;
+    Procedure Display; override;
   End;
 
 Procedure glutSolidSphere(radius: Double; slices, stacks: integer);
@@ -174,6 +192,49 @@ End;
 Procedure Application.mouse(button, state, x, y: integer);
 Begin
 
+End;
+
+{ MassAggregateApplication }
+
+Constructor MassAggregateApplication.Create(particleCount: integer);
+Var
+  i: Integer;
+Begin
+  Inherited Create();
+  world := ParticleWorld.Create(particleCount * 10);
+  setlength(particleArray, particleCount);
+  For i := 0 To particleCount - 1 Do Begin
+    world.getParticles().Push_back(@particleArray[i]);
+  End;
+  groundContactGenerator := GroundContacts.Create;
+  groundContactGenerator.init(world.getParticles());
+  world.getContactGenerators().push_back(groundContactGenerator);
+
+End;
+
+Destructor MassAggregateApplication.Destroy();
+Begin
+  world.free;
+  world := Nil;
+  setlength(particleArray, 0);
+  particleArray := Nil;
+  groundContactGenerator.free;
+  groundContactGenerator := Nil;
+End;
+
+Procedure MassAggregateApplication.Update;
+Begin
+  Inherited Update;
+End;
+
+Procedure MassAggregateApplication.initGraphics();
+Begin
+  Inherited initGraphics();
+End;
+
+Procedure MassAggregateApplication.Display;
+Begin
+  Inherited Display;
 End;
 
 End.

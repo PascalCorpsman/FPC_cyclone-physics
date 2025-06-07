@@ -23,6 +23,24 @@ Uses
 
 Type
 
+  { TArray }
+
+  Generic TArray < T > = Class
+  private
+    Data: Array Of T;
+    Function GetElement(index: integer): T;
+    Procedure SetElement(index: integer; AValue: T);
+  public
+    Property Element[index: integer]: T read GetElement write SetElement; default;
+
+    Constructor Create(); virtual;
+
+    Function Item(index: integer): T;
+
+    Procedure Push_back(aValue: T);
+    Function Length: Integer;
+  End;
+
   { Vector3 }
 
   Vector3 = Object
@@ -127,6 +145,39 @@ Begin
   c.Normalize;
   b := c Mod a;
 End;
+
+{ TArray }
+
+function TArray.GetElement(index: integer): T;
+Begin
+  result := item(index);
+End;
+
+procedure TArray.SetElement(index: integer; AValue: T);
+Begin
+
+End;
+
+constructor TArray.Create;
+Begin
+  Data := Nil;
+End;
+
+function TArray.Item(index: integer): T;
+Begin
+  result := data[index];
+End;
+
+procedure TArray.Push_back(aValue: T);
+Begin
+  setlength(data, high(Data) + 2);
+  data[high(Data)] := aValue;
+End;
+
+function TArray.Length: Integer;
+begin
+  result := system.length(data);
+end;
 
 { Vector3 }
 

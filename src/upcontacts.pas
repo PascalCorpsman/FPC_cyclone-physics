@@ -40,6 +40,14 @@ Type
     Function CalculateSeparatingVelocity(): float;
   End;
 
+  { ParticleContactGenerator }
+
+  ParticleContactGenerator = Class
+    Function addContact(Var contact: Array Of ParticleContact; limit: integer): integer; virtual;
+  End;
+
+  PParticleContactGenerator = ^ParticleContactGenerator;
+
 Implementation
 
 { ParticleContact }
@@ -164,6 +172,14 @@ Begin
     relativeVelocity := relativeVelocity - particle[1]^.getVelocity();
   End;
   result := relativeVelocity * contactNormal;
+End;
+
+{ ParticleContactGenerator }
+
+Function ParticleContactGenerator.addContact(
+  Var contact: Array Of ParticleContact; limit: integer): integer;
+Begin
+  result := 0;
 End;
 
 End.
