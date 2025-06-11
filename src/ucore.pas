@@ -28,10 +28,12 @@ Type
   Generic TArray < T > = Class
   private
     Data: Array Of T;
+    Function getCount: integer;
     Function GetElement(index: integer): T;
     Procedure SetElement(index: integer; AValue: T);
   public
     Property Element[index: integer]: T read GetElement write SetElement; default;
+    Property Count: integer read getCount;
 
     Constructor Create(); virtual;
 
@@ -148,36 +150,41 @@ End;
 
 { TArray }
 
-function TArray.GetElement(index: integer): T;
+Function TArray.GetElement(index: integer): T;
 Begin
   result := item(index);
 End;
 
-procedure TArray.SetElement(index: integer; AValue: T);
+Function TArray.getCount: integer;
 Begin
-
+  result := system.length(Data);
 End;
 
-constructor TArray.Create;
+Procedure TArray.SetElement(index: integer; AValue: T);
+Begin
+  data[index] := AValue;
+End;
+
+Constructor TArray.Create;
 Begin
   Data := Nil;
 End;
 
-function TArray.Item(index: integer): T;
+Function TArray.Item(index: integer): T;
 Begin
   result := data[index];
 End;
 
-procedure TArray.Push_back(aValue: T);
+Procedure TArray.Push_back(aValue: T);
 Begin
   setlength(data, high(Data) + 2);
   data[high(Data)] := aValue;
 End;
 
-function TArray.Length: Integer;
-begin
+Function TArray.Length: Integer;
+Begin
   result := system.length(data);
-end;
+End;
 
 { Vector3 }
 

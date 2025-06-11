@@ -120,8 +120,8 @@ Begin
   If Not Initialized Then Exit;
   app.Display;
 
-  app.Update;
   TimingData.Update;
+  app.Update;
   OpenGLControl1.SwapBuffers;
 End;
 

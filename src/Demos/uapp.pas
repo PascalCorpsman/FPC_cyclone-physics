@@ -74,7 +74,7 @@ Procedure glutSolidSphere(radius: Double; slices, stacks: integer);
 
 Implementation
 
-Uses dglOpenGL, uOpenGL_ASCII_Font, uvectormath;
+Uses dglOpenGL, uOpenGL_ASCII_Font, uvectormath, ucore, utiming, uprecision;
 
 // Created using ChatGTP, as glut is deprecated ...
 
@@ -183,7 +183,7 @@ Begin
   glDisable(GL_DEPTH_TEST);
   glBindTexture(GL_TEXTURE_2D, 0);
   Go2d(width, Height);
-  OpenGL_ASCII_Font.ColorV3 := v3(v.x, v.y, v.z);
+  OpenGL_ASCII_Font.ColorV3 := uvectormath.v3(v.x, v.y, v.z);
   OpenGL_ASCII_Font.Textout(round(x), round(height - y), text);
   Exit2d();
   glEnable(GL_DEPTH_TEST);
@@ -209,7 +209,6 @@ Begin
   groundContactGenerator := GroundContacts.Create;
   groundContactGenerator.init(world.getParticles());
   world.getContactGenerators().push_back(groundContactGenerator);
-
 End;
 
 Destructor MassAggregateApplication.Destroy();
@@ -222,19 +221,51 @@ Begin
   groundContactGenerator := Nil;
 End;
 
-Procedure MassAggregateApplication.Update;
-Begin
-  Inherited Update;
-End;
-
 Procedure MassAggregateApplication.initGraphics();
 Begin
   Inherited initGraphics();
 End;
 
 Procedure MassAggregateApplication.Display;
+Var
+  Particles: TParticles;
+  particle: PParticle;
+  iterator: Integer;
+  pos: Vector3;
 Begin
-  Inherited Display;
+  // Clear the view port and set the camera direction
+  glClear(GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  gluLookAt(0.0, 3.5, 8.0, 0.0, 3.5, 0.0, 0.0, 1.0, 0.0);
+
+  glColor3f(0, 0, 0);
+
+  particles := world.getParticles();
+  For iterator := 0 To Particles.Count - 1 Do Begin
+    particle := Particles[iterator];
+    pos := particle^.getPosition();
+    glPushMatrix();
+    glTranslatef(pos.x, pos.y, pos.z);
+    glutSolidSphere(0.1, 20, 10);
+    glPopMatrix();
+  End;
+End;
+
+Procedure MassAggregateApplication.Update;
+Var
+  duration: float;
+Begin
+  // Clear accumulators
+  world.startFrame();
+
+  // Find the duration of the last frame in seconds
+  duration := TimingData.lastFrameDuration * 0.001;
+  If (duration <= 0.0) Then exit;
+
+  // Run the simulation
+  world.runPhysics(duration);
+
+  Inherited update();
 End;
 
 End.

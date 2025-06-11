@@ -23,6 +23,8 @@ Uses
 
 Type
 
+  ParticleContactResolver = Class;
+
   { ParticleContact }
 
   ParticleContact = Object
@@ -47,6 +49,18 @@ Type
   End;
 
   PParticleContactGenerator = ^ParticleContactGenerator;
+
+  { ParticleContactResolver }
+
+  ParticleContactResolver = Class
+  private
+    iterations: integer;
+    iterationsUsed: integer;
+  public
+    Constructor Create(aiterations: integer);
+    Procedure setIterations(aiterations: integer);
+    Procedure resolveContacts(Const contactArray: Array Of ParticleContact; numContacts: integer; duration: float);
+  End;
 
 Implementation
 
@@ -180,6 +194,25 @@ Function ParticleContactGenerator.addContact(
   Var contact: Array Of ParticleContact; limit: integer): integer;
 Begin
   result := 0;
+End;
+
+{ ParticleContactResolver }
+
+Constructor ParticleContactResolver.Create(aiterations: integer);
+Begin
+  iterations := aiterations;
+End;
+
+Procedure ParticleContactResolver.setIterations(aiterations: integer);
+Begin
+  iterations := aiterations;
+End;
+
+Procedure ParticleContactResolver.resolveContacts(
+  Const contactArray: Array Of ParticleContact; numContacts: integer;
+  duration: float);
+Begin
+
 End;
 
 End.
