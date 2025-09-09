@@ -12,21 +12,8 @@
 (*               source file of the project.                                  *)
 (*                                                                            *)
 (******************************************************************************)
-Program project1;
 
-{$MODE objfpc}{$H+}
+{$DEFINE UseOperandOverloading}
 
-Uses
-{$IFDEF UNIX}{$IFDEF UseCThreads}
-  cthreads,
-{$ENDIF}{$ENDIF}
-  Interfaces, // this includes the LCL widgetset
-  Forms, imagesforlazarus, Unit1, ucontacts, ucollide_fine;
-
-Begin
-  Application.Initialize;
-  Application.Title := '';
-  Application.CreateForm(TForm1, Form1);
-  Application.Run;
-End.
+TBaseType = Single; // Alle Komponenten bestehen aus BaseType, zur Nutzung von OpenGL ist Single zwingend !!
 

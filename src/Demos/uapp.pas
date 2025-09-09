@@ -19,7 +19,21 @@ Unit uApp;
 Interface
 
 Uses
-  Classes, SysUtils, upworld, uparticle;
+  Classes, SysUtils
+
+  // cyclone.h
+  , uprecision
+  , ucore
+  , urandom
+  , uparticle
+  //  #include "body.h"
+  , upcontacts
+  , upworld
+  , ucollide_fine
+  , ucontacts
+  //  #include "fgen.h"
+  //  #include "joints.h"
+  ;
 
 Const
   // State for mouse Event
@@ -70,11 +84,88 @@ Type
     Procedure Display; override;
   End;
 
+Const
+  (** Holds the maximum number of contacts. *)
+  maxContacts = 256;
+
+Type
+
+  { RigidBodyApplication }
+
+  RigidBodyApplication = Class(Application)
+  private
+  protected
+
+    (** Holds the array of contacts. *)
+    contacts: Array[0..maxContacts - 1] Of Contact;
+
+    (** Holds the collision data structure for collision detection. *)
+    cData: CollisionData;
+
+    (** Holds the contact resolver. *)
+    resolver: ContactResolver;
+
+    (** Holds the camera angle. *)
+    theta: float;
+
+    (** Holds the camera elevation. *)
+    phi: float;
+
+    (** Holds the position of the mouse at the last frame of a drag. *)
+    last_x, last_y: integer;
+
+    (** True if the contacts should be rendered. *)
+    renderDebugInfo: Boolean;
+
+    (** True if the simulation is paused. *)
+    pauseSimulation: Boolean;
+
+    (** Pauses the simulation after the next frame automatically *)
+    autoPauseSimulation: Boolean;
+
+    (** Processes the contact generation code. *)
+    Procedure generateContacts(); virtual;
+
+    (** Processes the objects in the simulation forward in time. *)
+    Procedure updateObjects(duration: real); virtual;
+
+    (**
+     * Finishes drawing the frame, adding debugging information
+     * as needed.
+     *)
+    Procedure drawDebug;
+
+    (** Resets the simulation. *)
+    Procedure reset; virtual;
+
+  public
+    (**
+     * Creates a new application object.
+     *)
+    Constructor Create(); override;
+
+    //      /** Display the application. */
+    //      virtual void display();
+    //
+    //      /** Update the objects. */
+    //      virtual void update();
+    //
+    //      /** Handle a mouse click. */
+    //      virtual void mouse(int button, int state, int x, int y);
+    //
+    //      /** Handle a mouse drag */
+    //      virtual void mouseDrag(int x, int y);
+    //
+    //      /** Handles a key press. */
+    //      virtual void key(unsigned char key);
+
+  End;
+
 Procedure glutSolidSphere(radius: Double; slices, stacks: integer);
 
 Implementation
 
-Uses dglOpenGL, uOpenGL_ASCII_Font, uvectormath, ucore, utiming, uprecision;
+Uses dglOpenGL, uOpenGL_ASCII_Font, uvectormath, utiming;
 
 // Created using ChatGTP, as glut is deprecated ...
 
@@ -266,6 +357,43 @@ Begin
   world.runPhysics(duration);
 
   Inherited update();
+End;
+
+{ RigidBodyApplication }
+
+Procedure RigidBodyApplication.generateContacts;
+Begin
+
+End;
+
+Procedure RigidBodyApplication.updateObjects(duration: real);
+Begin
+
+End;
+
+Procedure RigidBodyApplication.drawDebug;
+Begin
+
+End;
+
+Procedure RigidBodyApplication.reset;
+Begin
+
+End;
+
+Constructor RigidBodyApplication.Create;
+Begin
+  Inherited Create();
+
+  //   theta(0.0f),
+  //    phi(15.0f),
+  //    resolver(maxContacts*8),
+  //
+  //    renderDebugInfo(false),
+  //    pauseSimulation(true),
+  //    autoPauseSimulation(false)
+  //    cData.contactArray = contacts;
+
 End;
 
 End.
