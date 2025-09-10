@@ -34,6 +34,7 @@ Const
 
 Type
   float = Double; // use single in order to be OpenGL compatible !
+  unsigned = uint64;
 
 {$ELSE}
 
@@ -43,6 +44,8 @@ Const
 
 Type
   float = single; // use single in order to be OpenGL compatible !
+  unsigned = uint32;
+
 {$ENDIF}
 
 Function real_pow(base, exp: float): Float;

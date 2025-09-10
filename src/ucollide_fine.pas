@@ -19,9 +19,152 @@ Unit ucollide_fine;
 Interface
 
 Uses
-  Classes, SysUtils, ucontacts;
+  Classes, SysUtils, ucontacts, ucore, ubody, uprecision;
 
 Type
+
+
+  // Forward declarations of primitive friends
+  //    class IntersectionTests;
+  //    class CollisionDetector;
+
+  (**
+   * Represents a primitive to detect collisions against.
+   *)
+
+  { CollisionPrimitive }
+
+  CollisionPrimitive = Object
+  public
+    //        /**
+    //         * This class exists to help the collision detector
+    //         * and intersection routines, so they should have
+    //         * access to its data.
+    //         */
+    //        friend class IntersectionTests;
+    //        friend class CollisionDetector;
+
+            (**
+             * The rigid body that is represented by this primitive.
+             *)
+    body: PRigidBody;
+
+    (**
+     * The offset of this primitive from the given rigid body.
+     *)
+    offset: Matrix4;
+
+    (**
+     * Calculates the internals for the primitive.
+     *)
+    Procedure calculateInternals();
+
+    (**
+     * This is a convenience function to allow access to the
+     * axis vectors in the transform for this primitive.
+     *)
+    Function getAxis(index: unsigned): Vector3;
+
+    (**
+     * Returns the resultant transform of the primitive, calculated from
+     * the combined offset of the primitive and the transform
+     * (orientation + position) of the rigid body to which it is
+     * attached.
+     *)
+    Function getTransform(): PMatrix4;
+
+  protected
+    (**
+     * The resultant transform of the primitive. This is
+     * calculated by combining the offset of the primitive
+     * with the transform of the rigid body.
+     *)
+    transform: Matrix4;
+  End;
+
+  //    /**
+  //     * Represents a rigid body that can be treated as a sphere
+  //     * for collision detection.
+  //     */
+  //    class CollisionSphere : public CollisionPrimitive
+  //    {
+  //    public:
+  //        /**
+  //         * The radius of the sphere.
+  //         */
+  //        real radius;
+  //    };
+  //
+  //    /**
+  //     * The plane is not a primitive: it doesn't represent another
+  //     * rigid body. It is used for contacts with the immovable
+  //     * world geometry.
+  //     */
+  //    class CollisionPlane
+  //    {
+  //    public:
+  //        /**
+  //         * The plane normal
+  //         */
+  //        Vector3 direction;
+  //
+  //        /**
+  //         * The distance of the plane from the origin.
+  //         */
+  //        real offset;
+  //    };
+  //
+(**
+       * Represents a rigid body that can be treated as an aligned bounding
+       * box for collision detection.
+       *)
+
+  CollisionBox = Object(CollisionPrimitive)
+  public
+    (**
+     * Holds the half-sizes of the box along each of its local axes.
+     *)
+    halfSize: Vector3;
+  End;
+  //
+  //    /**
+  //     * A wrapper class that holds fast intersection tests. These
+  //     * can be used to drive the coarse collision detection system or
+  //     * as an early out in the full collision tests below.
+  //     */
+  //    class IntersectionTests
+  //    {
+  //    public:
+  //
+  //        static bool sphereAndHalfSpace(
+  //            const CollisionSphere &sphere,
+  //            const CollisionPlane &plane);
+  //
+  //        static bool sphereAndSphere(
+  //            const CollisionSphere &one,
+  //            const CollisionSphere &two);
+  //
+  //        static bool boxAndBox(
+  //            const CollisionBox &one,
+  //            const CollisionBox &two);
+  //
+  //        /**
+  //         * Does an intersection test on an arbitrarily aligned box and a
+  //         * half-space.
+  //         *
+  //         * The box is given as a transform matrix, including
+  //         * position, and a vector of half-sizes for the extend of the
+  //         * box along each local axis.
+  //         *
+  //         * The half-space is given as a direction (i.e. unit) vector and the
+  //         * offset of the limiting plane from the origin, along the given
+  //         * direction.
+  //         */
+  //        static bool boxAndHalfSpace(
+  //            const CollisionBox &box,
+  //            const CollisionPlane &plane);
+  //    };
+
   (**
    * A helper structure that contains information for the detector to use
    * in building its contact data.
@@ -90,7 +233,85 @@ Type
     //           }
   End;
 
+  //   /**
+  //     * A wrapper class that holds the fine grained collision detection
+  //     * routines.
+  //     *
+  //     * Each of the functions has the same format: it takes the details
+  //     * of two objects, and a pointer to a contact array to fill. It
+  //     * returns the number of contacts it wrote into the array.
+  //     */
+  //    class CollisionDetector
+  //    {
+  //    public:
+  //
+  //        static unsigned sphereAndHalfSpace(
+  //            const CollisionSphere &sphere,
+  //            const CollisionPlane &plane,
+  //            CollisionData *data
+  //            );
+  //
+  //        static unsigned sphereAndTruePlane(
+  //            const CollisionSphere &sphere,
+  //            const CollisionPlane &plane,
+  //            CollisionData *data
+  //            );
+  //
+  //        static unsigned sphereAndSphere(
+  //            const CollisionSphere &one,
+  //            const CollisionSphere &two,
+  //            CollisionData *data
+  //            );
+  //
+  //        /**
+  //         * Does a collision test on a collision box and a plane representing
+  //         * a half-space (i.e. the normal of the plane
+  //         * points out of the half-space).
+  //         */
+  //        static unsigned boxAndHalfSpace(
+  //            const CollisionBox &box,
+  //            const CollisionPlane &plane,
+  //            CollisionData *data
+  //            );
+  //
+  //        static unsigned boxAndBox(
+  //            const CollisionBox &one,
+  //            const CollisionBox &two,
+  //            CollisionData *data
+  //            );
+  //
+  //        static unsigned boxAndPoint(
+  //            const CollisionBox &box,
+  //            const Vector3 &point,
+  //            CollisionData *data
+  //            );
+  //
+  //        static unsigned boxAndSphere(
+  //            const CollisionBox &box,
+  //            const CollisionSphere &sphere,
+  //            CollisionData *data
+  //            );
+  //    };
+
+
 Implementation
+
+{ CollisionPrimitive }
+
+Procedure CollisionPrimitive.calculateInternals;
+Begin
+
+End;
+
+Function CollisionPrimitive.getAxis(index: unsigned): Vector3;
+Begin
+  result := transform.getAxisVector(index);
+End;
+
+Function CollisionPrimitive.getTransform(): PMatrix4;
+Begin
+  result := @transform;
+End;
 
 End.
 
