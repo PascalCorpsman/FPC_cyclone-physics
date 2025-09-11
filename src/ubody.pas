@@ -40,6 +40,9 @@ Type
     * this total 15 words are padding, distributed among the
     * Vector3 data members.
     *)
+
+  { RigidBody }
+
   RigidBody = Object
 
   public
@@ -185,16 +188,16 @@ Type
     //         */
     //        bool canSleep;
     //
-    //        /**
-    //         * Holds a transform matrix for converting body space into
-    //         * world space and vice versa. This can be achieved by calling
-    //         * the getPointIn*Space functions.
-    //         *
-    //         * @see getPointInLocalSpace
-    //         * @see getPointInWorldSpace
-    //         * @see getTransform
-    //         */
-    //        Matrix4 transformMatrix;
+            (**
+             * Holds a transform matrix for converting body space into
+             * world space and vice versa. This can be achieved by calling
+             * the getPointIn*Space functions.
+             *
+             * @see getPointInLocalSpace
+             * @see getPointInWorldSpace
+             * @see getTransform
+             *)
+    transformMatrix: Matrix4;
     //
     //        /*@}*/
     //
@@ -238,7 +241,7 @@ Type
     //
     //        /*@}*/
     //
-    //    public:
+  public
     //        /**
     //         * @name Constructor and Destructor
     //         *
@@ -667,15 +670,15 @@ Type
     //         */
     //        Vector3 getPointInLocalSpace(const Vector3 &point) const;
     //
-    //        /**
-    //         * Converts the given point from world space into the body's
-    //         * local space.
-    //         *
-    //         * @param point The point to covert, given in local space.
-    //         *
-    //         * @return The converted point, in world space.
-    //         */
-    //        Vector3 getPointInWorldSpace(const Vector3 &point) const;
+            (**
+             * Converts the given point from world space into the body's
+             * local space.
+             *
+             * @param point The point to covert, given in local space.
+             *
+             * @return The converted point, in world space.
+             *)
+    Function getPointInWorldSpace(Const point: PVector3): Vector3;
     //
     //        /**
     //         * Converts the given direction from world space into the
@@ -977,6 +980,13 @@ Type
   PRigidBody = ^RigidBody;
 
 Implementation
+
+{ RigidBody }
+
+Function RigidBody.getPointInWorldSpace(Const point: PVector3): Vector3;
+Begin
+  result := transformMatrix.transform(point^);
+End;
 
 End.
 

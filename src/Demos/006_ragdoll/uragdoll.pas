@@ -20,7 +20,7 @@ Interface
 
 Uses
   Classes, SysUtils, uApp
-  , urandom, ucollide_fine //  ,  ucore, uprecision, uparticle, utiming, upcontacts
+  , urandom, ucollide_fine, ujoints //  ,  ucore, uprecision, uparticle, utiming, upcontacts
   ;
 
 Const
@@ -117,8 +117,8 @@ Type
     bones: Array[0..NUM_BONES - 1] Of Bone;
 
     //    /** Holds the joints. */
-    //    cyclone::Joint joints[NUM_JOINTS];
-    //
+    joints: Array[0..NUM_JOINTS - 1] Of Joint;
+
     //    /** Processes the contact generation code. */
     //    virtual void generateContacts();
     //

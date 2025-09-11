@@ -90,12 +90,7 @@ Type
     //         /**
     //          * Creates an identity matrix.
     //          */
-    //         Matrix4()
-    //         {
-    //             data[1] = data[2] = data[3] = data[4] = data[6] =
-    //                 data[7] = data[8] = data[9] = data[11] = 0;
-    //             data[0] = data[5] = data[10] = 1;
-    //         }
+    Constructor create();
     //
     //         /**
     //          * Sets the matrix to be a diagonal matrix with the given coefficients.
@@ -155,15 +150,12 @@ Type
     //             );
     //         }
     //
-    //         /**
-    //          * Transform the given vector by this matrix.
-    //          *
-    //          * @param vector The vector to transform.
-    //          */
-    //         Vector3 transform(const Vector3 &vector) const
-    //         {
-    //             return (*this) * vector;
-    //         }
+             (**
+              * Transform the given vector by this matrix.
+              *
+              * @param vector The vector to transform.
+              *)
+    Function transform(Const vector: Vector3): Vector3;
     //
     //         /**
     //          * Returns the determinant of the matrix.
@@ -769,6 +761,53 @@ Begin
   result.z := a.z - b.z;
 End;
 
+(**
+ * Returns a matrix which is this matrix multiplied by the given
+ * other matrix.
+ *)
+
+Operator * (m, o: Matrix4): Matrix4;
+Begin
+  result.data[0] := (o.data[0] * m.data[0]) + (o.data[4] * m.data[1]) + (o.data[8] * m.data[2]);
+  result.data[4] := (o.data[0] * m.data[4]) + (o.data[4] * m.data[5]) + (o.data[8] * m.data[6]);
+  result.data[8] := (o.data[0] * m.data[8]) + (o.data[4] * m.data[9]) + (o.data[8] * m.data[10]);
+
+  result.data[1] := (o.data[1] * m.data[0]) + (o.data[5] * m.data[1]) + (o.data[9] * m.data[2]);
+  result.data[5] := (o.data[1] * m.data[4]) + (o.data[5] * m.data[5]) + (o.data[9] * m.data[6]);
+  result.data[9] := (o.data[1] * m.data[8]) + (o.data[5] * m.data[9]) + (o.data[9] * m.data[10]);
+
+  result.data[2] := (o.data[2] * m.data[0]) + (o.data[6] * m.data[1]) + (o.data[10] * m.data[2]);
+  result.data[6] := (o.data[2] * m.data[4]) + (o.data[6] * m.data[5]) + (o.data[10] * m.data[6]);
+  result.data[10] := (o.data[2] * m.data[8]) + (o.data[6] * m.data[9]) + (o.data[10] * m.data[10]);
+
+  result.data[3] := (o.data[3] * m.data[0]) + (o.data[7] * m.data[1]) + (o.data[11] * m.data[2]) + m.data[3];
+  result.data[7] := (o.data[3] * m.data[4]) + (o.data[7] * m.data[5]) + (o.data[11] * m.data[6]) + m.data[7];
+  result.data[11] := (o.data[3] * m.data[8]) + (o.data[7] * m.data[9]) + (o.data[11] * m.data[10]) + m.data[11];
+End;
+
+(**
+ * Transform the given vector by this matrix.
+ *
+ * @param vector The vector to transform.
+ *)
+
+Operator * (m: Matrix4; vector: Vector3): Vector3;
+Begin
+  result.create(
+    vector.x * m.data[0] +
+    vector.y * m.data[1] +
+    vector.z * m.data[2] + m.data[3],
+
+    vector.x * m.data[4] +
+    vector.y * m.data[5] +
+    vector.z * m.data[6] + m.data[7],
+
+    vector.x * m.data[8] +
+    vector.y * m.data[9] +
+    vector.z * m.data[10] + m.data[11]
+    );
+End;
+
 Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 Begin
   a.Normalize;
@@ -900,6 +939,27 @@ Begin
 End;
 
 { Matrix4 }
+
+Constructor Matrix4.create();
+Begin
+  data[0] := 1;
+  data[1] := 0;
+  data[2] := 0;
+  data[3] := 0;
+  data[4] := 0;
+  data[5] := 1;
+  data[6] := 0;
+  data[7] := 0;
+  data[8] := 0;
+  data[9] := 0;
+  data[10] := 1;
+  data[11] := 0;
+End;
+
+Function Matrix4.transform(Const vector: Vector3): Vector3;
+Begin
+  result := self * vector;
+End;
 
 Function Matrix4.getAxisVector(i: integer): Vector3;
 Begin
