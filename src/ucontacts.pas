@@ -63,7 +63,7 @@ Type
      * Holds the bodies that are involved in the contact. The
      * second of these can be NULL, for contacts with the scenery.
      *)
-    body: Array[0..1] Of PRigidBody;
+    body: Array[0..1] Of RigidBody;
 
     (**
      * Holds the lateral friction coefficient at the contact.

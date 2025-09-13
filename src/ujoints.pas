@@ -30,13 +30,13 @@ Type
     (**
      * Holds the two rigid bodies that are connected by this joint.
      *)
-    body: Array[0..1] Of PRigidBody;
+    body: Array[0..1] Of RigidBody;
 
     (**
      * Holds the relative location of the connection for each
      * body, given in local coordinates.
      *)
-    position: Array[0..1] Of PVector3;
+    position: Array[0..1] Of Vector3;
 
     (**
      * Holds the maximum displacement at the joint before the
@@ -51,8 +51,8 @@ Type
      * Configures the joint in one go.
      *)
     Procedure _set(
-      a: PRigidBody; a_pos: PVector3;
-      b: PRigidBody; b_pos: PVector3;
+      a: RigidBody; a_pos: Vector3;
+      b: RigidBody; b_pos: Vector3;
       _Error: float
       );
 
@@ -67,8 +67,8 @@ Implementation
 
 { Joint }
 
-Procedure Joint._set(a: PRigidBody; a_pos: PVector3; b: PRigidBody;
-  b_pos: PVector3; _Error: float);
+procedure Joint._set(a: RigidBody; a_pos: Vector3; b: RigidBody;
+  b_pos: Vector3; _Error: float);
 Begin
   body[0] := a;
   body[1] := b;
@@ -79,7 +79,7 @@ Begin
   error := _error;
 End;
 
-Function Joint.addContact(Const contact: PContact; limit: unsigned): unsigned;
+function Joint.addContact(const contact: PContact; limit: unsigned): unsigned;
 Var
   a_pos_world, b_pos_world,
     a_to_b, normal: Vector3;
@@ -87,8 +87,8 @@ Var
 Begin
   result := 0;
   // Calculate the position of each connection point in world coordinates
-  a_pos_world := body[0]^.getPointInWorldSpace(position[0]);
-  b_pos_world := body[1]^.getPointInWorldSpace(position[1]);
+  a_pos_world := body[0].getPointInWorldSpace(@position[0]);
+  b_pos_world := body[1].getPointInWorldSpace(@position[1]);
 
   // Calculate the length of the joint
   a_to_b := b_pos_world - a_pos_world;

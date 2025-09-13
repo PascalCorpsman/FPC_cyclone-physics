@@ -43,6 +43,8 @@ Type
     Function Length: Integer;
   End;
 
+  TOpenGLMatrix = Array[0..15] Of Single;
+
   { Vector3 }
 
   Vector3 = Object
@@ -101,33 +103,6 @@ Type
     //             data[5] = b;
     //             data[10] = c;
     //         }
-    //
-    //         /**
-    //          * Returns a matrix which is this matrix multiplied by the given
-    //          * other matrix.
-    //          */
-    //         Matrix4 operator*(const Matrix4 &o) const
-    //         {
-    //             Matrix4 result;
-    //             result.data[0] = (o.data[0]*data[0]) + (o.data[4]*data[1]) + (o.data[8]*data[2]);
-    //             result.data[4] = (o.data[0]*data[4]) + (o.data[4]*data[5]) + (o.data[8]*data[6]);
-    //             result.data[8] = (o.data[0]*data[8]) + (o.data[4]*data[9]) + (o.data[8]*data[10]);
-    //
-    //             result.data[1] = (o.data[1]*data[0]) + (o.data[5]*data[1]) + (o.data[9]*data[2]);
-    //             result.data[5] = (o.data[1]*data[4]) + (o.data[5]*data[5]) + (o.data[9]*data[6]);
-    //             result.data[9] = (o.data[1]*data[8]) + (o.data[5]*data[9]) + (o.data[9]*data[10]);
-    //
-    //             result.data[2] = (o.data[2]*data[0]) + (o.data[6]*data[1]) + (o.data[10]*data[2]);
-    //             result.data[6] = (o.data[2]*data[4]) + (o.data[6]*data[5]) + (o.data[10]*data[6]);
-    //             result.data[10] = (o.data[2]*data[8]) + (o.data[6]*data[9]) + (o.data[10]*data[10]);
-    //
-    //             result.data[3] = (o.data[3]*data[0]) + (o.data[7]*data[1]) + (o.data[11]*data[2]) + data[3];
-    //             result.data[7] = (o.data[3]*data[4]) + (o.data[7]*data[5]) + (o.data[11]*data[6]) + data[7];
-    //             result.data[11] = (o.data[3]*data[8]) + (o.data[7]*data[9]) + (o.data[11]*data[10]) + data[11];
-    //
-    //             return result;
-    //         }
-    //
     //         /**
     //          * Transform the given vector by this matrix.
     //          *
@@ -693,6 +668,8 @@ Type
 Operator * (v: Vector3; s: Float): Vector3;
 Operator * (s: Float; v: Vector3): Vector3;
 Operator * (a, b: Vector3): Float;
+Operator * (m, o: Matrix4): Matrix4;
+
 Operator Mod (a, b: Vector3): Vector3;
 
 Operator + (a, b: Vector3): Vector3;

@@ -144,12 +144,12 @@ Type
      *)
     Constructor Create(); override;
 
-    //      /** Display the application. */
-    //      virtual void display();
-    //
-    //      /** Update the objects. */
-    //      virtual void update();
-    //
+    (** Display the application. *)
+    Procedure display(); override;
+
+    (** Update the objects. *)
+    Procedure update(); override;
+
     //      /** Handle a mouse click. */
     //      virtual void mouse(int button, int state, int x, int y);
     //
@@ -161,13 +161,13 @@ Type
 
   End;
 
+  // Created using ChatGTP, as glut is deprecated ...
 Procedure glutSolidSphere(radius: Double; slices, stacks: integer);
+Procedure glutSolidCube(size: Single);
 
 Implementation
 
 Uses dglOpenGL, uOpenGL_ASCII_Font, uvectormath, utiming;
-
-// Created using ChatGTP, as glut is deprecated ...
 
 Procedure glutSolidSphere(radius: Double; slices, stacks: integer);
 Var
@@ -197,6 +197,59 @@ Begin
     End;
     glEnd();
   End;
+End;
+
+Procedure glutSolidCube(size: Single);
+Var
+  s: GLfloat;
+Begin
+  s := size / 2.0;
+
+  glBegin(GL_QUADS);
+
+  // Front face  (z = +s)
+  glNormal3f(0.0, 0.0, 1.0);
+  glVertex3f(-s, -s, s);
+  glVertex3f(s, -s, s);
+  glVertex3f(s, s, s);
+  glVertex3f(-s, s, s);
+
+  // Back face (z = -s)
+  glNormal3f(0.0, 0.0, -1.0);
+  glVertex3f(-s, -s, -s);
+  glVertex3f(-s, s, -s);
+  glVertex3f(s, s, -s);
+  glVertex3f(s, -s, -s);
+
+  // Left face (x = -s)
+  glNormal3f(-1.0, 0.0, 0.0);
+  glVertex3f(-s, -s, -s);
+  glVertex3f(-s, -s, s);
+  glVertex3f(-s, s, s);
+  glVertex3f(-s, s, -s);
+
+  // Right face (x = +s)
+  glNormal3f(1.0, 0.0, 0.0);
+  glVertex3f(s, -s, -s);
+  glVertex3f(s, s, -s);
+  glVertex3f(s, s, s);
+  glVertex3f(s, -s, s);
+
+  // Top face (y = +s)
+  glNormal3f(0.0, 1.0, 0.0);
+  glVertex3f(-s, s, -s);
+  glVertex3f(-s, s, s);
+  glVertex3f(s, s, s);
+  glVertex3f(s, s, -s);
+
+  // Bottom face (y = -s)
+  glNormal3f(0.0, -1.0, 0.0);
+  glVertex3f(-s, -s, -s);
+  glVertex3f(s, -s, -s);
+  glVertex3f(s, -s, s);
+  glVertex3f(-s, -s, s);
+
+  glEnd();
 End;
 
 { Application }
@@ -385,8 +438,8 @@ Constructor RigidBodyApplication.Create;
 Begin
   Inherited Create();
 
-  //   theta(0.0f),
-  //    phi(15.0f),
+  theta := 0.0;
+  phi := 15.0;
   //    resolver(maxContacts*8),
   //
   //    renderDebugInfo(false),
@@ -396,5 +449,52 @@ Begin
 
 End;
 
+Procedure RigidBodyApplication.display;
+Begin
+  glClear(GL_COLOR_BUFFER_BIT Or GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  gluLookAt(18.0, 0, 0, 0, 0, 0, 0, 1.0, 0);
+  glRotatef(-phi, 0, 0, 1);
+  glRotatef(theta, 0, 1, 0);
+  glTranslatef(0, -5.0, 0);
+End;
+
+Procedure RigidBodyApplication.update();
+Begin
+  hier weiter
+  // Find the duration of the last frame in seconds
+//  float duration = (float)TimingData::get().lastFrameDuration * 0.001f;
+//  if (duration <= 0.0f) return;
+//  else if (duration > 0.05f) duration = 0.05f;
+//
+//  // Exit immediately if we aren't running the simulation
+//  if (pauseSimulation)
+//  {
+//      Application::update();
+//      return;
+//  }
+//  else if (autoPauseSimulation)
+//  {
+//      pauseSimulation = true;
+//      autoPauseSimulation = false;
+//  }
+//
+//  // Update the objects
+//  updateObjects(duration);
+//
+//  // Perform the contact generation
+//  generateContacts();
+//
+//  // Resolve detected contacts
+//  resolver.resolveContacts(
+//      cData.contactArray,
+//      cData.contactCount,
+//      duration
+//      );
+//
+//  Application::update();
+End;
+
 End.
+
 

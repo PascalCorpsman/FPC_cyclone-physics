@@ -34,7 +34,7 @@ Type
 
   { CollisionPrimitive }
 
-  CollisionPrimitive = Object
+  CollisionPrimitive = Class
   public
     //        /**
     //         * This class exists to help the collision detector
@@ -47,7 +47,7 @@ Type
             (**
              * The rigid body that is represented by this primitive.
              *)
-    body: PRigidBody;
+    body: RigidBody;
 
     (**
      * The offset of this primitive from the given rigid body.
@@ -80,6 +80,9 @@ Type
      * with the transform of the rigid body.
      *)
     transform: Matrix4;
+  public
+    Constructor Create; virtual;
+    Destructor Destroy; virtual;
   End;
 
   //    /**
@@ -119,7 +122,7 @@ Type
        * box for collision detection.
        *)
 
-  CollisionBox = Object(CollisionPrimitive)
+  CollisionBox = Class(CollisionPrimitive)
   public
     (**
      * Holds the half-sizes of the box along each of its local axes.
@@ -183,9 +186,9 @@ Type
     //
     //           /** Holds the maximum number of contacts the array can take. */
     //           int contactsLeft;
-    //
-    //           /** Holds the number of contacts found so far. */
-    //           unsigned contactCount;
+
+(** Holds the number of contacts found so far. *)
+    contactCount: unsigned;
     //
     //           /** Holds the friction value to write into any collisions. */
     //           real friction;
@@ -298,9 +301,20 @@ Implementation
 
 { CollisionPrimitive }
 
+Constructor CollisionPrimitive.Create;
+Begin
+  body := RigidBody.create();
+  offset.create();
+End;
+
+Destructor CollisionPrimitive.Destroy;
+Begin
+  body.Free;
+End;
+
 Procedure CollisionPrimitive.calculateInternals;
 Begin
-
+  transform := body.getTransform() * offset;
 End;
 
 Function CollisionPrimitive.getAxis(index: unsigned): Vector3;
@@ -308,7 +322,7 @@ Begin
   result := transform.getAxisVector(index);
 End;
 
-Function CollisionPrimitive.getTransform(): PMatrix4;
+Function CollisionPrimitive.getTransform: PMatrix4;
 Begin
   result := @transform;
 End;

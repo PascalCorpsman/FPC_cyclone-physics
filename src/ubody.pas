@@ -43,7 +43,7 @@ Type
 
   { RigidBody }
 
-  RigidBody = Object
+  RigidBody = Class
 
   public
 
@@ -123,13 +123,13 @@ Type
     //         * through numerical instability in the integrator.
     //         */
     //        real angularDamping;
-    //
-    //        /**
-    //         * Holds the linear position of the rigid body in
-    //         * world space.
-    //         */
-    //        Vector3 position;
-    //
+
+            (**
+             * Holds the linear position of the rigid body in
+             * world space.
+             *)
+    position: Vector3;
+
     //        /**
     //         * Holds the angular orientation of the rigid body in
     //         * world space.
@@ -173,14 +173,14 @@ Type
     //         * weighted mean that can be used to put a body to sleap.
     //         */
     //        real motion;
-    //
-    //        /**
-    //         * A body can be put to sleep to avoid it being updated
-    //         * by the integration functions or affected by collisions
-    //         * with the world.
-    //         */
-    //        bool isAwake;
-    //
+
+            (**
+             * A body can be put to sleep to avoid it being updated
+             * by the integration functions or affected by collisions
+             * with the world.
+             *)
+    isAwake: boolean;
+
     //        /**
     //         * Some bodies may never be allowed to fall asleep.
     //         * User controlled bodies, for example, should be
@@ -250,7 +250,7 @@ Type
     //         * automatically.
     //         */
     //        /*@{*/
-    //
+    Constructor Create(); virtual;
     //        /*@}*/
     //
     //
@@ -502,14 +502,14 @@ Type
     //         * @return The current angular damping value.
     //         */
     //        real getAngularDamping() const;
-    //
-    //        /**
-    //         * Sets the position of the rigid body.
-    //         *
-    //         * @param position The new position of the rigid body.
-    //         */
-    //        void setPosition(const Vector3 &position);
-    //
+
+            (**
+             * Sets the position of the rigid body.
+             *
+             * @param position The new position of the rigid body.
+             *)
+    Procedure setPosition(Const aposition: Vector3);
+
     //        /**
     //         * Sets the position of the rigid body by component.
     //         *
@@ -612,17 +612,17 @@ Type
     //         */
     //        void getOrientation(real matrix[9]) const;
     //
-    //        /**
-    //         * Fills the given matrix with a transformation representing
-    //         * the rigid body's position and orientation.
-    //         *
-    //         * @note Transforming a vector by this matrix turns it from
-    //         * the body's local space to world space.
-    //         *
-    //         * @param transform A pointer to the matrix to fill.
-    //         */
-    //        void getTransform(Matrix4 *transform) const;
-    //
+            (**
+             * Fills the given matrix with a transformation representing
+             * the rigid body's position and orientation.
+             *
+             * @note Transforming a vector by this matrix turns it from
+             * the body's local space to world space.
+             *
+             * @param transform A pointer to the matrix to fill.
+             *)
+    Procedure getTransform(Out transform: Matrix4); overload;
+
     //        /**
     //         * Fills the given matrix data structure with a
     //         * transformation representing the rigid body's position and
@@ -635,30 +635,30 @@ Type
     //         */
     //        void getTransform(real matrix[16]) const;
     //
-    //        /**
-    //         * Fills the given matrix data structure with a
-    //         * transformation representing the rigid body's position and
-    //         * orientation. The matrix is transposed from that returned
-    //         * by getTransform. This call returns a matrix suitable
-    //         * for applying as an OpenGL transform.
-    //         *
-    //         * @note Transforming a vector by this matrix turns it from
-    //         * the body's local space to world space.
-    //         *
-    //         * @param matrix A pointer to the matrix to fill.
-    //         */
-    //        void getGLTransform(float matrix[16]) const;
-    //
-    //        /**
-    //         * Gets a transformation representing the rigid body's
-    //         * position and orientation.
-    //         *
-    //         * @note Transforming a vector by this matrix turns it from
-    //         * the body's local space to world space.
-    //         *
-    //         * @return The transform matrix for the rigid body.
-    //         */
-    //        Matrix4 getTransform() const;
+            (**
+             * Fills the given matrix data structure with a
+             * transformation representing the rigid body's position and
+             * orientation. The matrix is transposed from that returned
+             * by getTransform. This call returns a matrix suitable
+             * for applying as an OpenGL transform.
+             *
+             * @note Transforming a vector by this matrix turns it from
+             * the body's local space to world space.
+             *
+             * @param matrix A pointer to the matrix to fill.
+             *)
+    Procedure getGLTransform(Out matrix: TOpenGLMatrix);
+
+    (**
+     * Gets a transformation representing the rigid body's
+     * position and orientation.
+     *
+     * @note Transforming a vector by this matrix turns it from
+     * the body's local space to world space.
+     *
+     * @return The transform matrix for the rigid body.
+     *)
+    Function getTransform(): Matrix4; overload;
     //
     //        /**
     //         * Converts the given point from world space into the body's
@@ -795,17 +795,14 @@ Type
     //         * Applies the given change in rotation.
     //         */
     //        void addRotation(const Vector3 &deltaRotation);
-    //
-    //        /**
-    //         * Returns true if the body is awake and responding to
-    //         * integration.
-    //         *
-    //         * @return The awake state of the body.
-    //         */
-    //        bool getAwake() const
-    //        {
-    //            return isAwake;
-    //        }
+
+            (**
+             * Returns true if the body is awake and responding to
+             * integration.
+             *
+             * @return The awake state of the body.
+             *)
+    Function getAwake(): boolean;
     //
     //        /**
     //         * Sets the awake state of the body. If the body is set to be
@@ -983,9 +980,58 @@ Implementation
 
 { RigidBody }
 
+Constructor RigidBody.Create;
+Begin
+  isAwake := false;
+  transformMatrix.create();
+End;
+
+Procedure RigidBody.setPosition(Const aposition: Vector3);
+Begin
+  position := aposition;
+End;
+
+Procedure RigidBody.getTransform(Out transform: Matrix4);
+Begin
+
+End;
+
+Procedure RigidBody.getGLTransform(Out matrix: TOpenGLMatrix);
+Begin
+  matrix[0] := transformMatrix.data[0];
+  matrix[1] := transformMatrix.data[4];
+  matrix[2] := transformMatrix.data[8];
+  matrix[3] := 0;
+
+  matrix[4] := transformMatrix.data[1];
+  matrix[5] := transformMatrix.data[5];
+  matrix[6] := transformMatrix.data[9];
+  matrix[7] := 0;
+
+  matrix[8] := transformMatrix.data[2];
+  matrix[9] := transformMatrix.data[6];
+  matrix[10] := transformMatrix.data[10];
+  matrix[11] := 0;
+
+  matrix[12] := transformMatrix.data[3];
+  matrix[13] := transformMatrix.data[7];
+  matrix[14] := transformMatrix.data[11];
+  matrix[15] := 1;
+End;
+
+Function RigidBody.getTransform(): Matrix4;
+Begin
+  result := transformMatrix;
+End;
+
 Function RigidBody.getPointInWorldSpace(Const point: PVector3): Vector3;
 Begin
   result := transformMatrix.transform(point^);
+End;
+
+Function RigidBody.getAwake: boolean;
+Begin
+  result := isAwake;
 End;
 
 End.
