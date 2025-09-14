@@ -34,9 +34,6 @@ Type
   Bone = Class(CollisionBox)
 
   public
-    Constructor Create; override;
-    Destructor Destroy; override;
-
     //      /**
     //       * We use a sphere to collide bone on bone to allow some limited
     //       * interpenetration.
@@ -79,7 +76,7 @@ Type
     //    virtual void generateContacts();
     //
     //    /** Processes the objects in the simulation forward in time. */
-    //    virtual void updateObjects(cyclone::real duration);
+    Procedure updateObjects(duration: real); override;
     //
     (** Resets the position of all the bones. *)
     Procedure reset(); override;
@@ -111,16 +108,6 @@ End;
 
 { Bone }
 
-Constructor Bone.Create;
-Begin
-  Inherited Create;
-End;
-
-Destructor Bone.Destroy;
-Begin
-  Inherited Destroy;
-End;
-
 Procedure Bone.render;
 Var
   mat: TOpenGLMatrix;
@@ -142,7 +129,6 @@ End;
 
 Procedure Bone.setState(Const position, extents: Vector3);
 Begin
-
   body.setPosition(position);
   //          body->setOrientation(cyclone::Quaternion());
   //          body->setVelocity(cyclone::Vector3());
@@ -163,12 +149,22 @@ Begin
   //
   //          body->setCanSleep(false);
   //          body->setAwake();
-  //
-  //          body->calculateDerivedData();
+
+  body.calculateDerivedData();
   calculateInternals();
 End;
 
 { RagdollDemo }
+
+Procedure RagdollDemo.updateObjects(duration: real);
+Var
+  i: integer;
+Begin
+  For i := 0 To high(bones) Do Begin
+    bones[i].body.integrate(duration);
+    bones[i].calculateInternals();
+  End;
+End;
 
 Procedure RagdollDemo.reset;
 Begin
@@ -315,7 +311,7 @@ Begin
   reset();
 End;
 
-Destructor RagdollDemo.Destroy();
+Destructor RagdollDemo.Destroy;
 Var
   i: Integer;
 Begin
@@ -413,4 +409,5 @@ Begin
 End;
 
 End.
+
 

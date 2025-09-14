@@ -303,6 +303,7 @@ Implementation
 
 Constructor CollisionPrimitive.Create;
 Begin
+  inherited create;
   body := RigidBody.create();
   offset.create();
 End;

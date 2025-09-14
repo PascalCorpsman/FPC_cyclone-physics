@@ -20,7 +20,7 @@ Interface
 
 Uses
   Classes, SysUtils
-  , ucore;
+  , ucore, uprecision;
 
 Type
 
@@ -92,7 +92,7 @@ Type
      * infinite mass (immovable) than zero mass
      * (completely unstable in numerical simulation).
      *)
-    inverseMass: real;
+    inverseMass: float;
     //
     //        /**
     //         * Holds the inverse of the body's inertia tensor. The
@@ -115,14 +115,14 @@ Type
     //         * motion.  Damping is required to remove energy added
     //         * through numerical instability in the integrator.
     //         */
-    //        real linearDamping;
+    //        float linearDamping;
     //
     //        /**
     //         * Holds the amount of damping applied to angular
     //         * motion.  Damping is required to remove energy added
     //         * through numerical instability in the integrator.
     //         */
-    //        real angularDamping;
+    //        float angularDamping;
 
             (**
              * Holds the linear position of the rigid body in
@@ -130,24 +130,24 @@ Type
              *)
     position: Vector3;
 
-    //        /**
-    //         * Holds the angular orientation of the rigid body in
-    //         * world space.
-    //         */
-    //        Quaternion orientation;
-    //
-    //        /**
-    //         * Holds the linear velocity of the rigid body in
-    //         * world space.
-    //         */
-    //        Vector3 velocity;
-    //
-    //        /**
-    //         * Holds the angular velocity, or rotation, or the
-    //         * rigid body in world space.
-    //         */
-    //        Vector3 rotation;
-    //
+    (**
+     * Holds the angular orientation of the rigid body in
+     * world space.
+     *)
+    orientation: Quaternion;
+
+    (**
+     * Holds the linear velocity of the rigid body in
+     * world space.
+     *)
+    velocity: Vector3;
+
+    (**
+     * Holds the angular velocity, or rotation, or the
+     * rigid body in world space.
+     *)
+    rotation: Vector3;
+
     //        /*@}*/
     //
     //
@@ -167,18 +167,18 @@ Type
     //         * @see inverseInertiaTensor
     //         */
     //        Matrix3 inverseInertiaTensorWorld;
-    //
-    //        /**
-    //         * Holds the amount of motion of the body. This is a recency
-    //         * weighted mean that can be used to put a body to sleap.
-    //         */
-    //        real motion;
 
             (**
-             * A body can be put to sleep to avoid it being updated
-             * by the integration functions or affected by collisions
-             * with the world.
+             * Holds the amount of motion of the body. This is a recency
+             * weighted mean that can be used to put a body to sleap.
              *)
+    motion: float;
+
+    (**
+     * A body can be put to sleep to avoid it being updated
+     * by the integration functions or affected by collisions
+     * with the world.
+     *)
     isAwake: boolean;
 
     //        /**
@@ -242,272 +242,272 @@ Type
     //        /*@}*/
     //
   public
-    //        /**
-    //         * @name Constructor and Destructor
-    //         *
-    //         * There are no data members in the rigid body class that are
-    //         * created on the heap. So all data storage is handled
-    //         * automatically.
-    //         */
-    //        /*@{*/
+    (**
+     * @name Constructor and Destructor
+     *
+     * There are no data members in the rigid body class that are
+     * created on the heap. So all data storage is handled
+     * automatically.
+     *)
+    (*@{*)
     Constructor Create(); virtual;
-    //        /*@}*/
-    //
-    //
-    //        /**
-    //         * @name Integration and Simulation Functions
-    //         *
-    //         * These functions are used to simulate the rigid body's
-    //         * motion over time. A normal application sets up one or more
-    //         * rigid bodies, applies permanent forces (i.e. gravity), then
-    //         * adds transient forces each frame, and integrates, prior to
-    //         * rendering.
-    //         *
-    //         * Currently the only integration function provided is the
-    //         * first order Newton Euler method.
-    //         */
-    //        /*@{*/
-    //
-    //        /**
-    //         * Calculates internal data from state data. This should be called
-    //         * after the body's state is altered directly (it is called
-    //         * automatically during integration). If you change the body's state
-    //         * and then intend to integrate before querying any data (such as
-    //         * the transform matrix), then you can ommit this step.
-    //         */
-    //        void calculateDerivedData();
-    //
-    //        /**
-    //         * Integrates the rigid body forward in time by the given amount.
-    //         * This function uses a Newton-Euler integration method, which is a
-    //         * linear approximation to the correct integral. For this reason it
-    //         * may be inaccurate in some cases.
-    //         */
-    //        void integrate(real duration);
-    //
-    //        /*@}*/
-    //
-    //
-    //        /**
-    //         * @name Accessor Functions for the Rigid Body's State
-    //         *
-    //         * These functions provide access to the rigid body's
-    //         * characteristics or state. These data can be accessed
-    //         * individually, or en masse as an array of values
-    //         * (e.g. getCharacteristics, getState). When setting new data,
-    //         * make sure the calculateInternals function, or an
-    //         * integration routine, is called before trying to get data
-    //         * from the body, since the class contains a number of
-    //         * dependent values that will need recalculating.
-    //         */
-    //        /*@{*/
-    //
-    //        /**
-    //         * Sets the mass of the rigid body.
-    //         *
-    //         * @param mass The new mass of the body. This may not be zero.
-    //         * Small masses can produce unstable rigid bodies under
-    //         * simulation.
-    //         *
-    //         * @warning This invalidates internal data for the rigid body.
-    //         * Either an integration function, or the calculateInternals
-    //         * function should be called before trying to get any settings
-    //         * from the rigid body.
-    //         */
-    //        void setMass(const real mass);
-    //
-    //        /**
-    //         * Gets the mass of the rigid body.
-    //         *
-    //         * @return The current mass of the rigid body.
-    //         */
-    //        real getMass() const;
-    //
-    //        /**
-    //         * Sets the inverse mass of the rigid body.
-    //         *
-    //         * @param inverseMass The new inverse mass of the body. This
-    //         * may be zero, for a body with infinite mass
-    //         * (i.e. unmovable).
-    //         *
-    //         * @warning This invalidates internal data for the rigid body.
-    //         * Either an integration function, or the calculateInternals
-    //         * function should be called before trying to get any settings
-    //         * from the rigid body.
-    //         */
-    //        void setInverseMass(const real inverseMass);
-    //
-    //        /**
-    //         * Gets the inverse mass of the rigid body.
-    //         *
-    //         * @return The current inverse mass of the rigid body.
-    //         */
-    //        real getInverseMass() const;
-    //
-    //        /**
-    //         * Returns true if the mass of the body is not-infinite.
-    //         */
-    //        bool hasFiniteMass() const;
-    //
-    //        /**
-    //         * Sets the intertia tensor for the rigid body.
-    //         *
-    //         * @param inertiaTensor The inertia tensor for the rigid
-    //         * body. This must be a full rank matrix and must be
-    //         * invertible.
-    //         *
-    //         * @warning This invalidates internal data for the rigid body.
-    //         * Either an integration function, or the calculateInternals
-    //         * function should be called before trying to get any settings
-    //         * from the rigid body.
-    //         */
-    //        void setInertiaTensor(const Matrix3 &inertiaTensor);
-    //
-    //        /**
-    //         * Copies the current inertia tensor of the rigid body into
-    //         * the given matrix.
-    //         *
-    //         * @param inertiaTensor A pointer to a matrix to hold the
-    //         * current inertia tensor of the rigid body. The inertia
-    //         * tensor is expressed in the rigid body's local space.
-    //         */
-    //        void getInertiaTensor(Matrix3 *inertiaTensor) const;
-    //
-    //        /**
-    //         * Gets a copy of the current inertia tensor of the rigid body.
-    //         *
-    //         * @return A new matrix containing the current intertia
-    //         * tensor. The inertia tensor is expressed in the rigid body's
-    //         * local space.
-    //         */
-    //        Matrix3 getInertiaTensor() const;
-    //
-    //        /**
-    //         * Copies the current inertia tensor of the rigid body into
-    //         * the given matrix.
-    //         *
-    //         * @param inertiaTensor A pointer to a matrix to hold the
-    //         * current inertia tensor of the rigid body. The inertia
-    //         * tensor is expressed in world space.
-    //         */
-    //        void getInertiaTensorWorld(Matrix3 *inertiaTensor) const;
-    //
-    //        /**
-    //         * Gets a copy of the current inertia tensor of the rigid body.
-    //         *
-    //         * @return A new matrix containing the current intertia
-    //         * tensor. The inertia tensor is expressed in world space.
-    //         */
-    //        Matrix3 getInertiaTensorWorld() const;
-    //
-    //        /**
-    //         * Sets the inverse intertia tensor for the rigid body.
-    //         *
-    //         * @param inverseInertiaTensor The inverse inertia tensor for
-    //         * the rigid body. This must be a full rank matrix and must be
-    //         * invertible.
-    //         *
-    //         * @warning This invalidates internal data for the rigid body.
-    //         * Either an integration function, or the calculateInternals
-    //         * function should be called before trying to get any settings
-    //         * from the rigid body.
-    //         */
-    //        void setInverseInertiaTensor(const Matrix3 &inverseInertiaTensor);
-    //
-    //        /**
-    //         * Copies the current inverse inertia tensor of the rigid body
-    //         * into the given matrix.
-    //         *
-    //         * @param inverseInertiaTensor A pointer to a matrix to hold
-    //         * the current inverse inertia tensor of the rigid body. The
-    //         * inertia tensor is expressed in the rigid body's local
-    //         * space.
-    //         */
-    //        void getInverseInertiaTensor(Matrix3 *inverseInertiaTensor) const;
-    //
-    //        /**
-    //         * Gets a copy of the current inverse inertia tensor of the
-    //         * rigid body.
-    //         *
-    //         * @return A new matrix containing the current inverse
-    //         * intertia tensor. The inertia tensor is expressed in the
-    //         * rigid body's local space.
-    //         */
-    //        Matrix3 getInverseInertiaTensor() const;
-    //
-    //        /**
-    //         * Copies the current inverse inertia tensor of the rigid body
-    //         * into the given matrix.
-    //         *
-    //         * @param inverseInertiaTensor A pointer to a matrix to hold
-    //         * the current inverse inertia tensor of the rigid body. The
-    //         * inertia tensor is expressed in world space.
-    //         */
-    //        void getInverseInertiaTensorWorld(Matrix3 *inverseInertiaTensor) const;
-    //
-    //        /**
-    //         * Gets a copy of the current inverse inertia tensor of the
-    //         * rigid body.
-    //         *
-    //         * @return A new matrix containing the current inverse
-    //         * intertia tensor. The inertia tensor is expressed in world
-    //         * space.
-    //         */
-    //        Matrix3 getInverseInertiaTensorWorld() const;
-    //
-    //        /**
-    //         * Sets both linear and angular damping in one function call.
-    //         *
-    //         * @param linearDamping The speed that velocity is shed from
-    //         * the rigid body.
-    //         *
-    //         * @param angularDamping The speed that rotation is shed from
-    //         * the rigid body.
-    //         *
-    //         * @see setLinearDamping
-    //         * @see setAngularDamping
-    //         */
-    //        void setDamping(const real linearDamping, const real angularDamping);
-    //
-    //        /**
-    //         * Sets the linear damping for the rigid body.
-    //         *
-    //         * @param linearDamping The speed that velocity is shed from
-    //         * the rigid body.
-    //         *
-    //         * @see setAngularDamping
-    //         */
-    //        void setLinearDamping(const real linearDamping);
-    //
-    //        /**
-    //         * Gets the current linear damping value.
-    //         *
-    //         * @return The current linear damping value.
-    //         */
-    //        real getLinearDamping() const;
-    //
-    //        /**
-    //         * Sets the angular damping for the rigid body.
-    //         *
-    //         * @param angularDamping The speed that rotation is shed from
-    //         * the rigid body.
-    //         *
-    //         * @see setLinearDamping
-    //         */
-    //        void setAngularDamping(const real angularDamping);
-    //
-    //        /**
-    //         * Gets the current angular damping value.
-    //         *
-    //         * @return The current angular damping value.
-    //         */
-    //        real getAngularDamping() const;
+    (*@}*)
 
-            (**
-             * Sets the position of the rigid body.
-             *
-             * @param position The new position of the rigid body.
-             *)
+
+    (**
+     * @name Integration and Simulation Functions
+     *
+     * These functions are used to simulate the rigid body's
+     * motion over time. A normal application sets up one or more
+     * rigid bodies, applies permanent forces (i.e. gravity), then
+     * adds transient forces each frame, and integrates, prior to
+     * rendering.
+     *
+     * Currently the only integration function provided is the
+     * first order Newton Euler method.
+     *)
+    (*@{*)
+
+    (**
+     * Calculates internal data from state data. This should be called
+     * after the body's state is altered directly (it is called
+     * automatically during integration). If you change the body's state
+     * and then intend to integrate before querying any data (such as
+     * the transform matrix), then you can ommit this step.
+     *)
+    Procedure calculateDerivedData();
+
+    (**
+     * Integrates the rigid body forward in time by the given amount.
+     * This function uses a Newton-Euler integration method, which is a
+     * linear approximation to the correct integral. For this reason it
+     * may be inaccurate in some cases.
+     *)
+    Procedure integrate(duration: float);
+
+    (*@}*)
+
+
+//        /**
+//         * @name Accessor Functions for the Rigid Body's State
+//         *
+//         * These functions provide access to the rigid body's
+//         * characteristics or state. These data can be accessed
+//         * individually, or en masse as an array of values
+//         * (e.g. getCharacteristics, getState). When setting new data,
+//         * make sure the calculateInternals function, or an
+//         * integration routine, is called before trying to get data
+//         * from the body, since the class contains a number of
+//         * dependent values that will need recalculating.
+//         */
+//        /*@{*/
+//
+//        /**
+//         * Sets the mass of the rigid body.
+//         *
+//         * @param mass The new mass of the body. This may not be zero.
+//         * Small masses can produce unstable rigid bodies under
+//         * simulation.
+//         *
+//         * @warning This invalidates internal data for the rigid body.
+//         * Either an integration function, or the calculateInternals
+//         * function should be called before trying to get any settings
+//         * from the rigid body.
+//         */
+//        void setMass(const real mass);
+//
+//        /**
+//         * Gets the mass of the rigid body.
+//         *
+//         * @return The current mass of the rigid body.
+//         */
+//        real getMass() const;
+//
+//        /**
+//         * Sets the inverse mass of the rigid body.
+//         *
+//         * @param inverseMass The new inverse mass of the body. This
+//         * may be zero, for a body with infinite mass
+//         * (i.e. unmovable).
+//         *
+//         * @warning This invalidates internal data for the rigid body.
+//         * Either an integration function, or the calculateInternals
+//         * function should be called before trying to get any settings
+//         * from the rigid body.
+//         */
+//        void setInverseMass(const real inverseMass);
+//
+//        /**
+//         * Gets the inverse mass of the rigid body.
+//         *
+//         * @return The current inverse mass of the rigid body.
+//         */
+//        real getInverseMass() const;
+//
+//        /**
+//         * Returns true if the mass of the body is not-infinite.
+//         */
+//        bool hasFiniteMass() const;
+//
+//        /**
+//         * Sets the intertia tensor for the rigid body.
+//         *
+//         * @param inertiaTensor The inertia tensor for the rigid
+//         * body. This must be a full rank matrix and must be
+//         * invertible.
+//         *
+//         * @warning This invalidates internal data for the rigid body.
+//         * Either an integration function, or the calculateInternals
+//         * function should be called before trying to get any settings
+//         * from the rigid body.
+//         */
+//        void setInertiaTensor(const Matrix3 &inertiaTensor);
+//
+//        /**
+//         * Copies the current inertia tensor of the rigid body into
+//         * the given matrix.
+//         *
+//         * @param inertiaTensor A pointer to a matrix to hold the
+//         * current inertia tensor of the rigid body. The inertia
+//         * tensor is expressed in the rigid body's local space.
+//         */
+//        void getInertiaTensor(Matrix3 *inertiaTensor) const;
+//
+//        /**
+//         * Gets a copy of the current inertia tensor of the rigid body.
+//         *
+//         * @return A new matrix containing the current intertia
+//         * tensor. The inertia tensor is expressed in the rigid body's
+//         * local space.
+//         */
+//        Matrix3 getInertiaTensor() const;
+//
+//        /**
+//         * Copies the current inertia tensor of the rigid body into
+//         * the given matrix.
+//         *
+//         * @param inertiaTensor A pointer to a matrix to hold the
+//         * current inertia tensor of the rigid body. The inertia
+//         * tensor is expressed in world space.
+//         */
+//        void getInertiaTensorWorld(Matrix3 *inertiaTensor) const;
+//
+//        /**
+//         * Gets a copy of the current inertia tensor of the rigid body.
+//         *
+//         * @return A new matrix containing the current intertia
+//         * tensor. The inertia tensor is expressed in world space.
+//         */
+//        Matrix3 getInertiaTensorWorld() const;
+//
+//        /**
+//         * Sets the inverse intertia tensor for the rigid body.
+//         *
+//         * @param inverseInertiaTensor The inverse inertia tensor for
+//         * the rigid body. This must be a full rank matrix and must be
+//         * invertible.
+//         *
+//         * @warning This invalidates internal data for the rigid body.
+//         * Either an integration function, or the calculateInternals
+//         * function should be called before trying to get any settings
+//         * from the rigid body.
+//         */
+//        void setInverseInertiaTensor(const Matrix3 &inverseInertiaTensor);
+//
+//        /**
+//         * Copies the current inverse inertia tensor of the rigid body
+//         * into the given matrix.
+//         *
+//         * @param inverseInertiaTensor A pointer to a matrix to hold
+//         * the current inverse inertia tensor of the rigid body. The
+//         * inertia tensor is expressed in the rigid body's local
+//         * space.
+//         */
+//        void getInverseInertiaTensor(Matrix3 *inverseInertiaTensor) const;
+//
+//        /**
+//         * Gets a copy of the current inverse inertia tensor of the
+//         * rigid body.
+//         *
+//         * @return A new matrix containing the current inverse
+//         * intertia tensor. The inertia tensor is expressed in the
+//         * rigid body's local space.
+//         */
+//        Matrix3 getInverseInertiaTensor() const;
+//
+//        /**
+//         * Copies the current inverse inertia tensor of the rigid body
+//         * into the given matrix.
+//         *
+//         * @param inverseInertiaTensor A pointer to a matrix to hold
+//         * the current inverse inertia tensor of the rigid body. The
+//         * inertia tensor is expressed in world space.
+//         */
+//        void getInverseInertiaTensorWorld(Matrix3 *inverseInertiaTensor) const;
+//
+//        /**
+//         * Gets a copy of the current inverse inertia tensor of the
+//         * rigid body.
+//         *
+//         * @return A new matrix containing the current inverse
+//         * intertia tensor. The inertia tensor is expressed in world
+//         * space.
+//         */
+//        Matrix3 getInverseInertiaTensorWorld() const;
+//
+//        /**
+//         * Sets both linear and angular damping in one function call.
+//         *
+//         * @param linearDamping The speed that velocity is shed from
+//         * the rigid body.
+//         *
+//         * @param angularDamping The speed that rotation is shed from
+//         * the rigid body.
+//         *
+//         * @see setLinearDamping
+//         * @see setAngularDamping
+//         */
+//        void setDamping(const real linearDamping, const real angularDamping);
+//
+//        /**
+//         * Sets the linear damping for the rigid body.
+//         *
+//         * @param linearDamping The speed that velocity is shed from
+//         * the rigid body.
+//         *
+//         * @see setAngularDamping
+//         */
+//        void setLinearDamping(const real linearDamping);
+//
+//        /**
+//         * Gets the current linear damping value.
+//         *
+//         * @return The current linear damping value.
+//         */
+//        real getLinearDamping() const;
+//
+//        /**
+//         * Sets the angular damping for the rigid body.
+//         *
+//         * @param angularDamping The speed that rotation is shed from
+//         * the rigid body.
+//         *
+//         * @see setLinearDamping
+//         */
+//        void setAngularDamping(const real angularDamping);
+//
+//        /**
+//         * Gets the current angular damping value.
+//         *
+//         * @return The current angular damping value.
+//         */
+//        real getAngularDamping() const;
+
+    (**
+     * Sets the position of the rigid body.
+     *
+     * @param position The new position of the rigid body.
+     *)
     Procedure setPosition(Const aposition: Vector3);
 
     //        /**
@@ -803,17 +803,17 @@ Type
              * @return The awake state of the body.
              *)
     Function getAwake(): boolean;
-    //
-    //        /**
-    //         * Sets the awake state of the body. If the body is set to be
-    //         * not awake, then its velocities are also cancelled, since
-    //         * a moving body that is not awake can cause problems in the
-    //         * simulation.
-    //         *
-    //         * @param awake The new awake state of the body.
-    //         */
-    //        void setAwake(const bool awake=true);
-    //
+
+    (**
+     * Sets the awake state of the body. If the body is set to be
+     * not awake, then its velocities are also cancelled, since
+     * a moving body that is not awake can cause problems in the
+     * simulation.
+     *
+     * @param awake The new awake state of the body.
+     *)
+    Procedure setAwake(awake: boolean = true);
+
     //        /**
     //         * Returns true if the body is allowed to go to sleep at
     //         * any time.
@@ -978,12 +978,191 @@ Type
 
 Implementation
 
+///**
+// * Internal function that checks the validity of an inverse inertia tensor.
+// */
+//static inline void _checkInverseInertiaTensor(const Matrix3 &iitWorld)
+//{
+//    // TODO: Perform a validity check in an assert.
+//}
+//
+///**
+// * Internal function to do an intertia tensor transform by a quaternion.
+// * Note that the implementation of this function was created by an
+// * automated code-generator and optimizer.
+// */
+//static inline void _transformInertiaTensor(Matrix3 &iitWorld,
+//                                           const Quaternion &q,
+//                                           const Matrix3 &iitBody,
+//                                           const Matrix4 &rotmat)
+//{
+//    real t4 = rotmat.data[0]*iitBody.data[0]+
+//        rotmat.data[1]*iitBody.data[3]+
+//        rotmat.data[2]*iitBody.data[6];
+//    real t9 = rotmat.data[0]*iitBody.data[1]+
+//        rotmat.data[1]*iitBody.data[4]+
+//        rotmat.data[2]*iitBody.data[7];
+//    real t14 = rotmat.data[0]*iitBody.data[2]+
+//        rotmat.data[1]*iitBody.data[5]+
+//        rotmat.data[2]*iitBody.data[8];
+//    real t28 = rotmat.data[4]*iitBody.data[0]+
+//        rotmat.data[5]*iitBody.data[3]+
+//        rotmat.data[6]*iitBody.data[6];
+//    real t33 = rotmat.data[4]*iitBody.data[1]+
+//        rotmat.data[5]*iitBody.data[4]+
+//        rotmat.data[6]*iitBody.data[7];
+//    real t38 = rotmat.data[4]*iitBody.data[2]+
+//        rotmat.data[5]*iitBody.data[5]+
+//        rotmat.data[6]*iitBody.data[8];
+//    real t52 = rotmat.data[8]*iitBody.data[0]+
+//        rotmat.data[9]*iitBody.data[3]+
+//        rotmat.data[10]*iitBody.data[6];
+//    real t57 = rotmat.data[8]*iitBody.data[1]+
+//        rotmat.data[9]*iitBody.data[4]+
+//        rotmat.data[10]*iitBody.data[7];
+//    real t62 = rotmat.data[8]*iitBody.data[2]+
+//        rotmat.data[9]*iitBody.data[5]+
+//        rotmat.data[10]*iitBody.data[8];
+//
+//    iitWorld.data[0] = t4*rotmat.data[0]+
+//        t9*rotmat.data[1]+
+//        t14*rotmat.data[2];
+//    iitWorld.data[1] = t4*rotmat.data[4]+
+//        t9*rotmat.data[5]+
+//        t14*rotmat.data[6];
+//    iitWorld.data[2] = t4*rotmat.data[8]+
+//        t9*rotmat.data[9]+
+//        t14*rotmat.data[10];
+//    iitWorld.data[3] = t28*rotmat.data[0]+
+//        t33*rotmat.data[1]+
+//        t38*rotmat.data[2];
+//    iitWorld.data[4] = t28*rotmat.data[4]+
+//        t33*rotmat.data[5]+
+//        t38*rotmat.data[6];
+//    iitWorld.data[5] = t28*rotmat.data[8]+
+//        t33*rotmat.data[9]+
+//        t38*rotmat.data[10];
+//    iitWorld.data[6] = t52*rotmat.data[0]+
+//        t57*rotmat.data[1]+
+//        t62*rotmat.data[2];
+//    iitWorld.data[7] = t52*rotmat.data[4]+
+//        t57*rotmat.data[5]+
+//        t62*rotmat.data[6];
+//    iitWorld.data[8] = t52*rotmat.data[8]+
+//        t57*rotmat.data[9]+
+//        t62*rotmat.data[10];
+//}
+
+(**
+ * Inline function that creates a transform matrix from a
+ * position and orientation.
+ *)
+
+Procedure _calculateTransformMatrix(Var transformMatrix: Matrix4;
+  Const position: Vector3;
+  Const orientation: Quaternion);
+Begin
+  transformMatrix.data[0] := 1 - 2 * orientation._d.j * orientation._d.j -
+    2 * orientation._d.k * orientation._d.k;
+  transformMatrix.data[1] := 2 * orientation._d.i * orientation._d.j -
+    2 * orientation._d.r * orientation._d.k;
+  transformMatrix.data[2] := 2 * orientation._d.i * orientation._d.k +
+    2 * orientation._d.r * orientation._d.j;
+  transformMatrix.data[3] := position.x;
+
+  transformMatrix.data[4] := 2 * orientation._d.i * orientation._d.j +
+    2 * orientation._d.r * orientation._d.k;
+  transformMatrix.data[5] := 1 - 2 * orientation._d.i * orientation._d.i -
+    2 * orientation._d.k * orientation._d.k;
+  transformMatrix.data[6] := 2 * orientation._d.j * orientation._d.k -
+    2 * orientation._d.r * orientation._d.i;
+  transformMatrix.data[7] := position.y;
+
+  transformMatrix.data[8] := 2 * orientation._d.i * orientation._d.k -
+    2 * orientation._d.r * orientation._d.j;
+  transformMatrix.data[9] := 2 * orientation._d.j * orientation._d.k +
+    2 * orientation._d.r * orientation._d.i;
+  transformMatrix.data[10] := 1 - 2 * orientation._d.i * orientation._d.i -
+    2 * orientation._d.j * orientation._d.j;
+  transformMatrix.data[11] := position.z;
+End;
+
 { RigidBody }
 
 Constructor RigidBody.Create;
 Begin
+  Inherited create;
   isAwake := false;
   transformMatrix.create();
+  orientation.Create();
+  velocity.create();
+  rotation.create();
+  motion := 0;
+End;
+
+Procedure RigidBody.calculateDerivedData;
+Begin
+  orientation.normalise();
+
+  // Calculate the transform matrix for the body.
+  _calculateTransformMatrix(transformMatrix, position, orientation);
+
+  // Calculate the inertiaTensor in world space.
+//    _transformInertiaTensor(inverseInertiaTensorWorld,
+//        orientation,
+//        inverseInertiaTensor,
+//        transformMatrix);
+End;
+
+Procedure RigidBody.integrate(duration: float);
+Begin
+  If (Not isAwake) Then exit;
+
+  //    // Calculate linear acceleration from force inputs.
+  //    lastFrameAcceleration = acceleration;
+  //    lastFrameAcceleration.addScaledVector(forceAccum, inverseMass);
+  //
+  //    // Calculate angular acceleration from torque inputs.
+  //    Vector3 angularAcceleration =
+  //        inverseInertiaTensorWorld.transform(torqueAccum);
+  //
+  //    // Adjust velocities
+  //    // Update linear velocity from both acceleration and impulse.
+  //    velocity.addScaledVector(lastFrameAcceleration, duration);
+  //
+  //    // Update angular velocity from both acceleration and impulse.
+  //    rotation.addScaledVector(angularAcceleration, duration);
+  //
+  //    // Impose drag.
+  //    velocity *= real_pow(linearDamping, duration);
+  //    rotation *= real_pow(angularDamping, duration);
+  //
+  //    // Adjust positions
+  //    // Update linear position.
+  //    position.addScaledVector(velocity, duration);
+  //
+  //    // Update angular position.
+  //    orientation.addScaledVector(rotation, duration);
+  //
+      // Normalise the orientation, and update the matrices with the new
+      // position and orientation
+  calculateDerivedData();
+
+  // Clear accumulators.
+//  clearAccumulators();
+  //
+  //    // Update the kinetic energy store, and possibly put the body to
+  //    // sleep.
+  //    if (canSleep) {
+  //        real currentMotion = velocity.scalarProduct(velocity) +
+  //            rotation.scalarProduct(rotation);
+  //
+  //        real bias = real_pow(0.5, duration);
+  //        motion = bias*motion + (1-bias)*currentMotion;
+  //
+  //        if (motion < sleepEpsilon) setAwake(false);
+  //        else if (motion > 10 * sleepEpsilon) motion = 10 * sleepEpsilon;
+  //    }
 End;
 
 Procedure RigidBody.setPosition(Const aposition: Vector3);
@@ -992,8 +1171,11 @@ Begin
 End;
 
 Procedure RigidBody.getTransform(Out transform: Matrix4);
+Var
+  i: Integer;
 Begin
-
+  For i := 0 To high(transformMatrix.data) Do
+    transform.data[i] := transformMatrix.data[i];
 End;
 
 Procedure RigidBody.getGLTransform(Out matrix: TOpenGLMatrix);
@@ -1019,7 +1201,7 @@ Begin
   matrix[15] := 1;
 End;
 
-Function RigidBody.getTransform(): Matrix4;
+Function RigidBody.getTransform: Matrix4;
 Begin
   result := transformMatrix;
 End;
@@ -1032,6 +1214,21 @@ End;
 Function RigidBody.getAwake: boolean;
 Begin
   result := isAwake;
+End;
+
+Procedure RigidBody.setAwake(awake: boolean);
+Begin
+  If (awake) Then Begin
+    isAwake := true;
+
+    // Add a bit of motion to avoid it falling asleep immediately.
+    motion := sleepEpsilon * 2.0;
+  End
+  Else Begin
+    isAwake := false;
+    velocity.clear();
+    rotation.clear();
+  End;
 End;
 
 End.

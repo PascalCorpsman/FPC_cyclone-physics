@@ -460,41 +460,42 @@ Begin
 End;
 
 Procedure RigidBodyApplication.update();
+Var
+  duration: float;
 Begin
-  hier weiter
   // Find the duration of the last frame in seconds
-//  float duration = (float)TimingData::get().lastFrameDuration * 0.001f;
-//  if (duration <= 0.0f) return;
-//  else if (duration > 0.05f) duration = 0.05f;
-//
-//  // Exit immediately if we aren't running the simulation
-//  if (pauseSimulation)
-//  {
-//      Application::update();
-//      return;
-//  }
-//  else if (autoPauseSimulation)
-//  {
-//      pauseSimulation = true;
-//      autoPauseSimulation = false;
-//  }
-//
-//  // Update the objects
-//  updateObjects(duration);
-//
-//  // Perform the contact generation
-//  generateContacts();
-//
-//  // Resolve detected contacts
-//  resolver.resolveContacts(
-//      cData.contactArray,
-//      cData.contactCount,
-//      duration
-//      );
-//
-//  Application::update();
+  duration := TimingData.lastFrameDuration * 0.001;
+  If (duration <= 0.0) Then Begin
+    exit;
+  End
+  Else If (duration > 0.05) Then
+    duration := 0.05;
+
+  // Exit immediately if we aren't running the simulation
+  If (pauseSimulation) Then Begin
+    Inherited update();
+    exit;
+  End
+  Else If (autoPauseSimulation) Then Begin
+    pauseSimulation := true;
+    autoPauseSimulation := false;
+  End;
+
+  // Update the objects
+  updateObjects(duration);
+
+  // Perform the contact generation
+  generateContacts();
+
+  // Resolve detected contacts
+  resolver.resolveContacts(
+    cData.contactArray,
+    cData.contactCount,
+    duration
+    );
+
+  Inherited update();
 End;
 
 End.
-
 
