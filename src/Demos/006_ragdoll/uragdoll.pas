@@ -20,7 +20,7 @@ Interface
 
 Uses
   Classes, SysUtils, uApp
-  , urandom, ucollide_fine, ujoints, ucore, ubody //, uprecision , uparticle, utiming, upcontacts
+  , urandom, ucollide_fine, ujoints, ucore, ubody, uprecision //, uparticle, utiming, upcontacts
   ;
 
 Const
@@ -34,23 +34,13 @@ Type
   Bone = Class(CollisionBox)
 
   public
-    //      /**
-    //       * We use a sphere to collide bone on bone to allow some limited
-    //       * interpenetration.
-    //       */
-    //      cyclone::CollisionSphere getCollisionSphere() const
-    //      {
-    //          cyclone::CollisionSphere sphere;
-    //          sphere.body = body;
-    //          sphere.radius = halfSize.x;
-    //          sphere.offset = cyclone::Matrix4();
-    //          if (halfSize.y < sphere.radius) sphere.radius = halfSize.y;
-    //          if (halfSize.z < sphere.radius) sphere.radius = halfSize.z;
-    //          sphere.calculateInternals();
-    //          return sphere;
-    //      }
-    //
-          (** Draws the bone. *)
+    (**
+     * We use a sphere to collide bone on bone to allow some limited
+     * interpenetration.
+     *)
+    Function getCollisionSphere(): CollisionSphere;
+
+    (** Draws the bone. *)
     Procedure render();
 
 
@@ -107,6 +97,20 @@ Begin
 End;
 
 { Bone }
+
+Function Bone.getCollisionSphere(): CollisionSphere;
+Var
+  sphere: CollisionSphere;
+Begin
+  sphere := CollisionSphere.Create;
+  sphere.body := body;
+  sphere.radius := halfSize.x;
+  sphere.offset.create();
+  If (halfSize.y < sphere.radius) Then sphere.radius := halfSize.y;
+  If (halfSize.z < sphere.radius) Then sphere.radius := halfSize.z;
+  sphere.calculateInternals();
+  result := sphere;
+End;
 
 Procedure Bone.render;
 Var
@@ -343,7 +347,10 @@ Const
   lightPosition: Array[0..3] Of single = (0.7, -1, 0.4, 0);
   lightPositionMirror: Array[0..3] Of single = (0.7, 1, 0.4, 0);
 Var
-  i: Integer;
+  i, j: Integer;
+  _Joint: Joint;
+  a_pos, b_pos: Vector3;
+  _theta, _length: Float;
 Begin
 
   Inherited display();
@@ -362,52 +369,49 @@ Begin
   For i := 0 To NUM_BONES - 1 Do Begin
     bones[i].render();
   End;
-  //  glutSolidCube(2); // -- Debug
   glDisable(GL_NORMALIZE);
 
   glDisable(GL_LIGHTING);
   glDisable(GL_COLOR_MATERIAL);
 
   glDisable(GL_DEPTH_TEST);
-  //    glBegin(GL_LINES);
-  //    for (unsigned i = 0; i < NUM_JOINTS; i++)
-  //    {
-  //        cyclone::Joint *joint = joints + i;
-  //        cyclone::Vector3 a_pos = joint->body[0]->getPointInWorldSpace(joint->position[0]);
-  //        cyclone::Vector3 b_pos = joint->body[1]->getPointInWorldSpace(joint->position[1]);
-  //        cyclone::real length = (b_pos - a_pos).magnitude();
-  //
-  //        if (length > joint->error) glColor3f(1,0,0);
-  //        else glColor3f(0,1,0);
-  //
-  //        glVertex3f(a_pos.x, a_pos.y, a_pos.z);
-  //        glVertex3f(b_pos.x, b_pos.y, b_pos.z);
-  //    }
-  //    glEnd();
-  //    glEnable(GL_DEPTH_TEST);
-  //
-  //    // Draw some scale circles
-  //    glColor3f(0.75, 0.75, 0.75);
-  //    for (unsigned i = 1; i < 20; i++)
-  //    {
-  //        glBegin(GL_LINE_LOOP);
-  //        for (unsigned j = 0; j < 32; j++)
-  //        {
-  //            float theta = 3.1415926f * j / 16.0f;
-  //            glVertex3f(i*cosf(theta),0.0f,i*sinf(theta));
-  //        }
-  //        glEnd();
-  //    }
-  //    glBegin(GL_LINES);
-  //    glVertex3f(-20,0,0);
-  //    glVertex3f(20,0,0);
-  //    glVertex3f(0,0,-20);
-  //    glVertex3f(0,0,20);
-  //    glEnd();
+  glBegin(GL_LINES);
+  For i := 0 To NUM_JOINTS - 1 Do Begin
+    _Joint := joints[i];
+    a_pos := _joint.body[0].getPointInWorldSpace(@_joint.position[0]);
+    b_pos := _joint.body[1].getPointInWorldSpace(@_joint.position[1]);
+    _length := (b_pos - a_pos).magnitude();
 
-  //    RigidBodyApplication::drawDebug();
+    If (_length > _joint.error) Then
+      glColor3f(1, 0, 0)
+    Else
+      glColor3f(0, 1, 0);
+
+    glVertex3f(a_pos.x, a_pos.y, a_pos.z);
+    glVertex3f(b_pos.x, b_pos.y, b_pos.z);
+  End;
+  glEnd();
+  glEnable(GL_DEPTH_TEST);
+
+  // Draw some scale circles
+  glColor3f(0.75, 0.75, 0.75);
+  For i := 1 To 19 Do Begin
+    glBegin(GL_LINE_LOOP);
+    For j := 0 To 31 Do Begin
+      _theta := 3.1415926 * j / 16.0;
+      glVertex3f(i * real_cos(_theta), 0.0, i * real_sin(_theta));
+    End;
+    glEnd();
+  End;
+  glBegin(GL_LINES);
+  glVertex3f(-20, 0, 0);
+  glVertex3f(20, 0, 0);
+  glVertex3f(0, 0, -20);
+  glVertex3f(0, 0, 20);
+  glEnd();
+
+  drawDebug();
 End;
 
 End.
-
 

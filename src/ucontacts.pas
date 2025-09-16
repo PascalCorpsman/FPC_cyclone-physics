@@ -315,14 +315,14 @@ Type
     //        bool validSettings;
     //
   public
-    //        /**
-    //         * Creates a new contact resolver with the given number of iterations
-    //         * per resolution call, and optional epsilon values.
-    //         */
-    //        ContactResolver(unsigned iterations,
-    //            real velocityEpsilon=(real)0.01,
-    //            real positionEpsilon=(real)0.01);
-    //
+    (**
+     * Creates a new contact resolver with the given number of iterations
+     * per resolution call, and optional epsilon values.
+     *)
+    Constructor Create(iterations: unsigned;
+      velocityEpsilon: float = 0.01;
+      positionEpsilon: float = 0.01);
+
     //        /**
     //         * Creates a new contact resolver with the given number of iterations
     //         * for each kind of resolution, and optional epsilon values.
@@ -436,6 +436,12 @@ Type
 Implementation
 
 { ContactResolver }
+
+Constructor ContactResolver.Create(iterations: unsigned;
+  velocityEpsilon: float; positionEpsilon: float);
+Begin
+
+End;
 
 Procedure ContactResolver.resolveContacts(contactArray: PContact;
   numContacts: unsigned; duration: float);

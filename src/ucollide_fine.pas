@@ -168,6 +168,18 @@ Type
   //            const CollisionPlane &plane);
   //    };
 
+    (**
+     * Represents a rigid body that can be treated as a sphere
+     * for collision detection.
+     *)
+  CollisionSphere = Class(CollisionPrimitive)
+  public
+    (**
+     * The radius of the sphere.
+     *)
+    radius: float;
+  End;
+
   (**
    * A helper structure that contains information for the detector to use
    * in building its contact data.
@@ -303,7 +315,7 @@ Implementation
 
 Constructor CollisionPrimitive.Create;
 Begin
-  inherited create;
+  Inherited create;
   body := RigidBody.create();
   offset.create();
 End;

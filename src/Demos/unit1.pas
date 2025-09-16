@@ -106,7 +106,9 @@ End;
 Procedure TForm1.OpenGLControl1MouseMove(Sender: TObject; Shift: TShiftState;
   X, Y: Integer);
 Begin
-  //  app.mouseDrag(x, y);
+  If ssleft In shift Then Begin
+    app.mouseDrag(x, y);
+  End;
 End;
 
 Procedure TForm1.OpenGLControl1MouseUp(Sender: TObject; Button: TMouseButton;

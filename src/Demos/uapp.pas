@@ -26,13 +26,15 @@ Uses
   , ucore
   , urandom
   , uparticle
-  //  #include "body.h"
-  , upcontacts
+  // , ubody
+  // , upcontacts
   , upworld
   , ucollide_fine
   , ucontacts
-  //  #include "fgen.h"
-  //  #include "joints.h"
+  //  , fgen
+  //  , joints
+  // -- End cyclone.h
+
   ;
 
 Const
@@ -64,6 +66,9 @@ Type
     Procedure RenderText(x, y: Single; text: String);
 
     Procedure mouse(button, state, x, y: integer); virtual;
+
+    Procedure mouseDrag(x, y: integer); virtual;
+
   End;
 
 
@@ -127,7 +132,7 @@ Type
     Procedure generateContacts(); virtual;
 
     (** Processes the objects in the simulation forward in time. *)
-    Procedure updateObjects(duration: real); virtual;
+    Procedure updateObjects(duration: real); virtual; // Abstract
 
     (**
      * Finishes drawing the frame, adding debugging information
@@ -136,7 +141,7 @@ Type
     Procedure drawDebug;
 
     (** Resets the simulation. *)
-    Procedure reset; virtual;
+    Procedure reset; virtual; // abstract
 
   public
     (**
@@ -150,14 +155,14 @@ Type
     (** Update the objects. *)
     Procedure update(); override;
 
-    //      /** Handle a mouse click. */
-    //      virtual void mouse(int button, int state, int x, int y);
-    //
-    //      /** Handle a mouse drag */
-    //      virtual void mouseDrag(int x, int y);
-    //
-    //      /** Handles a key press. */
-    //      virtual void key(unsigned char key);
+    (** Handle a mouse click. *)
+    Procedure mouse(button, state, x, y: integer); override;
+
+    (** Handle a mouse drag *)
+    Procedure mouseDrag(x, y: integer); override;
+
+    (** Handles a key press. *)
+    Procedure Key(akey: Char); override;
 
   End;
 
@@ -338,6 +343,11 @@ Begin
 
 End;
 
+Procedure Application.mouseDrag(x, y: integer);
+Begin
+
+End;
+
 { MassAggregateApplication }
 
 Constructor MassAggregateApplication.Create(particleCount: integer);
@@ -425,8 +435,33 @@ Begin
 End;
 
 Procedure RigidBodyApplication.drawDebug;
+Var
+  vec: Vector3;
+  i: Integer;
 Begin
+  If (Not renderDebugInfo) Then exit;
 
+  // Recalculate the contacts, so they are current (in case we're
+  // paused, for example).
+  generateContacts();
+
+  // Render the contacts, if required
+  glBegin(GL_LINES);
+  For i := 0 To cData.contactCount - 1 Do Begin
+    // Interbody contacts are in green, floor contacts are red.
+    If assigned(contacts[i].body[1]) Then Begin
+      glColor3f(0, 1, 0);
+    End
+    Else Begin
+      glColor3f(1, 0, 0);
+    End;
+
+    vec := contacts[i].contactPoint;
+    glVertex3f(vec.x, vec.y, vec.z);
+    vec := vec + contacts[i].contactNormal;
+    glVertex3f(vec.x, vec.y, vec.z);
+  End;
+  glEnd();
 End;
 
 Procedure RigidBodyApplication.reset;
@@ -440,13 +475,12 @@ Begin
 
   theta := 0.0;
   phi := 15.0;
-  //    resolver(maxContacts*8),
-  //
-  //    renderDebugInfo(false),
-  //    pauseSimulation(true),
-  //    autoPauseSimulation(false)
-  //    cData.contactArray = contacts;
+  resolver := ContactResolver.create(maxContacts * 8);
 
+  renderDebugInfo := false;
+  pauseSimulation := true;
+  autoPauseSimulation := false;
+  cData.contactArray := contacts;
 End;
 
 Procedure RigidBodyApplication.display;
@@ -459,7 +493,7 @@ Begin
   glTranslatef(0, -5.0, 0);
 End;
 
-Procedure RigidBodyApplication.update();
+Procedure RigidBodyApplication.update;
 Var
   duration: float;
 Begin
@@ -495,6 +529,58 @@ Begin
     );
 
   Inherited update();
+End;
+
+Procedure RigidBodyApplication.mouse(button, state, x, y: integer);
+Begin
+  // Set the position
+  last_x := x;
+  last_y := y;
+End;
+
+Procedure RigidBodyApplication.mouseDrag(x, y: integer);
+Begin
+  // Update the camera
+  theta := theta + (x - last_x) * 0.25;
+  phi := phi + (y - last_y) * 0.25;
+
+  // Keep it in bounds
+  If (phi < -20.0) Then
+    phi := -20.0
+  Else If (phi > 80.0) Then
+    phi := 80.0;
+
+  // Remember the position
+  last_x := x;
+  last_y := y;
+End;
+
+Procedure RigidBodyApplication.Key(akey: Char);
+Begin
+  Case akey Of
+    'R', 'r': Begin
+        // Reset the simulation
+        reset();
+        exit;
+      End;
+    'C', 'c': Begin
+        // Toggle rendering of contacts
+        renderDebugInfo := Not renderDebugInfo;
+        exit;
+      End;
+    'P', 'p': Begin
+        // Toggle running the simulation
+        pauseSimulation := Not pauseSimulation;
+        exit;
+      End;
+    #32: Begin
+        // Advance one frame
+        autoPauseSimulation := true;
+        pauseSimulation := false;
+      End;
+  End;
+
+  Inherited Key(akey);
 End;
 
 End.
