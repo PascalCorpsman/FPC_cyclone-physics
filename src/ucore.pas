@@ -468,24 +468,23 @@ Type
     * damping coefficients to make the 12-element characteristics array
     * of a rigid body.
     *)
+
+  { Matrix3 }
+
   Matrix3 = Object
   public
-    //        /**
-    //         * Holds the tensor matrix data in array form.
-    //         */
-    //        real data[9];
-    //
-    //        // ... Other Matrix3 code as before ...
-    //
-    //        /**
-    //         * Creates a new matrix.
-    //         */
-    //        Matrix3()
-    //        {
-    //            data[0] = data[1] = data[2] = data[3] = data[4] = data[5] =
-    //                data[6] = data[7] = data[8] = 0;
-    //        }
-    //
+    (**
+     * Holds the tensor matrix data in array form.
+     *)
+    data: Array[0..8] Of float;
+
+    // ... Other Matrix3 code as before ...
+
+    (**
+     * Creates a new matrix.
+     *)
+    Constructor Create();
+
     //        /**
     //         * Creates a new matrix with the given three vectors making
     //         * up its columns.
@@ -516,33 +515,19 @@ Type
     //            setInertiaTensorCoeffs(a, b, c);
     //        }
     //
-    //        /**
-    //         * Sets the value of the matrix from inertia tensor values.
-    //         */
-    //        void setInertiaTensorCoeffs(real ix, real iy, real iz,
-    //            real ixy=0, real ixz=0, real iyz=0)
-    //        {
-    //            data[0] = ix;
-    //            data[1] = data[3] = -ixy;
-    //            data[2] = data[6] = -ixz;
-    //            data[4] = iy;
-    //            data[5] = data[7] = -iyz;
-    //            data[8] = iz;
-    //        }
-    //
-    //        /**
-    //         * Sets the value of the matrix as an inertia tensor of
-    //         * a rectangular block aligned with the body's coordinate
-    //         * system with the given axis half-sizes and mass.
-    //         */
-    //        void setBlockInertiaTensor(const Vector3 &halfSizes, real mass)
-    //        {
-    //            Vector3 squares = halfSizes.componentProduct(halfSizes);
-    //            setInertiaTensorCoeffs(0.3f*mass*(squares.y + squares.z),
-    //                0.3f*mass*(squares.x + squares.z),
-    //                0.3f*mass*(squares.x + squares.y));
-    //        }
-    //
+        (**
+         * Sets the value of the matrix from inertia tensor values.
+         *)
+    Procedure setInertiaTensorCoeffs(ix, iy, iz: Float;
+      ixy: Float = 0; ixz: Float = 0; iyz: Float = 0);
+
+    (**
+     * Sets the value of the matrix as an inertia tensor of
+     * a rectangular block aligned with the body's coordinate
+     * system with the given axis half-sizes and mass.
+     *)
+    Procedure setBlockInertiaTensor(Const halfSizes: Vector3; mass: Float);
+
     //        /**
     //         * Sets the matrix to be a skew symmetric matrix based on
     //         * the given vector. The skew symmetric matrix is the equivalent
@@ -639,38 +624,13 @@ Type
     //            return Vector3(data[i], data[i+3], data[i+6]);
     //        }
     //
-    //        /**
-    //         * Sets the matrix to be the inverse of the given matrix.
-    //         *
-    //         * @param m The matrix to invert and use to set this.
-    //         */
-    //        void setInverse(const Matrix3 &m)
-    //        {
-    //            real t4 = m.data[0]*m.data[4];
-    //            real t6 = m.data[0]*m.data[5];
-    //            real t8 = m.data[1]*m.data[3];
-    //            real t10 = m.data[2]*m.data[3];
-    //            real t12 = m.data[1]*m.data[6];
-    //            real t14 = m.data[2]*m.data[6];
-    //
-    //            // Calculate the determinant
-    //            real t16 = (t4*m.data[8] - t6*m.data[7] - t8*m.data[8]+
-    //                        t10*m.data[7] + t12*m.data[5] - t14*m.data[4]);
-    //
-    //            // Make sure the determinant is non-zero.
-    //            if (t16 == (real)0.0f) return;
-    //            real t17 = 1/t16;
-    //
-    //            data[0] = (m.data[4]*m.data[8]-m.data[5]*m.data[7])*t17;
-    //            data[1] = -(m.data[1]*m.data[8]-m.data[2]*m.data[7])*t17;
-    //            data[2] = (m.data[1]*m.data[5]-m.data[2]*m.data[4])*t17;
-    //            data[3] = -(m.data[3]*m.data[8]-m.data[5]*m.data[6])*t17;
-    //            data[4] = (m.data[0]*m.data[8]-t14)*t17;
-    //            data[5] = -(t6-t10)*t17;
-    //            data[6] = (m.data[3]*m.data[7]-m.data[4]*m.data[6])*t17;
-    //            data[7] = -(m.data[0]*m.data[7]-t12)*t17;
-    //            data[8] = (t4-t8)*t17;
-    //        }
+            (**
+             * Sets the matrix to be the inverse of the given matrix.
+             *
+             * @param m The matrix to invert and use to set this.
+             *)
+    Procedure setInverse(Const m: Matrix3);
+
     //
     //        /** Returns a new matrix containing the inverse of this matrix. */
     //        Matrix3 inverse() const
@@ -1124,6 +1084,76 @@ End;
 Function Matrix4.getAxisVector(i: integer): Vector3;
 Begin
   result.create(data[i], data[i + 4], data[i + 8]);
+End;
+
+{ Matrix3 }
+
+Constructor Matrix3.Create;
+Begin
+  data[0] := 0;
+  data[1] := 0;
+  data[2] := 0;
+  data[3] := 0;
+  data[4] := 0;
+  data[5] := 0;
+  data[6] := 0;
+  data[7] := 0;
+  data[8] := 0;
+End;
+
+Procedure Matrix3.setInertiaTensorCoeffs(ix, iy, iz: Float; ixy: Float;
+  ixz: Float; iyz: Float);
+Begin
+  data[0] := ix;
+  data[1] := -ixy;
+  data[3] := -ixy;
+  data[2] := -ixz;
+  data[6] := -ixz;
+  data[4] := iy;
+  data[5] := -iyz;
+  data[7] := -iyz;
+  data[8] := iz;
+End;
+
+Procedure Matrix3.setBlockInertiaTensor(Const halfSizes: Vector3; mass: Float);
+Var
+  squares: Vector3;
+Begin
+  squares := halfSizes.componentProduct(halfSizes);
+  setInertiaTensorCoeffs(0.3 * mass * (squares.y + squares.z),
+    0.3 * mass * (squares.x + squares.z),
+    0.3 * mass * (squares.x + squares.y));
+End;
+
+Procedure Matrix3.setInverse(Const m: Matrix3);
+Var
+  t4, t6, t8, t10, t12, t14, t16, t17: float;
+Begin
+
+  t4 := m.data[0] * m.data[4];
+  t6 := m.data[0] * m.data[5];
+  t8 := m.data[1] * m.data[3];
+  t10 := m.data[2] * m.data[3];
+  t12 := m.data[1] * m.data[6];
+  t14 := m.data[2] * m.data[6];
+
+  // Calculate the determinant
+  t16 := (t4 * m.data[8] - t6 * m.data[7] - t8 * m.data[8] +
+    t10 * m.data[7] + t12 * m.data[5] - t14 * m.data[4]);
+
+  // Make sure the determinant is non-zero.
+  If (t16 = 0.0) Then exit;
+  t17 := 1 / t16;
+
+  data[0] := (m.data[4] * m.data[8] - m.data[5] * m.data[7]) * t17;
+  data[1] := -(m.data[1] * m.data[8] - m.data[2] * m.data[7]) * t17;
+  data[2] := (m.data[1] * m.data[5] - m.data[2] * m.data[4]) * t17;
+  data[3] := -(m.data[3] * m.data[8] - m.data[5] * m.data[6]) * t17;
+  data[4] := (m.data[0] * m.data[8] - t14) * t17;
+  data[5] := -(t6 - t10) * t17;
+  data[6] := (m.data[3] * m.data[7] - m.data[4] * m.data[6]) * t17;
+  data[7] := -(m.data[0] * m.data[7] - t12) * t17;
+  data[8] := (t4 - t8) * t17;
 End;
 
 Initialization

@@ -132,27 +132,33 @@ Begin
 End;
 
 Procedure Bone.setState(Const position, extents: Vector3);
+Var
+  q: Quaternion;
+  v: Vector3;
+  mass: float;
+  tensor: Matrix3;
 Begin
   body.setPosition(position);
-  //          body->setOrientation(cyclone::Quaternion());
-  //          body->setVelocity(cyclone::Vector3());
-  //          body->setRotation(cyclone::Vector3());
+  q.Create;
+  body.setOrientation(Q);
+  v.create;
+  body.setVelocity(V);
+  body.setRotation(V);
   halfSize := extents;
 
-  //          cyclone::real mass = halfSize.x * halfSize.y * halfSize.z * 8.0f;
-  //          body->setMass(mass);
-  //
-  //          cyclone::Matrix3 tensor;
-  //          tensor.setBlockInertiaTensor(halfSize, mass);
-  //          body->setInertiaTensor(tensor);
-  //
-  //          body->setLinearDamping(0.95f);
-  //          body->setAngularDamping(0.8f);
-  //          body->clearAccumulators();
-  //          body->setAcceleration(cyclone::Vector3::GRAVITY);
-  //
-  //          body->setCanSleep(false);
-  //          body->setAwake();
+  mass := halfSize.x * halfSize.y * halfSize.z * 8.0;
+  body.setMass(mass);
+
+  tensor.setBlockInertiaTensor(halfSize, mass);
+  body.setInertiaTensor(tensor);
+
+  body.setLinearDamping(0.95);
+  body.setAngularDamping(0.8);
+  body.clearAccumulators();
+  body.setAcceleration(GRAVITY);
+
+  body.setCanSleep(false);
+  body.setAwake();
 
   body.calculateDerivedData();
   calculateInternals();

@@ -93,41 +93,41 @@ Type
      * (completely unstable in numerical simulation).
      *)
     inverseMass: float;
-    //
-    //        /**
-    //         * Holds the inverse of the body's inertia tensor. The
-    //         * inertia tensor provided must not be degenerate
-    //         * (that would mean the body had zero inertia for
-    //         * spinning along one axis). As long as the tensor is
-    //         * finite, it will be invertible. The inverse tensor
-    //         * is used for similar reasons to the use of inverse
-    //         * mass.
-    //         *
-    //         * The inertia tensor, unlike the other variables that
-    //         * define a rigid body, is given in body space.
-    //         *
-    //         * @see inverseMass
-    //         */
-    //        Matrix3 inverseInertiaTensor;
-    //
-    //        /**
-    //         * Holds the amount of damping applied to linear
-    //         * motion.  Damping is required to remove energy added
-    //         * through numerical instability in the integrator.
-    //         */
-    //        float linearDamping;
-    //
-    //        /**
-    //         * Holds the amount of damping applied to angular
-    //         * motion.  Damping is required to remove energy added
-    //         * through numerical instability in the integrator.
-    //         */
-    //        float angularDamping;
 
-            (**
-             * Holds the linear position of the rigid body in
-             * world space.
-             *)
+    (**
+     * Holds the inverse of the body's inertia tensor. The
+     * inertia tensor provided must not be degenerate
+     * (that would mean the body had zero inertia for
+     * spinning along one axis). As long as the tensor is
+     * finite, it will be invertible. The inverse tensor
+     * is used for similar reasons to the use of inverse
+     * mass.
+     *
+     * The inertia tensor, unlike the other variables that
+     * define a rigid body, is given in body space.
+     *
+     * @see inverseMass
+     *)
+    inverseInertiaTensor: Matrix3;
+
+    (**
+     * Holds the amount of damping applied to linear
+     * motion.  Damping is required to remove energy added
+     * through numerical instability in the integrator.
+     *)
+    linearDamping: float;
+
+    (**
+     * Holds the amount of damping applied to angular
+     * motion.  Damping is required to remove energy added
+     * through numerical instability in the integrator.
+     *)
+    angularDamping: float;
+
+    (**
+     * Holds the linear position of the rigid body in
+     * world space.
+     *)
     position: Vector3;
 
     (**
@@ -149,8 +149,8 @@ Type
     rotation: Vector3;
 
     //        /*@}*/
-    //
-    //
+
+
     //        /**
     //         * @name Derived Data
     //         *
@@ -181,22 +181,22 @@ Type
      *)
     isAwake: boolean;
 
-    //        /**
-    //         * Some bodies may never be allowed to fall asleep.
-    //         * User controlled bodies, for example, should be
-    //         * always awake.
-    //         */
-    //        bool canSleep;
-    //
-            (**
-             * Holds a transform matrix for converting body space into
-             * world space and vice versa. This can be achieved by calling
-             * the getPointIn*Space functions.
-             *
-             * @see getPointInLocalSpace
-             * @see getPointInWorldSpace
-             * @see getTransform
-             *)
+    (**
+     * Some bodies may never be allowed to fall asleep.
+     * User controlled bodies, for example, should be
+     * always awake.
+     *)
+    canSleep: Boolean;
+
+    (**
+     * Holds a transform matrix for converting body space into
+     * world space and vice versa. This can be achieved by calling
+     * the getPointIn*Space functions.
+     *
+     * @see getPointInLocalSpace
+     * @see getPointInWorldSpace
+     * @see getTransform
+     *)
     transformMatrix: Matrix4;
     //
     //        /*@}*/
@@ -213,26 +213,26 @@ Type
     //         * are calculated and stored to be applied to the rigid body.
     //         */
     //        /*@{*/
-    //
-    //        /**
-    //         * Holds the accumulated force to be applied at the next
-    //         * integration step.
-    //         */
-    //        Vector3 forceAccum;
-    //
-    //        /**
-    //         * Holds the accumulated torque to be applied at the next
-    //         * integration step.
-    //         */
-    //        Vector3 torqueAccum;
-    //
-    //       /**
-    //         * Holds the acceleration of the rigid body.  This value
-    //         * can be used to set acceleration due to gravity (its primary
-    //         * use), or any other constant acceleration.
-    //         */
-    //        Vector3 acceleration;
-    //
+
+            (**
+             * Holds the accumulated force to be applied at the next
+             * integration step.
+             *)
+    forceAccum: Vector3;
+
+    (**
+     * Holds the accumulated torque to be applied at the next
+     * integration step.
+     *)
+    torqueAccum: Vector3;
+
+    (**
+      * Holds the acceleration of the rigid body.  This value
+      * can be used to set acceleration due to gravity (its primary
+      * use), or any other constant acceleration.
+      *)
+    acceleration: Vector3;
+
     //        /**
     //         * Holds the linear acceleration of the rigid body, for the
     //         * previous frame.
@@ -302,212 +302,212 @@ Type
 //         */
 //        /*@{*/
 //
-//        /**
-//         * Sets the mass of the rigid body.
-//         *
-//         * @param mass The new mass of the body. This may not be zero.
-//         * Small masses can produce unstable rigid bodies under
-//         * simulation.
-//         *
-//         * @warning This invalidates internal data for the rigid body.
-//         * Either an integration function, or the calculateInternals
-//         * function should be called before trying to get any settings
-//         * from the rigid body.
-//         */
-//        void setMass(const real mass);
-//
-//        /**
-//         * Gets the mass of the rigid body.
-//         *
-//         * @return The current mass of the rigid body.
-//         */
-//        real getMass() const;
-//
-//        /**
-//         * Sets the inverse mass of the rigid body.
-//         *
-//         * @param inverseMass The new inverse mass of the body. This
-//         * may be zero, for a body with infinite mass
-//         * (i.e. unmovable).
-//         *
-//         * @warning This invalidates internal data for the rigid body.
-//         * Either an integration function, or the calculateInternals
-//         * function should be called before trying to get any settings
-//         * from the rigid body.
-//         */
-//        void setInverseMass(const real inverseMass);
-//
-//        /**
-//         * Gets the inverse mass of the rigid body.
-//         *
-//         * @return The current inverse mass of the rigid body.
-//         */
-//        real getInverseMass() const;
-//
-//        /**
-//         * Returns true if the mass of the body is not-infinite.
-//         */
-//        bool hasFiniteMass() const;
-//
-//        /**
-//         * Sets the intertia tensor for the rigid body.
-//         *
-//         * @param inertiaTensor The inertia tensor for the rigid
-//         * body. This must be a full rank matrix and must be
-//         * invertible.
-//         *
-//         * @warning This invalidates internal data for the rigid body.
-//         * Either an integration function, or the calculateInternals
-//         * function should be called before trying to get any settings
-//         * from the rigid body.
-//         */
-//        void setInertiaTensor(const Matrix3 &inertiaTensor);
-//
-//        /**
-//         * Copies the current inertia tensor of the rigid body into
-//         * the given matrix.
-//         *
-//         * @param inertiaTensor A pointer to a matrix to hold the
-//         * current inertia tensor of the rigid body. The inertia
-//         * tensor is expressed in the rigid body's local space.
-//         */
-//        void getInertiaTensor(Matrix3 *inertiaTensor) const;
-//
-//        /**
-//         * Gets a copy of the current inertia tensor of the rigid body.
-//         *
-//         * @return A new matrix containing the current intertia
-//         * tensor. The inertia tensor is expressed in the rigid body's
-//         * local space.
-//         */
-//        Matrix3 getInertiaTensor() const;
-//
-//        /**
-//         * Copies the current inertia tensor of the rigid body into
-//         * the given matrix.
-//         *
-//         * @param inertiaTensor A pointer to a matrix to hold the
-//         * current inertia tensor of the rigid body. The inertia
-//         * tensor is expressed in world space.
-//         */
-//        void getInertiaTensorWorld(Matrix3 *inertiaTensor) const;
-//
-//        /**
-//         * Gets a copy of the current inertia tensor of the rigid body.
-//         *
-//         * @return A new matrix containing the current intertia
-//         * tensor. The inertia tensor is expressed in world space.
-//         */
-//        Matrix3 getInertiaTensorWorld() const;
-//
-//        /**
-//         * Sets the inverse intertia tensor for the rigid body.
-//         *
-//         * @param inverseInertiaTensor The inverse inertia tensor for
-//         * the rigid body. This must be a full rank matrix and must be
-//         * invertible.
-//         *
-//         * @warning This invalidates internal data for the rigid body.
-//         * Either an integration function, or the calculateInternals
-//         * function should be called before trying to get any settings
-//         * from the rigid body.
-//         */
-//        void setInverseInertiaTensor(const Matrix3 &inverseInertiaTensor);
-//
-//        /**
-//         * Copies the current inverse inertia tensor of the rigid body
-//         * into the given matrix.
-//         *
-//         * @param inverseInertiaTensor A pointer to a matrix to hold
-//         * the current inverse inertia tensor of the rigid body. The
-//         * inertia tensor is expressed in the rigid body's local
-//         * space.
-//         */
-//        void getInverseInertiaTensor(Matrix3 *inverseInertiaTensor) const;
-//
-//        /**
-//         * Gets a copy of the current inverse inertia tensor of the
-//         * rigid body.
-//         *
-//         * @return A new matrix containing the current inverse
-//         * intertia tensor. The inertia tensor is expressed in the
-//         * rigid body's local space.
-//         */
-//        Matrix3 getInverseInertiaTensor() const;
-//
-//        /**
-//         * Copies the current inverse inertia tensor of the rigid body
-//         * into the given matrix.
-//         *
-//         * @param inverseInertiaTensor A pointer to a matrix to hold
-//         * the current inverse inertia tensor of the rigid body. The
-//         * inertia tensor is expressed in world space.
-//         */
-//        void getInverseInertiaTensorWorld(Matrix3 *inverseInertiaTensor) const;
-//
-//        /**
-//         * Gets a copy of the current inverse inertia tensor of the
-//         * rigid body.
-//         *
-//         * @return A new matrix containing the current inverse
-//         * intertia tensor. The inertia tensor is expressed in world
-//         * space.
-//         */
-//        Matrix3 getInverseInertiaTensorWorld() const;
-//
-//        /**
-//         * Sets both linear and angular damping in one function call.
-//         *
-//         * @param linearDamping The speed that velocity is shed from
-//         * the rigid body.
-//         *
-//         * @param angularDamping The speed that rotation is shed from
-//         * the rigid body.
-//         *
-//         * @see setLinearDamping
-//         * @see setAngularDamping
-//         */
-//        void setDamping(const real linearDamping, const real angularDamping);
-//
-//        /**
-//         * Sets the linear damping for the rigid body.
-//         *
-//         * @param linearDamping The speed that velocity is shed from
-//         * the rigid body.
-//         *
-//         * @see setAngularDamping
-//         */
-//        void setLinearDamping(const real linearDamping);
-//
-//        /**
-//         * Gets the current linear damping value.
-//         *
-//         * @return The current linear damping value.
-//         */
-//        real getLinearDamping() const;
-//
-//        /**
-//         * Sets the angular damping for the rigid body.
-//         *
-//         * @param angularDamping The speed that rotation is shed from
-//         * the rigid body.
-//         *
-//         * @see setLinearDamping
-//         */
-//        void setAngularDamping(const real angularDamping);
-//
-//        /**
-//         * Gets the current angular damping value.
-//         *
-//         * @return The current angular damping value.
-//         */
-//        real getAngularDamping() const;
+        (**
+         * Sets the mass of the rigid body.
+         *
+         * @param mass The new mass of the body. This may not be zero.
+         * Small masses can produce unstable rigid bodies under
+         * simulation.
+         *
+         * @warning This invalidates internal data for the rigid body.
+         * Either an integration function, or the calculateInternals
+         * function should be called before trying to get any settings
+         * from the rigid body.
+         *)
+    Procedure setMass(Const mass: float);
+
+    //        /**
+    //         * Gets the mass of the rigid body.
+    //         *
+    //         * @return The current mass of the rigid body.
+    //         */
+    //        real getMass() const;
+    //
+    //        /**
+    //         * Sets the inverse mass of the rigid body.
+    //         *
+    //         * @param inverseMass The new inverse mass of the body. This
+    //         * may be zero, for a body with infinite mass
+    //         * (i.e. unmovable).
+    //         *
+    //         * @warning This invalidates internal data for the rigid body.
+    //         * Either an integration function, or the calculateInternals
+    //         * function should be called before trying to get any settings
+    //         * from the rigid body.
+    //         */
+    //        void setInverseMass(const real inverseMass);
+    //
+    //        /**
+    //         * Gets the inverse mass of the rigid body.
+    //         *
+    //         * @return The current inverse mass of the rigid body.
+    //         */
+    //        real getInverseMass() const;
+    //
+    //        /**
+    //         * Returns true if the mass of the body is not-infinite.
+    //         */
+    //        bool hasFiniteMass() const;
+    //
+            (**
+             * Sets the intertia tensor for the rigid body.
+             *
+             * @param inertiaTensor The inertia tensor for the rigid
+             * body. This must be a full rank matrix and must be
+             * invertible.
+             *
+             * @warning This invalidates internal data for the rigid body.
+             * Either an integration function, or the calculateInternals
+             * function should be called before trying to get any settings
+             * from the rigid body.
+             *)
+    Procedure setInertiaTensor(Const inertiaTensor: Matrix3);
+
+    //        /**
+    //         * Copies the current inertia tensor of the rigid body into
+    //         * the given matrix.
+    //         *
+    //         * @param inertiaTensor A pointer to a matrix to hold the
+    //         * current inertia tensor of the rigid body. The inertia
+    //         * tensor is expressed in the rigid body's local space.
+    //         */
+    //        void getInertiaTensor(Matrix3 *inertiaTensor) const;
+    //
+    //        /**
+    //         * Gets a copy of the current inertia tensor of the rigid body.
+    //         *
+    //         * @return A new matrix containing the current intertia
+    //         * tensor. The inertia tensor is expressed in the rigid body's
+    //         * local space.
+    //         */
+    //        Matrix3 getInertiaTensor() const;
+    //
+    //        /**
+    //         * Copies the current inertia tensor of the rigid body into
+    //         * the given matrix.
+    //         *
+    //         * @param inertiaTensor A pointer to a matrix to hold the
+    //         * current inertia tensor of the rigid body. The inertia
+    //         * tensor is expressed in world space.
+    //         */
+    //        void getInertiaTensorWorld(Matrix3 *inertiaTensor) const;
+    //
+    //        /**
+    //         * Gets a copy of the current inertia tensor of the rigid body.
+    //         *
+    //         * @return A new matrix containing the current intertia
+    //         * tensor. The inertia tensor is expressed in world space.
+    //         */
+    //        Matrix3 getInertiaTensorWorld() const;
+    //
+    //        /**
+    //         * Sets the inverse intertia tensor for the rigid body.
+    //         *
+    //         * @param inverseInertiaTensor The inverse inertia tensor for
+    //         * the rigid body. This must be a full rank matrix and must be
+    //         * invertible.
+    //         *
+    //         * @warning This invalidates internal data for the rigid body.
+    //         * Either an integration function, or the calculateInternals
+    //         * function should be called before trying to get any settings
+    //         * from the rigid body.
+    //         */
+    //        void setInverseInertiaTensor(const Matrix3 &inverseInertiaTensor);
+    //
+    //        /**
+    //         * Copies the current inverse inertia tensor of the rigid body
+    //         * into the given matrix.
+    //         *
+    //         * @param inverseInertiaTensor A pointer to a matrix to hold
+    //         * the current inverse inertia tensor of the rigid body. The
+    //         * inertia tensor is expressed in the rigid body's local
+    //         * space.
+    //         */
+    //        void getInverseInertiaTensor(Matrix3 *inverseInertiaTensor) const;
+    //
+    //        /**
+    //         * Gets a copy of the current inverse inertia tensor of the
+    //         * rigid body.
+    //         *
+    //         * @return A new matrix containing the current inverse
+    //         * intertia tensor. The inertia tensor is expressed in the
+    //         * rigid body's local space.
+    //         */
+    //        Matrix3 getInverseInertiaTensor() const;
+    //
+    //        /**
+    //         * Copies the current inverse inertia tensor of the rigid body
+    //         * into the given matrix.
+    //         *
+    //         * @param inverseInertiaTensor A pointer to a matrix to hold
+    //         * the current inverse inertia tensor of the rigid body. The
+    //         * inertia tensor is expressed in world space.
+    //         */
+    //        void getInverseInertiaTensorWorld(Matrix3 *inverseInertiaTensor) const;
+    //
+    //        /**
+    //         * Gets a copy of the current inverse inertia tensor of the
+    //         * rigid body.
+    //         *
+    //         * @return A new matrix containing the current inverse
+    //         * intertia tensor. The inertia tensor is expressed in world
+    //         * space.
+    //         */
+    //        Matrix3 getInverseInertiaTensorWorld() const;
+    //
+            (**
+             * Sets both linear and angular damping in one function call.
+             *
+             * @param linearDamping The speed that velocity is shed from
+             * the rigid body.
+             *
+             * @param angularDamping The speed that rotation is shed from
+             * the rigid body.
+             *
+             * @see setLinearDamping
+             * @see setAngularDamping
+             *)
+    Procedure setDamping(Const alinearDamping: Float; Const aangularDamping: Float);
 
     (**
-     * Sets the position of the rigid body.
+     * Sets the linear damping for the rigid body.
      *
-     * @param position The new position of the rigid body.
+     * @param linearDamping The speed that velocity is shed from
+     * the rigid body.
+     *
+     * @see setAngularDamping
      *)
+    Procedure setLinearDamping(Const alinearDamping: float);
+
+    //        /**
+    //         * Gets the current linear damping value.
+    //         *
+    //         * @return The current linear damping value.
+    //         */
+    //        real getLinearDamping() const;
+    //
+            (**
+             * Sets the angular damping for the rigid body.
+             *
+             * @param angularDamping The speed that rotation is shed from
+             * the rigid body.
+             *
+             * @see setLinearDamping
+             *)
+    Procedure setAngularDamping(Const aangularDamping: Float);
+    //
+    //        /**
+    //         * Gets the current angular damping value.
+    //         *
+    //         * @return The current angular damping value.
+    //         */
+    //        real getAngularDamping() const;
+
+        (**
+         * Sets the position of the rigid body.
+         *
+         * @param position The new position of the rigid body.
+         *)
     Procedure setPosition(Const aposition: Vector3);
 
     //        /**
@@ -539,18 +539,18 @@ Type
     //         */
     //        Vector3 getPosition() const;
     //
-    //        /**
-    //         * Sets the orientation of the rigid body.
-    //         *
-    //         * @param orientation The new orientation of the rigid body.
-    //         *
-    //         * @note The given orientation does not need to be normalised,
-    //         * and can be zero. This function automatically constructs a
-    //         * valid rotation quaternion with (0,0,0,0) mapping to
-    //         * (1,0,0,0).
-    //         */
-    //        void setOrientation(const Quaternion &orientation);
-    //
+            (**
+             * Sets the orientation of the rigid body.
+             *
+             * @param orientation The new orientation of the rigid body.
+             *
+             * @note The given orientation does not need to be normalised,
+             * and can be zero. This function automatically constructs a
+             * valid rotation quaternion with (0,0,0,0) mapping to
+             * (1,0,0,0).
+             *)
+    Procedure setOrientation(Const aorientation: Quaternion);
+
     //        /**
     //         * Sets the orientation of the rigid body by component.
     //         *
@@ -707,15 +707,15 @@ Type
     //         * @return The converted direction, in world space.
     //         */
     //        Vector3 getDirectionInWorldSpace(const Vector3 &direction) const;
-    //
-    //        /**
-    //         * Sets the velocity of the rigid body.
-    //         *
-    //         * @param velocity The new velocity of the rigid body. The
-    //         * velocity is given in world space.
-    //         */
-    //        void setVelocity(const Vector3 &velocity);
-    //
+
+            (**
+             * Sets the velocity of the rigid body.
+             *
+             * @param velocity The new velocity of the rigid body. The
+             * velocity is given in world space.
+             *)
+    Procedure setVelocity(Const avelocity: Vector3);
+
     //        /**
     //         * Sets the velocity of the rigid body by component. The
     //         * velocity is given in world space.
@@ -751,15 +751,15 @@ Type
     //         * Applies the given change in velocity.
     //         */
     //        void addVelocity(const Vector3 &deltaVelocity);
-    //
-    //        /**
-    //         * Sets the rotation of the rigid body.
-    //         *
-    //         * @param rotation The new rotation of the rigid body. The
-    //         * rotation is given in world space.
-    //         */
-    //        void setRotation(const Vector3 &rotation);
-    //
+
+            (**
+             * Sets the rotation of the rigid body.
+             *
+             * @param rotation The new rotation of the rigid body. The
+             * rotation is given in world space.
+             *)
+    Procedure setRotation(Const arotation: Vector3);
+
     //        /**
     //         * Sets the rotation of the rigid body by component. The
     //         * rotation is given in world space.
@@ -822,17 +822,17 @@ Type
     //        {
     //            return canSleep;
     //        }
-    //
-    //        /**
-    //         * Sets whether the body is ever allowed to go to sleep. Bodies
-    //         * under the player's control, or for which the set of
-    //         * transient forces applied each frame are not predictable,
-    //         * should be kept awake.
-    //         *
-    //         * @param canSleep Whether the body can now be put to sleep.
-    //         */
-    //        void setCanSleep(const bool canSleep=true);
-    //
+
+            (**
+             * Sets whether the body is ever allowed to go to sleep. Bodies
+             * under the player's control, or for which the set of
+             * transient forces applied each frame are not predictable,
+             * should be kept awake.
+             *
+             * @param canSleep Whether the body can now be put to sleep.
+             *)
+    Procedure setCanSleep(Const acanSleep: boolean);
+
     //        /*@}*/
     //
     //
@@ -882,13 +882,13 @@ Type
     //         * rigid body.
     //         */
     //        /*@{*/
-    //
-    //        /**
-    //         * Clears the forces and torques in the accumulators. This will
-    //         * be called automatically after each intergration step.
-    //         */
-    //        void clearAccumulators();
-    //
+
+            (**
+             * Clears the forces and torques in the accumulators. This will
+             * be called automatically after each intergration step.
+             *)
+    Procedure clearAccumulators();
+
     //        /**
     //         * Adds the given force to centre of mass of the rigid body.
     //         * The force is expressed in world-coordinates.
@@ -933,13 +933,13 @@ Type
     //         */
     //        void addTorque(const Vector3 &torque);
     //
-    //        /**
-    //         * Sets the constant acceleration of the rigid body.
-    //         *
-    //         * @param acceleration The new acceleration of the rigid body.
-    //         */
-    //        void setAcceleration(const Vector3 &acceleration);
-    //
+            (**
+             * Sets the constant acceleration of the rigid body.
+             *
+             * @param acceleration The new acceleration of the rigid body.
+             *)
+    Procedure setAcceleration(Const aacceleration: Vector3);
+
     //        /**
     //         * Sets the constant acceleration of the rigid body by component.
     //         *
@@ -978,19 +978,20 @@ Type
 
 Implementation
 
-///**
-// * Internal function that checks the validity of an inverse inertia tensor.
-// */
-//static inline void _checkInverseInertiaTensor(const Matrix3 &iitWorld)
-//{
-//    // TODO: Perform a validity check in an assert.
-//}
-//
-///**
-// * Internal function to do an intertia tensor transform by a quaternion.
-// * Note that the implementation of this function was created by an
-// * automated code-generator and optimizer.
-// */
+(**
+ * Internal function that checks the validity of an inverse inertia tensor.
+ *)
+
+Procedure _checkInverseInertiaTensor(Const iitWorld: Matrix3);
+Begin
+  // TODO: Perform a validity check in an assert.
+End;
+
+(**
+ * Internal function to do an intertia tensor transform by a quaternion.
+ * Note that the implementation of this function was created by an
+ * automated code-generator and optimizer.
+ *)
 //static inline void _transformInertiaTensor(Matrix3 &iitWorld,
 //                                           const Quaternion &q,
 //                                           const Matrix3 &iitBody,
@@ -1097,6 +1098,7 @@ Begin
   orientation.Create();
   velocity.create();
   rotation.create();
+  inverseInertiaTensor.create();
   motion := 0;
 End;
 
@@ -1165,9 +1167,44 @@ Begin
   //    }
 End;
 
+Procedure RigidBody.setMass(Const mass: float);
+Begin
+  assert(mass <> 0);
+  inverseMass := (1.0) / mass;
+End;
+
+Procedure RigidBody.setInertiaTensor(Const inertiaTensor: Matrix3);
+Begin
+  inverseInertiaTensor.setInverse(inertiaTensor);
+  _checkInverseInertiaTensor(inverseInertiaTensor);
+End;
+
+Procedure RigidBody.setDamping(Const alinearDamping: Float;
+  Const aangularDamping: Float);
+Begin
+  linearDamping := alinearDamping;
+  angularDamping := aangularDamping;
+End;
+
+Procedure RigidBody.setLinearDamping(Const alinearDamping: float);
+Begin
+  linearDamping := alinearDamping;
+End;
+
+Procedure RigidBody.setAngularDamping(Const aangularDamping: Float);
+Begin
+  angularDamping := aangularDamping;
+End;
+
 Procedure RigidBody.setPosition(Const aposition: Vector3);
 Begin
   position := aposition;
+End;
+
+Procedure RigidBody.setOrientation(Const aorientation: Quaternion);
+Begin
+  orientation := aorientation;
+  orientation.normalise();
 End;
 
 Procedure RigidBody.getTransform(Out transform: Matrix4);
@@ -1211,6 +1248,16 @@ Begin
   result := transformMatrix.transform(point^);
 End;
 
+Procedure RigidBody.setVelocity(Const avelocity: Vector3);
+Begin
+  velocity := avelocity;
+End;
+
+Procedure RigidBody.setRotation(Const arotation: Vector3);
+Begin
+  rotation := arotation;
+End;
+
 Function RigidBody.getAwake: boolean;
 Begin
   result := isAwake;
@@ -1229,6 +1276,23 @@ Begin
     velocity.clear();
     rotation.clear();
   End;
+End;
+
+Procedure RigidBody.setCanSleep(Const acanSleep: boolean);
+Begin
+  canSleep := acanSleep;
+  If (Not canSleep) And (Not isAwake) Then setAwake();
+End;
+
+Procedure RigidBody.clearAccumulators;
+Begin
+  forceAccum.clear();
+  torqueAccum.clear();
+End;
+
+Procedure RigidBody.setAcceleration(Const aacceleration: Vector3);
+Begin
+  acceleration := aacceleration;
 End;
 
 End.
