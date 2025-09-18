@@ -97,30 +97,29 @@ Type
   //         */
   //        real radius;
   //    };
-  //
-  //    /**
-  //     * The plane is not a primitive: it doesn't represent another
-  //     * rigid body. It is used for contacts with the immovable
-  //     * world geometry.
-  //     */
-  //    class CollisionPlane
-  //    {
-  //    public:
-  //        /**
-  //         * The plane normal
-  //         */
-  //        Vector3 direction;
-  //
-  //        /**
-  //         * The distance of the plane from the origin.
-  //         */
-  //        real offset;
-  //    };
-  //
-(**
-       * Represents a rigid body that can be treated as an aligned bounding
-       * box for collision detection.
+
+      (**
+       * The plane is not a primitive: it doesn't represent another
+       * rigid body. It is used for contacts with the immovable
+       * world geometry.
        *)
+  CollisionPlane = Class
+  public
+    (**
+     * The plane normal
+     *)
+    direction: Vector3;
+
+    (**
+     * The distance of the plane from the origin.
+     *)
+    offset: float;
+  End;
+
+  (**
+   * Represents a rigid body that can be treated as an aligned bounding
+   * box for collision detection.
+   *)
 
   CollisionBox = Class(CollisionPrimitive)
   public
@@ -184,6 +183,9 @@ Type
    * A helper structure that contains information for the detector to use
    * in building its contact data.
    *)
+
+  { CollisionData }
+
   CollisionData = Object
     (**
      * Holds the base of the collision data: the first contact
@@ -192,124 +194,122 @@ Type
      * this pointer points to the first contact found.
      *)
     contactArray: pContact;
-    //
-    //           /** Holds the contact array to write into. */
-    //           Contact *contacts;
-    //
-    //           /** Holds the maximum number of contacts the array can take. */
-    //           int contactsLeft;
 
-(** Holds the number of contacts found so far. *)
+    (** Holds the contact array to write into. *)
+    contacts: PContact;
+
+    (** Holds the maximum number of contacts the array can take. *)
+    contactsLeft: Integer;
+
+    (** Holds the number of contacts found so far. *)
     contactCount: unsigned;
-    //
-    //           /** Holds the friction value to write into any collisions. */
-    //           real friction;
-    //
-    //           /** Holds the restitution value to write into any collisions. */
-    //           real restitution;
-    //
-    //           /**
-    //            * Holds the collision tolerance, even uncolliding objects this
-    //            * close should have collisions generated.
-    //            */
-    //           real tolerance;
-    //
-    //           /**
-    //            * Checks if there are more contacts available in the contact
-    //            * data.
-    //            */
-    //           bool hasMoreContacts()
-    //           {
-    //               return contactsLeft > 0;
-    //           }
-    //
-    //           /**
-    //            * Resets the data so that it has no used contacts recorded.
-    //            */
-    //           void reset(unsigned maxContacts)
-    //           {
-    //               contactsLeft = maxContacts;
-    //               contactCount = 0;
-    //               contacts = contactArray;
-    //           }
-    //
-    //           /**
-    //            * Notifies the data that the given number of contacts have
-    //            * been added.
-    //            */
-    //           void addContacts(unsigned count)
-    //           {
-    //               // Reduce the number of contacts remaining, add number used
-    //               contactsLeft -= count;
-    //               contactCount += count;
-    //
-    //               // Move the array forward
-    //               contacts += count;
-    //           }
+
+    (** Holds the friction value to write into any collisions. *)
+    friction: float;
+
+    (** Holds the restitution value to write into any collisions. *)
+    restitution: float;
+
+    (**
+     * Holds the collision tolerance, even uncolliding objects this
+     * close should have collisions generated.
+     *)
+    tolerance: float;
+
+    (**
+     * Checks if there are more contacts available in the contact
+     * data.
+     *)
+    Function hasMoreContacts(): Boolean;
+
+    (**
+     * Resets the data so that it has no used contacts recorded.
+     *)
+    Procedure reset(maxContacts: unsigned);
+
+    (**
+     * Notifies the data that the given number of contacts have
+     * been added.
+     *)
+    Procedure addContacts(count: unsigned);
   End;
 
-  //   /**
-  //     * A wrapper class that holds the fine grained collision detection
-  //     * routines.
-  //     *
-  //     * Each of the functions has the same format: it takes the details
-  //     * of two objects, and a pointer to a contact array to fill. It
-  //     * returns the number of contacts it wrote into the array.
-  //     */
-  //    class CollisionDetector
-  //    {
-  //    public:
-  //
-  //        static unsigned sphereAndHalfSpace(
-  //            const CollisionSphere &sphere,
-  //            const CollisionPlane &plane,
-  //            CollisionData *data
-  //            );
-  //
-  //        static unsigned sphereAndTruePlane(
-  //            const CollisionSphere &sphere,
-  //            const CollisionPlane &plane,
-  //            CollisionData *data
-  //            );
-  //
-  //        static unsigned sphereAndSphere(
-  //            const CollisionSphere &one,
-  //            const CollisionSphere &two,
-  //            CollisionData *data
-  //            );
-  //
-  //        /**
-  //         * Does a collision test on a collision box and a plane representing
-  //         * a half-space (i.e. the normal of the plane
-  //         * points out of the half-space).
-  //         */
-  //        static unsigned boxAndHalfSpace(
-  //            const CollisionBox &box,
-  //            const CollisionPlane &plane,
-  //            CollisionData *data
-  //            );
-  //
-  //        static unsigned boxAndBox(
-  //            const CollisionBox &one,
-  //            const CollisionBox &two,
-  //            CollisionData *data
-  //            );
-  //
-  //        static unsigned boxAndPoint(
-  //            const CollisionBox &box,
-  //            const Vector3 &point,
-  //            CollisionData *data
-  //            );
-  //
-  //        static unsigned boxAndSphere(
-  //            const CollisionBox &box,
-  //            const CollisionSphere &sphere,
-  //            CollisionData *data
-  //            );
-  //    };
+  (**
+    * A wrapper class that holds the fine grained collision detection
+    * routines.
+    *
+    * Each of the functions has the same format: it takes the details
+    * of two objects, and a pointer to a contact array to fill. It
+    * returns the number of contacts it wrote into the array.
+    *)
+
+  { CollisionDetector }
+
+  CollisionDetector = Class
+  public
+    //
+    //        static unsigned sphereAndHalfSpace(
+    //            const CollisionSphere &sphere,
+    //            const CollisionPlane &plane,
+    //            CollisionData *data
+    //            );
+    //
+    //        static unsigned sphereAndTruePlane(
+    //            const CollisionSphere &sphere,
+    //            const CollisionPlane &plane,
+    //            CollisionData *data
+    //            );
+
+    Class Function sphereAndSphere(
+      Const one: CollisionSphere;
+      Const two: CollisionSphere;
+      Var data: CollisionData
+      ): unsigned;
+
+    (**
+     * Does a collision test on a collision box and a plane representing
+     * a half-space (i.e. the normal of the plane
+     * points out of the half-space).
+     *)
+    Class Function boxAndHalfSpace(
+      Const box: CollisionBox;
+      Const plane: CollisionPlane;
+      Var data: CollisionData
+      ): unsigned;
+
+    //        static unsigned boxAndBox(
+    //            const CollisionBox &one,
+    //            const CollisionBox &two,
+    //            CollisionData *data
+    //            );
+    //
+    //        static unsigned boxAndPoint(
+    //            const CollisionBox &box,
+    //            const Vector3 &point,
+    //            CollisionData *data
+    //            );
+    //
+    //        static unsigned boxAndSphere(
+    //            const CollisionBox &box,
+    //            const CollisionSphere &sphere,
+    //            CollisionData *data
+    //            );
+  End;
 
 
 Implementation
+
+Function transformToAxis(
+  Const box: CollisionBox;
+  Const axis: Vector3): Float;
+Begin
+  result :=
+    box.halfSize.x * real_abs(axis * box.getAxis(0)) +
+    box.halfSize.y * real_abs(axis * box.getAxis(1)) +
+    box.halfSize.z * real_abs(axis * box.getAxis(2));
+End;
+
+
 
 { CollisionPrimitive }
 
@@ -338,6 +338,86 @@ End;
 Function CollisionPrimitive.getTransform: PMatrix4;
 Begin
   result := @transform;
+End;
+
+Function CollisionData.hasMoreContacts: Boolean;
+Begin
+  result := contactsLeft > 0;
+End;
+
+Procedure CollisionData.reset(maxContacts: unsigned);
+Begin
+  contactsLeft := maxContacts;
+  contactCount := 0;
+  contacts := contactArray;
+End;
+
+Procedure CollisionData.addContacts(count: unsigned);
+Begin
+  // Reduce the number of contacts remaining, add number used
+  contactsLeft := contactsLeft - count;
+  contactCount := contactCount + count;
+
+  // Move the array forward
+  inc(contacts, count);
+End;
+
+{ CollisionDetector }
+
+Class Function CollisionDetector.sphereAndSphere(Const one: CollisionSphere;
+  Const two: CollisionSphere; Var data: CollisionData): unsigned;
+Var
+  normal, positionOne, positionTwo, midline: Vector3;
+  size_: float;
+  contact: pContact;
+Begin
+  result := 0;
+  // Make sure we have contacts
+  If (data.contactsLeft <= 0) Then exit;
+
+  // Cache the sphere positions
+  positionOne := one.getAxis(3);
+  positionTwo := two.getAxis(3);
+
+  // Find the vector between the objects
+  midline := positionOne - positionTwo;
+  size_ := midline.magnitude();
+
+  // See if it is large enough.
+  If (size_ <= 0.0) Or (size_ >= one.radius + two.radius) Then exit;
+
+  // We manually create the normal, because we have the
+  // size to hand.
+  normal := midline * (1.0 / size_);
+
+  contact := data.contacts;
+  contact^.contactNormal := normal;
+  contact^.contactPoint := positionOne + midline * 0.5;
+  contact^.penetration := (one.radius + two.radius - size_);
+  contact^.setBodyData(@one.body, @two.body,
+    data.friction, data.restitution);
+
+  data.addContacts(1);
+  result := 1;
+End;
+
+Class Function CollisionDetector.boxAndHalfSpace(Const box: CollisionBox;
+  Const plane: CollisionPlane; Var data: CollisionData): unsigned;
+Var
+  projectedRadius: Float;
+  boxDistance: Float;
+Begin
+  // Work out the projected radius of the box onto the plane direction
+  projectedRadius := transformToAxis(box, plane.direction);
+
+  // Work out how far the box is from the origin
+  boxDistance :=
+    plane.direction *
+    box.getAxis(3) -
+    projectedRadius;
+
+  // Check for the intersection
+  result := ord(boxDistance <= plane.offset);
 End;
 
 End.

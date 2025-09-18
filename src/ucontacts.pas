@@ -49,6 +49,9 @@ Type
    * details. To resolve a set of contacts, use the contact resolver
    * class.
    *)
+
+  { Contact }
+
   Contact = Class
     // ... Other data as before ...
 
@@ -92,13 +95,13 @@ Type
      *)
     penetration: float;
 
-    //        /**
-    //         * Sets the data that doesn't normally depend on the position
-    //         * of the contact (i.e. the bodies, and their material properties).
-    //         */
-    //        void setBodyData(RigidBody* one, RigidBody *two,
-    //                         real friction, real restitution);
-    //
+    (**
+     * Sets the data that doesn't normally depend on the position
+     * of the contact (i.e. the bodies, and their material properties).
+     *)
+    Procedure setBodyData(one, two: PRigidBody;
+      afriction, arestitution: Float);
+
   protected
     //
     //        /**
@@ -448,6 +451,12 @@ Procedure ContactResolver.resolveContacts(contactArray: PContact;
 Begin
 
 End;
+
+procedure Contact.setBodyData(one, two: PRigidBody; afriction,
+  arestitution: Float);
+begin
+
+end;
 
 End.
 

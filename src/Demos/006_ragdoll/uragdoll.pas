@@ -43,10 +43,8 @@ Type
     (** Draws the bone. *)
     Procedure render();
 
-
     (** Sets the bone to a specific location. *)
     Procedure setState(Const position, extents: Vector3);
-
   End;
 
   { RagdollDemo }
@@ -55,17 +53,16 @@ Type
   private
   protected
 
-
     (** Holds the bone bodies. *)
     bones: Array[0..NUM_BONES - 1] Of Bone;
 
     //    /** Holds the joints. */
     joints: Array[0..NUM_JOINTS - 1] Of Joint;
 
-    //    /** Processes the contact generation code. */
-    //    virtual void generateContacts();
-    //
-    //    /** Processes the objects in the simulation forward in time. */
+    (** Processes the contact generation code. *)
+    Procedure generateContacts(); override;
+
+    (** Processes the objects in the simulation forward in time. *)
     Procedure updateObjects(duration: real); override;
     //
     (** Resets the position of all the bones. *)
@@ -165,6 +162,66 @@ Begin
 End;
 
 { RagdollDemo }
+
+Procedure RagdollDemo.generateContacts();
+Var
+  plane: CollisionPlane;
+  transform, otherTransform: Matrix4;
+  position, otherPosition: Vector3;
+  bone_, other: Bone;
+  i, j: integer;
+  boneSphere, otherSphere: CollisionSphere;
+Begin
+  // Create the ground plane data
+  plane := CollisionPlane.Create;
+  plane.direction := V3(0, 1, 0);
+  plane.offset := 0;
+
+  // Set up the collision data structure
+  cData.reset(maxContacts);
+  cData.friction := 0.9;
+  cData.restitution := 0.6;
+  cData.tolerance := 0.1;
+
+  // Perform exhaustive collision detection on the ground plane
+  For i := 0 To NUM_BONES - 1 Do Begin
+    //    for (Bone *bone = bones; bone < bones+NUM_BONES; bone++)
+    bone_ := bones[i];
+    // Check for collisions with the ground plane
+    If (Not cData.hasMoreContacts()) Then exit;
+    CollisionDetector.boxAndHalfSpace(bone_, plane, cdata);
+
+    boneSphere := bone_.getCollisionSphere();
+
+    // Check for collisions with each other box
+    For j := i + 1 To NUM_BONES - 1 Do Begin
+      //        for (Bone *other = bone+1; other < bones+NUM_BONES; other++)
+      other := bones[j];
+      If (Not cData.hasMoreContacts()) Then Begin
+        boneSphere.free;
+        exit;
+      End;
+
+      otherSphere := other.getCollisionSphere();
+
+      CollisionDetector.sphereAndSphere(
+        boneSphere,
+        otherSphere,
+        cData
+        );
+    End;
+    boneSphere.free;
+  End;
+  //
+  //    // Check for joint violation
+  //    for (cyclone::Joint *joint = joints; joint < joints+NUM_JOINTS; joint++)
+  //    {
+  //        if (!cData.hasMoreContacts()) return;
+  //        unsigned added = joint->addContact(cData.contacts, cData.contactsLeft);
+  //        cData.addContacts(added);
+  //    }
+  plane.free;
+End;
 
 Procedure RagdollDemo.updateObjects(duration: real);
 Var
