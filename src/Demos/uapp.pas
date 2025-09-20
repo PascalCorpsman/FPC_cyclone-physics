@@ -321,7 +321,7 @@ End;
 
 Procedure Application.Update;
 Begin
-
+  // glutPostRedisplay();
 End;
 
 Procedure Application.RenderText(x, y: Single; text: String);
@@ -508,7 +508,7 @@ Begin
   // Exit immediately if we aren't running the simulation
   If (pauseSimulation) Then Begin
     Inherited update();
-    exit;
+     exit;
   End
   Else If (autoPauseSimulation) Then Begin
     pauseSimulation := true;

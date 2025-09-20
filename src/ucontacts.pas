@@ -52,7 +52,7 @@ Type
 
   { Contact }
 
-  Contact = Class
+  Contact = Object
     // ... Other data as before ...
 
 //        /**
@@ -66,7 +66,7 @@ Type
      * Holds the bodies that are involved in the contact. The
      * second of these can be NULL, for contacts with the scenery.
      *)
-    body: Array[0..1] Of RigidBody;
+    body: Array[0..1] Of PRigidBody;
 
     (**
      * Holds the lateral friction coefficient at the contact.
@@ -103,75 +103,75 @@ Type
       afriction, arestitution: Float);
 
   protected
-    //
-    //        /**
-    //         * A transform matrix that converts co-ordinates in the contact's
-    //         * frame of reference to world co-ordinates. The columns of this
-    //         * matrix form an orthonormal set of vectors.
-    //         */
-    //        Matrix3 contactToWorld;
-    //
-    //        /**
-    //         * Holds the closing velocity at the point of contact. This is set
-    //         * when the calculateInternals function is run.
-    //         */
-    //        Vector3 contactVelocity;
-    //
-    //        /**
-    //         * Holds the required change in velocity for this contact to be
-    //         * resolved.
-    //         */
-    //        real desiredDeltaVelocity;
-    //
-    //        /**
-    //         * Holds the world space position of the contact point relative to
-    //         * centre of each body. This is set when the calculateInternals
-    //         * function is run.
-    //         */
-    //        Vector3 relativeContactPosition[2];
-    //
+
+    (**
+     * A transform matrix that converts co-ordinates in the contact's
+     * frame of reference to world co-ordinates. The columns of this
+     * matrix form an orthonormal set of vectors.
+     *)
+    contactToWorld: Matrix3;
+
+    (**
+     * Holds the closing velocity at the point of contact. This is set
+     * when the calculateInternals function is run.
+     *)
+    contactVelocity: Vector3;
+
+    (**
+     * Holds the required change in velocity for this contact to be
+     * resolved.
+     *)
+    desiredDeltaVelocity: float;
+
+    (**
+     * Holds the world space position of the contact point relative to
+     * centre of each body. This is set when the calculateInternals
+     * function is run.
+     *)
+    relativeContactPosition: Array[0..1] Of Vector3;
+
   protected
-    //        /**
-    //         * Calculates internal data from state data. This is called before
-    //         * the resolution algorithm tries to do any resolution. It should
-    //         * never need to be called manually.
-    //         */
-    //        void calculateInternals(real duration);
-    //
-    //        /**
-    //         * Reverses the contact. This involves swapping the two rigid bodies
-    //         * and reversing the contact normal. The internal values should then
-    //         * be recalculated using calculateInternals (this is not done
-    //         * automatically).
-    //         */
-    //        void swapBodies();
-    //
+    (**
+     * Calculates internal data from state data. This is called before
+     * the resolution algorithm tries to do any resolution. It should
+     * never need to be called manually.
+     *)
+    Procedure calculateInternals(duration: Float);
+
+    (**
+     * Reverses the contact. This involves swapping the two rigid bodies
+     * and reversing the contact normal. The internal values should then
+     * be recalculated using calculateInternals (this is not done
+     * automatically).
+     *)
+    Procedure swapBodies();
+
     //        /**
     //         * Updates the awake state of rigid bodies that are taking
     //         * place in the given contact. A body will be made awake if it
     //         * is in contact with a body that is awake.
     //         */
     //        void matchAwakeState();
-    //
-    //        /**
-    //         * Calculates and sets the internal value for the desired delta
-    //         * velocity.
-    //         */
-    //        void calculateDesiredDeltaVelocity(real duration);
-    //
-    //        /**
-    //         * Calculates and returns the velocity of the contact
-    //         * point on the given body.
-    //         */
-    //        Vector3 calculateLocalVelocity(unsigned bodyIndex, real duration);
-    //
-    //        /**
-    //         * Calculates an orthonormal basis for the contact point, based on
-    //         * the primary friction direction (for anisotropic friction) or
-    //         * a random orientation (for isotropic friction).
-    //         */
-    //        void calculateContactBasis();
-    //
+
+            (**
+             * Calculates and sets the internal value for the desired delta
+             * velocity.
+             *)
+    Procedure calculateDesiredDeltaVelocity(duration: float);
+
+    (**
+     * Calculates and returns the velocity of the contact
+     * point on the given body.
+     *)
+    Function calculateLocalVelocity(bodyIndex: unsigned; duration: Float): Vector3;
+
+    (**
+     * Calculates an orthonormal basis for the contact point, based on
+     * the primary friction direction (for anisotropic friction) or
+     * a random orientation (for isotropic friction).
+     *)
+    Procedure calculateContactBasis();
+
     //        /**
     //         * Applies an impulse to the given body, returning the
     //         * change in velocities.
@@ -268,36 +268,36 @@ Type
 
   ContactResolver = Class
   protected
-    //        /**
-    //         * Holds the number of iterations to perform when resolving
-    //         * velocity.
-    //         */
-    //        unsigned velocityIterations;
-    //
-    //        /**
-    //         * Holds the number of iterations to perform when resolving
-    //         * position.
-    //         */
-    //        unsigned positionIterations;
-    //
-    //        /**
-    //         * To avoid instability velocities smaller
-    //         * than this value are considered to be zero. Too small and the
-    //         * simulation may be unstable, too large and the bodies may
-    //         * interpenetrate visually. A good starting point is the default
-    //         * of 0.01.
-    //         */
-    //        real velocityEpsilon;
-    //
-    //        /**
-    //         * To avoid instability penetrations
-    //         * smaller than this value are considered to be not interpenetrating.
-    //         * Too small and the simulation may be unstable, too large and the
-    //         * bodies may interpenetrate visually. A good starting point is
-    //         * the default of0.01.
-    //         */
-    //        real positionEpsilon;
-    //
+    (**
+     * Holds the number of iterations to perform when resolving
+     * velocity.
+     *)
+    velocityIterations: unsigned;
+
+    (**
+     * Holds the number of iterations to perform when resolving
+     * position.
+     *)
+    positionIterations: unsigned;
+
+    (**
+     * To avoid instability velocities smaller
+     * than this value are considered to be zero. Too small and the
+     * simulation may be unstable, too large and the bodies may
+     * interpenetrate visually. A good starting point is the default
+     * of 0.01.
+     *)
+    velocityEpsilon: Float;
+
+    (**
+     * To avoid instability penetrations
+     * smaller than this value are considered to be not interpenetrating.
+     * Too small and the simulation may be unstable, too large and the
+     * bodies may interpenetrate visually. A good starting point is
+     * the default of0.01.
+     *)
+    positionEpsilon: Float;
+
   public
     //        /**
     //         * Stores the number of velocity iterations used in the
@@ -323,8 +323,8 @@ Type
      * per resolution call, and optional epsilon values.
      *)
     Constructor Create(iterations: unsigned;
-      velocityEpsilon: float = 0.01;
-      positionEpsilon: float = 0.01);
+      avelocityEpsilon: float = 0.01;
+      apositionEpsilon: float = 0.01);
 
     //        /**
     //         * Creates a new contact resolver with the given number of iterations
@@ -335,88 +335,82 @@ Type
     //            real velocityEpsilon=(real)0.01,
     //            real positionEpsilon=(real)0.01);
     //
-    //        /**
-    //         * Returns true if the resolver has valid settings and is ready to go.
-    //         */
-    //        bool isValid()
-    //        {
-    //            return (velocityIterations > 0) &&
-    //                   (positionIterations > 0) &&
-    //                   (positionEpsilon >= 0.0f) &&
-    //                   (positionEpsilon >= 0.0f);
-    //        }
-    //
-    //        /**
-    //         * Sets the number of iterations for each resolution stage.
-    //         */
-    //        void setIterations(unsigned velocityIterations,
-    //                           unsigned positionIterations);
-    //
+            (**
+             * Returns true if the resolver has valid settings and is ready to go.
+             *)
+    Function isValid(): Boolean;
+
+    (**
+     * Sets the number of iterations for each resolution stage.
+     *)
+    Procedure setIterations(avelocityIterations: unsigned;
+      apositionIterations: unsigned);
+
     //        /**
     //         * Sets the number of iterations for both resolution stages.
     //         */
     //        void setIterations(unsigned iterations);
     //
-    //        /**
-    //         * Sets the tolerance value for both velocity and position.
-    //         */
-    //        void setEpsilon(real velocityEpsilon,
-    //                        real positionEpsilon);
-
             (**
-             * Resolves a set of contacts for both penetration and velocity.
-             *
-             * Contacts that cannot interact with
-             * each other should be passed to separate calls to resolveContacts,
-             * as the resolution algorithm takes much longer for lots of
-             * contacts than it does for the same number of contacts in small
-             * sets.
-             *
-             * @param contactArray Pointer to an array of contact objects.
-             *
-             * @param numContacts The number of contacts in the array to resolve.
-             *
-             * @param numIterations The number of iterations through the
-             * resolution algorithm. This should be at least the number of
-             * contacts (otherwise some constraints will not be resolved -
-             * although sometimes this is not noticable). If the iterations are
-             * not needed they will not be used, so adding more iterations may
-             * not make any difference. In some cases you would need millions
-             * of iterations. Think about the number of iterations as a bound:
-             * if you specify a large number, sometimes the algorithm WILL use
-             * it, and you may drop lots of frames.
-             *
-             * @param duration The duration of the previous integration step.
-             * This is used to compensate for forces applied.
+             * Sets the tolerance value for both velocity and position.
              *)
+    Procedure setEpsilon(avelocityEpsilon: float;
+      apositionEpsilon: Float);
+
+    (**
+     * Resolves a set of contacts for both penetration and velocity.
+     *
+     * Contacts that cannot interact with
+     * each other should be passed to separate calls to resolveContacts,
+     * as the resolution algorithm takes much longer for lots of
+     * contacts than it does for the same number of contacts in small
+     * sets.
+     *
+     * @param contactArray Pointer to an array of contact objects.
+     *
+     * @param numContacts The number of contacts in the array to resolve.
+     *
+     * @param numIterations The number of iterations through the
+     * resolution algorithm. This should be at least the number of
+     * contacts (otherwise some constraints will not be resolved -
+     * although sometimes this is not noticable). If the iterations are
+     * not needed they will not be used, so adding more iterations may
+     * not make any difference. In some cases you would need millions
+     * of iterations. Think about the number of iterations as a bound:
+     * if you specify a large number, sometimes the algorithm WILL use
+     * it, and you may drop lots of frames.
+     *
+     * @param duration The duration of the previous integration step.
+     * This is used to compensate for forces applied.
+     *)
     Procedure resolveContacts(contactArray: PContact;
       numContacts: unsigned;
       duration: float);
 
   protected
-    //        /**
-    //         * Sets up contacts ready for processing. This makes sure their
-    //         * internal data is configured correctly and the correct set of bodies
-    //         * is made alive.
-    //         */
-    //        void prepareContacts(Contact *contactArray, unsigned numContacts,
-    //            real duration);
-    //
-    //        /**
-    //         * Resolves the velocity issues with the given array of constraints,
-    //         * using the given number of iterations.
-    //         */
-    //        void adjustVelocities(Contact *contactArray,
-    //            unsigned numContacts,
-    //            real duration);
-    //
-    //        /**
-    //         * Resolves the positional issues with the given array of constraints,
-    //         * using the given number of iterations.
-    //         */
-    //        void adjustPositions(Contact *contacts,
-    //            unsigned numContacts,
-    //            real duration);
+    (**
+     * Sets up contacts ready for processing. This makes sure their
+     * internal data is configured correctly and the correct set of bodies
+     * is made alive.
+     *)
+    Procedure prepareContacts(contactArray: PContact; numContacts: unsigned;
+      duration: Float);
+
+    (**
+     * Resolves the velocity issues with the given array of constraints,
+     * using the given number of iterations.
+     *)
+    Procedure adjustVelocities(contactArray: PContact;
+      numContacts: unsigned;
+      duration: Float);
+
+    (**
+     * Resolves the positional issues with the given array of constraints,
+     * using the given number of iterations.
+     *)
+    Procedure adjustPositions(contacts: PContact;
+      numContacts: unsigned;
+      duration: float);
   End;
 
   (**
@@ -441,22 +435,358 @@ Implementation
 { ContactResolver }
 
 Constructor ContactResolver.Create(iterations: unsigned;
-  velocityEpsilon: float; positionEpsilon: float);
+  avelocityEpsilon: float; apositionEpsilon: float);
 Begin
+  Inherited Create;
+  setIterations(iterations, iterations);
+  setEpsilon(avelocityEpsilon, apositionEpsilon);
+End;
 
+Function ContactResolver.isValid: Boolean;
+Begin
+  result :=
+    (velocityIterations > 0) And
+    (positionIterations > 0) And
+    (positionEpsilon >= 0.0) And
+    (positionEpsilon >= 0.0);
+End;
+
+Procedure ContactResolver.setIterations(avelocityIterations: unsigned;
+  apositionIterations: unsigned);
+Begin
+  velocityIterations := avelocityIterations;
+  positionIterations := apositionIterations;
+End;
+
+Procedure ContactResolver.setEpsilon(avelocityEpsilon: float;
+  apositionEpsilon: Float);
+Begin
+  velocityEpsilon := avelocityEpsilon;
+  positionEpsilon := apositionEpsilon;
 End;
 
 Procedure ContactResolver.resolveContacts(contactArray: PContact;
   numContacts: unsigned; duration: float);
 Begin
+  // Make sure we have something to do.
+  If (numContacts = 0) Then exit;
+  If (Not isValid()) Then exit;
 
+  // Prepare the contacts for processing
+  prepareContacts(contactArray, numContacts, duration);
+
+  // Resolve the interpenetration problems with the contacts.
+  adjustPositions(contactArray, numContacts, duration);
+
+  // Resolve the velocity problems with the contacts.
+  adjustVelocities(contactArray, numContacts, duration);
 End;
 
-procedure Contact.setBodyData(one, two: PRigidBody; afriction,
-  arestitution: Float);
-begin
+Procedure ContactResolver.prepareContacts(contactArray: PContact;
+  numContacts: unsigned; duration: Float);
+Var
+  i: integer;
+  contact: pContact;
+Begin
+  // Generate contact velocity and axis information.
+  contact := contactArray;
+  For i := 0 To numContacts - 1 Do Begin
+    // Calculate the internal contact data (inertia, basis, etc).
+    contact^.calculateInternals(duration);
+    inc(contact);
+  End;
+End;
 
-end;
+Procedure ContactResolver.adjustVelocities(contactArray: PContact;
+  numContacts: unsigned; duration: Float);
+Begin
+  //    Vector3 velocityChange[2], rotationChange[2];
+  //    Vector3 deltaVel;
+  //
+  //    // iteratively handle impacts in order of severity.
+  //    velocityIterationsUsed = 0;
+  //    while (velocityIterationsUsed < velocityIterations)
+  //    {
+  //        // Find contact with maximum magnitude of probable velocity change.
+  //        real max = velocityEpsilon;
+  //        unsigned index = numContacts;
+  //        for (unsigned i = 0; i < numContacts; i++)
+  //        {
+  //            if (c[i].desiredDeltaVelocity > max)
+  //            {
+  //                max = c[i].desiredDeltaVelocity;
+  //                index = i;
+  //            }
+  //        }
+  //        if (index == numContacts) break;
+  //
+  //        // Match the awake state at the contact
+  //        c[index].matchAwakeState();
+  //
+  //        // Do the resolution on the contact that came out top.
+  //        c[index].applyVelocityChange(velocityChange, rotationChange);
+  //
+  //        // With the change in velocity of the two bodies, the update of
+  //        // contact velocities means that some of the relative closing
+  //        // velocities need recomputing.
+  //        for (unsigned i = 0; i < numContacts; i++)
+  //        {
+  //            // Check each body in the contact
+  //            for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
+  //            {
+  //                // Check for a match with each body in the newly
+  //                // resolved contact
+  //                for (unsigned d = 0; d < 2; d++)
+  //                {
+  //                    if (c[i].body[b] == c[index].body[d])
+  //                    {
+  //                        deltaVel = velocityChange[d] +
+  //                            rotationChange[d].vectorProduct(
+  //                                c[i].relativeContactPosition[b]);
+  //
+  //                        // The sign of the change is negative if we're dealing
+  //                        // with the second body in a contact.
+  //                        c[i].contactVelocity +=
+  //                            c[i].contactToWorld.transformTranspose(deltaVel)
+  //                            * (b?-1:1);
+  //                        c[i].calculateDesiredDeltaVelocity(duration);
+  //                    }
+  //                }
+  //            }
+  //        }
+  //        velocityIterationsUsed++;
+  //    }
+End;
+
+Procedure ContactResolver.adjustPositions(contacts: PContact;
+  numContacts: unsigned; duration: float);
+Begin
+  //    unsigned i,index;
+  //    Vector3 linearChange[2], angularChange[2];
+  //    real max;
+  //    Vector3 deltaPosition;
+  //
+  //    // iteratively resolve interpenetrations in order of severity.
+  //    positionIterationsUsed = 0;
+  //    while (positionIterationsUsed < positionIterations)
+  //    {
+  //        // Find biggest penetration
+  //        max = positionEpsilon;
+  //        index = numContacts;
+  //        for (i=0; i<numContacts; i++)
+  //        {
+  //            if (c[i].penetration > max)
+  //            {
+  //                max = c[i].penetration;
+  //                index = i;
+  //            }
+  //        }
+  //        if (index == numContacts) break;
+  //
+  //        // Match the awake state at the contact
+  //        c[index].matchAwakeState();
+  //
+  //        // Resolve the penetration.
+  //        c[index].applyPositionChange(
+  //            linearChange,
+  //            angularChange,
+  //            max);
+  //
+  //        // Again this action may have changed the penetration of other
+  //        // bodies, so we update contacts.
+  //        for (i = 0; i < numContacts; i++)
+  //        {
+  //            // Check each body in the contact
+  //            for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
+  //            {
+  //                // Check for a match with each body in the newly
+  //                // resolved contact
+  //                for (unsigned d = 0; d < 2; d++)
+  //                {
+  //                    if (c[i].body[b] == c[index].body[d])
+  //                    {
+  //                        deltaPosition = linearChange[d] +
+  //                            angularChange[d].vectorProduct(
+  //                                c[i].relativeContactPosition[b]);
+  //
+  //                        // The sign of the change is positive if we're
+  //                        // dealing with the second body in a contact
+  //                        // and negative otherwise (because we're
+  //                        // subtracting the resolution)..
+  //                        c[i].penetration +=
+  //                            deltaPosition.scalarProduct(c[i].contactNormal)
+  //                            * (b?1:-1);
+  //                    }
+  //                }
+  //            }
+  //        }
+  //        positionIterationsUsed++;
+  //    }
+End;
+
+Procedure Contact.setBodyData(one, two: PRigidBody; afriction,
+  arestitution: Float);
+Begin
+  body[0] := one;
+  body[1] := two;
+  friction := afriction;
+  restitution := arestitution;
+End;
+
+Procedure Contact.calculateInternals(duration: Float);
+Begin
+  // Check if the first object is NULL, and swap if it is.
+  If (body[0] = Nil) Then swapBodies();
+  assert(assigned(body[0]));
+
+  // Calculate an set of axis at the contact point.
+  calculateContactBasis();
+
+  // Store the relative position of the contact relative to each body
+  relativeContactPosition[0] := contactPoint - body[0]^.getPosition();
+  If assigned(body[1]) Then Begin
+    relativeContactPosition[1] := contactPoint - body[1]^.getPosition();
+  End;
+
+  // Find the relative velocity of the bodies at the contact point.
+  contactVelocity := calculateLocalVelocity(0, duration);
+  If assigned(body[1]) Then Begin
+    contactVelocity := contactVelocity - calculateLocalVelocity(1, duration);
+  End;
+
+  // Calculate the desired change in velocity for resolution
+  calculateDesiredDeltaVelocity(duration);
+End;
+
+Procedure Contact.swapBodies;
+Var
+  temp: PRigidBody;
+Begin
+  contactNormal := contactNormal * (-1);
+
+  temp := body[0];
+  body[0] := body[1];
+  body[1] := temp;
+End;
+
+Procedure Contact.calculateDesiredDeltaVelocity(duration: float);
+Begin
+  //    const static real velocityLimit = (real)0.25f;
+  //
+  //    // Calculate the acceleration induced velocity accumulated this frame
+  //    real velocityFromAcc = 0;
+  //
+  //    if (body[0]->getAwake())
+  //    {
+  //	velocityFromAcc+=
+  //	    body[0]->getLastFrameAcceleration() * duration * contactNormal;
+  //    }
+  //
+  //    if (body[1] && body[1]->getAwake())
+  //    {
+  //        velocityFromAcc -=
+  //            body[1]->getLastFrameAcceleration() * duration * contactNormal;
+  //    }
+  //
+  //    // If the velocity is very slow, limit the restitution
+  //    real thisRestitution = restitution;
+  //    if (real_abs(contactVelocity.x) < velocityLimit)
+  //    {
+  //        thisRestitution = (real)0.0f;
+  //    }
+  //
+  //    // Combine the bounce velocity with the removed
+  //    // acceleration velocity.
+  //    desiredDeltaVelocity =
+  //        -contactVelocity.x
+  //        -thisRestitution * (contactVelocity.x - velocityFromAcc);
+End;
+
+Function Contact.calculateLocalVelocity(bodyIndex: unsigned; duration: Float
+  ): Vector3;
+Begin
+  //  RigidBody *thisBody = body[bodyIndex];
+  //
+  //    // Work out the velocity of the contact point.
+  //    Vector3 velocity =
+  //        thisBody->getRotation() % relativeContactPosition[bodyIndex];
+  //    velocity += thisBody->getVelocity();
+  //
+  //    // Turn the velocity into contact-coordinates.
+  //    Vector3 contactVelocity = contactToWorld.transformTranspose(velocity);
+  //
+  //    // Calculate the ammount of velocity that is due to forces without
+  //    // reactions.
+  //    Vector3 accVelocity = thisBody->getLastFrameAcceleration() * duration;
+  //
+  //    // Calculate the velocity in contact-coordinates.
+  //    accVelocity = contactToWorld.transformTranspose(accVelocity);
+  //
+  //    // We ignore any component of acceleration in the contact normal
+  //    // direction, we are only interested in planar acceleration
+  //    accVelocity.x = 0;
+  //
+  //    // Add the planar velocities - if there's enough friction they will
+  //    // be removed during velocity resolution
+  //    contactVelocity += accVelocity;
+  //
+  //    // And return it
+  //    return contactVelocity;
+End;
+
+(*
+ * Constructs an arbitrary orthonormal basis for the contact.  This is
+ * stored as a 3x3 matrix, where each vector is a column (in other
+ * words the matrix transforms contact space into world space). The x
+ * direction is generated from the contact normal, and the y and z
+ * directionss are set so they are at right angles to it.
+ *)
+
+Procedure Contact.calculateContactBasis;
+Var
+  contactTangent: Array[0..1] Of Vector3;
+Begin
+  // Check whether the Z-axis is nearer to the X or Y axis
+  If (real_abs(contactNormal.x) > real_abs(contactNormal.y)) Then Begin
+
+    //        // Scaling factor to ensure the results are normalised
+    //        const real s = (real)1.0f/real_sqrt(contactNormal.z*contactNormal.z +
+    //            contactNormal.x*contactNormal.x);
+    //
+    //        // The new X-axis is at right angles to the world Y-axis
+    //        contactTangent[0].x = contactNormal.z*s;
+    //        contactTangent[0].y = 0;
+    //        contactTangent[0].z = -contactNormal.x*s;
+    //
+    //        // The new Y-axis is at right angles to the new X- and Z- axes
+    //        contactTangent[1].x = contactNormal.y*contactTangent[0].z;
+    //        contactTangent[1].y = contactNormal.z*contactTangent[0].x -
+    //            contactNormal.x*contactTangent[0].z;
+    //        contactTangent[1].z = -contactNormal.y*contactTangent[0].x;
+  End
+  Else Begin
+    //        // Scaling factor to ensure the results are normalised
+    //        const real s = (real)1.0/real_sqrt(contactNormal.z*contactNormal.z +
+    //            contactNormal.y*contactNormal.y);
+    //
+    //        // The new X-axis is at right angles to the world X-axis
+    //        contactTangent[0].x = 0;
+    //        contactTangent[0].y = -contactNormal.z*s;
+    //        contactTangent[0].z = contactNormal.y*s;
+    //
+    //        // The new Y-axis is at right angles to the new X- and Z- axes
+    //        contactTangent[1].x = contactNormal.y*contactTangent[0].z -
+    //            contactNormal.z*contactTangent[0].y;
+    //        contactTangent[1].y = -contactNormal.x*contactTangent[0].z;
+    //        contactTangent[1].z = contactNormal.x*contactTangent[0].y;
+  End;
+
+  // Make a matrix from the three vectors.
+  contactToWorld.setComponents(
+    contactNormal,
+    contactTangent[0],
+    contactTangent[1]);
+End;
 
 End.
 

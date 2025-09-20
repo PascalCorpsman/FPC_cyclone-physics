@@ -524,31 +524,31 @@ Type
     //         */
     //        void setPosition(const real x, const real y, const real z);
     //
-    //        /**
-    //         * Fills the given vector with the position of the rigid body.
-    //         *
-    //         * @param position A pointer to a vector into which to write
-    //         * the position.
-    //         */
-    //        void getPosition(Vector3 *position) const;
-    //
-    //        /**
-    //         * Gets the position of the rigid body.
-    //         *
-    //         * @return The position of the rigid body.
-    //         */
-    //        Vector3 getPosition() const;
-    //
             (**
-             * Sets the orientation of the rigid body.
+             * Fills the given vector with the position of the rigid body.
              *
-             * @param orientation The new orientation of the rigid body.
-             *
-             * @note The given orientation does not need to be normalised,
-             * and can be zero. This function automatically constructs a
-             * valid rotation quaternion with (0,0,0,0) mapping to
-             * (1,0,0,0).
+             * @param position A pointer to a vector into which to write
+             * the position.
              *)
+    Procedure getPosition(Out aposition: Vector3);
+
+    (**
+     * Gets the position of the rigid body.
+     *
+     * @return The position of the rigid body.
+     *)
+    Function getPosition(): Vector3;
+
+    (**
+     * Sets the orientation of the rigid body.
+     *
+     * @param orientation The new orientation of the rigid body.
+     *
+     * @note The given orientation does not need to be normalised,
+     * and can be zero. This function automatically constructs a
+     * valid rotation quaternion with (0,0,0,0) mapping to
+     * (1,0,0,0).
+     *)
     Procedure setOrientation(Const aorientation: Quaternion);
 
     //        /**
@@ -896,35 +896,35 @@ Type
     //         * @param force The force to apply.
     //         */
     //        void addForce(const Vector3 &force);
-    //
-    //        /**
-    //         * Adds the given force to the given point on the rigid body.
-    //         * Both the force and the
-    //         * application point are given in world space. Because the
-    //         * force is not applied at the centre of mass, it may be split
-    //         * into both a force and torque.
-    //         *
-    //         * @param force The force to apply.
-    //         *
-    //         * @param point The location at which to apply the force, in
-    //         * world-coordinates.
-    //         */
-    //        void addForceAtPoint(const Vector3 &force, const Vector3 &point);
-    //
-    //        /**
-    //         * Adds the given force to the given point on the rigid body.
-    //         * The direction of the force is given in world coordinates,
-    //         * but the application point is given in body space. This is
-    //         * useful for spring forces, or other forces fixed to the
-    //         * body.
-    //         *
-    //         * @param force The force to apply.
-    //         *
-    //         * @param point The location at which to apply the force, in
-    //         * body-coordinates.
-    //         */
-    //        void addForceAtBodyPoint(const Vector3 &force, const Vector3 &point);
-    //
+
+            (**
+             * Adds the given force to the given point on the rigid body.
+             * Both the force and the
+             * application point are given in world space. Because the
+             * force is not applied at the centre of mass, it may be split
+             * into both a force and torque.
+             *
+             * @param force The force to apply.
+             *
+             * @param point The location at which to apply the force, in
+             * world-coordinates.
+             *)
+    Procedure addForceAtPoint(Const force: Vector3; Const point: Vector3);
+
+    (**
+     * Adds the given force to the given point on the rigid body.
+     * The direction of the force is given in world coordinates,
+     * but the application point is given in body space. This is
+     * useful for spring forces, or other forces fixed to the
+     * body.
+     *
+     * @param force The force to apply.
+     *
+     * @param point The location at which to apply the force, in
+     * body-coordinates.
+     *)
+    Procedure addForceAtBodyPoint(Const force: Vector3; Const point: Vector3);
+
     //        /**
     //         * Adds the given torque to the rigid body.
     //         * The force is expressed in world-coordinates.
@@ -1201,6 +1201,16 @@ Begin
   position := aposition;
 End;
 
+Procedure RigidBody.getPosition(Out aposition: Vector3);
+Begin
+  aposition := position;
+End;
+
+Function RigidBody.getPosition(): Vector3;
+Begin
+  result := position;
+End;
+
 Procedure RigidBody.setOrientation(Const aorientation: Quaternion);
 Begin
   orientation := aorientation;
@@ -1288,6 +1298,30 @@ Procedure RigidBody.clearAccumulators;
 Begin
   forceAccum.clear();
   torqueAccum.clear();
+End;
+
+Procedure RigidBody.addForceAtPoint(Const force: Vector3; Const point: Vector3);
+Var
+  pt: Vector3;
+Begin
+  // Convert to coordinates relative to center of mass.
+  pt := point;
+  pt := pt - position;
+
+  forceAccum := forceAccum + force;
+  torqueAccum := torqueAccum + (pt Mod force);
+
+  isAwake := true;
+End;
+
+Procedure RigidBody.addForceAtBodyPoint(Const force: Vector3;
+  Const point: Vector3);
+Var
+  pt: Vector3;
+Begin
+  // Convert to coordinates relative to center of mass.
+  pt := getPointInWorldSpace(@point);
+  addForceAtPoint(force, pt);
 End;
 
 Procedure RigidBody.setAcceleration(Const aacceleration: Vector3);

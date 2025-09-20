@@ -82,7 +82,7 @@ Type
     transform: Matrix4;
   public
     Constructor Create; virtual;
-    Destructor Destroy; virtual;
+    Destructor Destroy; override;
   End;
 
   //    /**
@@ -128,49 +128,51 @@ Type
      *)
     halfSize: Vector3;
   End;
-  //
-  //    /**
-  //     * A wrapper class that holds fast intersection tests. These
-  //     * can be used to drive the coarse collision detection system or
-  //     * as an early out in the full collision tests below.
-  //     */
-  //    class IntersectionTests
-  //    {
-  //    public:
-  //
-  //        static bool sphereAndHalfSpace(
-  //            const CollisionSphere &sphere,
-  //            const CollisionPlane &plane);
-  //
-  //        static bool sphereAndSphere(
-  //            const CollisionSphere &one,
-  //            const CollisionSphere &two);
-  //
-  //        static bool boxAndBox(
-  //            const CollisionBox &one,
-  //            const CollisionBox &two);
-  //
-  //        /**
-  //         * Does an intersection test on an arbitrarily aligned box and a
-  //         * half-space.
-  //         *
-  //         * The box is given as a transform matrix, including
-  //         * position, and a vector of half-sizes for the extend of the
-  //         * box along each local axis.
-  //         *
-  //         * The half-space is given as a direction (i.e. unit) vector and the
-  //         * offset of the limiting plane from the origin, along the given
-  //         * direction.
-  //         */
-  //        static bool boxAndHalfSpace(
-  //            const CollisionBox &box,
-  //            const CollisionPlane &plane);
-  //    };
 
+  (**
+   * A wrapper class that holds fast intersection tests. These
+   * can be used to drive the coarse collision detection system or
+   * as an early out in the full collision tests below.
+   *)
+
+  { IntersectionTests }
+
+  IntersectionTests = Class
+  public
+    //
+    //        static bool sphereAndHalfSpace(
+    //            const CollisionSphere &sphere,
+    //            const CollisionPlane &plane);
+    //
+    //        static bool sphereAndSphere(
+    //            const CollisionSphere &one,
+    //            const CollisionSphere &two);
+    //
+    //        static bool boxAndBox(
+    //            const CollisionBox &one,
+    //            const CollisionBox &two);
+    //
     (**
-     * Represents a rigid body that can be treated as a sphere
-     * for collision detection.
+     * Does an intersection test on an arbitrarily aligned box and a
+     * half-space.
+     *
+     * The box is given as a transform matrix, including
+     * position, and a vector of half-sizes for the extend of the
+     * box along each local axis.
+     *
+     * The half-space is given as a direction (i.e. unit) vector and the
+     * offset of the limiting plane from the origin, along the given
+     * direction.
      *)
+    Class Function boxAndHalfSpace(
+      Const box: CollisionBox;
+      Const plane: CollisionPlane): Boolean;
+  End;
+
+  (**
+   * Represents a rigid body that can be treated as a sphere
+   * for collision detection.
+   *)
   CollisionSphere = Class(CollisionPrimitive)
   public
     (**
@@ -296,7 +298,6 @@ Type
     //            );
   End;
 
-
 Implementation
 
 Function transformToAxis(
@@ -308,8 +309,6 @@ Begin
     box.halfSize.y * real_abs(axis * box.getAxis(1)) +
     box.halfSize.z * real_abs(axis * box.getAxis(2));
 End;
-
-
 
 { CollisionPrimitive }
 
@@ -338,6 +337,27 @@ End;
 Function CollisionPrimitive.getTransform: PMatrix4;
 Begin
   result := @transform;
+End;
+
+{ IntersectionTests }
+
+Class Function IntersectionTests.boxAndHalfSpace(Const box: CollisionBox;
+  Const plane: CollisionPlane): Boolean;
+Var
+  projectedRadius: Float;
+  boxDistance: Float;
+Begin
+  // Work out the projected radius of the box onto the plane direction
+  projectedRadius := transformToAxis(box, plane.direction);
+
+  // Work out how far the box is from the origin
+  boxDistance :=
+    plane.direction *
+    box.getAxis(3) -
+    projectedRadius;
+
+  // Check for the intersection
+  result := boxDistance <= plane.offset;
 End;
 
 Function CollisionData.hasMoreContacts: Boolean;
@@ -403,21 +423,75 @@ End;
 
 Class Function CollisionDetector.boxAndHalfSpace(Const box: CollisionBox;
   Const plane: CollisionPlane; Var data: CollisionData): unsigned;
+
+Const
+  // Go through each combination of + and - for each half-size
+  mults: Array[0..7, 0..2] Of float =
+  ((1, 1, 1), (-1, 1, 1), (1, -1, 1), (-1, -1, 1),
+    (1, 1, -1), (-1, 1, -1), (1, -1, -1), (-1, -1, -1));
+
 Var
-  projectedRadius: Float;
-  boxDistance: Float;
+  contact: pContact;
+  contactsUsed: unsigned;
+  i: integer;
+  vertexPos: Vector3;
+  vertexDistance: float;
 Begin
-  // Work out the projected radius of the box onto the plane direction
-  projectedRadius := transformToAxis(box, plane.direction);
+  result := 0;
+  // Make sure we have contacts
+  If (data.contactsLeft <= 0) Then exit;
 
-  // Work out how far the box is from the origin
-  boxDistance :=
-    plane.direction *
-    box.getAxis(3) -
-    projectedRadius;
+  // Check for intersection
+  If (Not IntersectionTests.boxAndHalfSpace(box, plane)) Then exit;
 
-  // Check for the intersection
-  result := ord(boxDistance <= plane.offset);
+  // We have an intersection, so find the intersection points. We can make
+  // do with only checking vertices. If the box is resting on a plane
+  // or on an edge, it will be reported as four or two contact points.
+
+  contact := data.contacts;
+  contactsUsed := 0;
+
+  For i := 0 To 7 Do Begin
+
+    // Calculate the position of each vertex
+    vertexPos.create(mults[i][0], mults[i][1], mults[i][2]);
+    vertexPos.componentProductUpdate(box.halfSize);
+    vertexPos := box.transform.transform(vertexPos);
+
+    // Calculate the distance from the plane
+    vertexDistance := vertexPos * plane.direction;
+
+    // Compare this to the plane's distance
+    If (vertexDistance <= plane.offset) Then Begin
+      // Create the contact data.
+
+      // The contact point is halfway between the vertex and the
+      // plane - we multiply the direction by half the separation
+      // distance and add the vertex location.
+      contact^.contactPoint := plane.direction;
+      contact^.contactPoint := contact^.contactPoint * (vertexDistance - plane.offset);
+      contact^.contactPoint := contact^.contactPoint + vertexPos;
+      contact^.contactNormal := plane.direction;
+      contact^.penetration := plane.offset - vertexDistance;
+
+      // Write the appropriate data
+      contact^.setBodyData(@box.body, Nil,
+        data.friction, data.restitution);
+
+      // Move onto the next contact
+      contact := contact + 1;
+      contactsUsed := contactsUsed + 1;
+      If (contactsUsed = data.contactsLeft) Then Begin
+        // FIXME: müsste hier nicht noch ein "data.addContacts(contactsUsed);" kommen ?
+        Raise exception.create('Juhu, testen ob die obige Zeile nicht doch rein muss oder nicht (wenn nicht av und Zeile löschen, sonst rein)');
+        result := contactsUsed;
+        exit;
+      End;
+    End;
+  End;
+
+  data.addContacts(contactsUsed);
+  result := contactsUsed;
 End;
 
 End.

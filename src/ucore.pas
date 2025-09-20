@@ -485,39 +485,39 @@ Type
      *)
     Constructor Create();
 
-    //        /**
-    //         * Creates a new matrix with the given three vectors making
-    //         * up its columns.
-    //         */
-    //        Matrix3(const Vector3 &compOne, const Vector3 &compTwo,
-    //            const Vector3 &compThree)
-    //        {
-    //            setComponents(compOne, compTwo, compThree);
-    //        }
-    //
-    //        /**
-    //         * Creates a new matrix with explicit coefficients.
-    //         */
-    //        Matrix3(real c0, real c1, real c2, real c3, real c4, real c5,
-    //            real c6, real c7, real c8)
-    //        {
-    //            data[0] = c0; data[1] = c1; data[2] = c2;
-    //            data[3] = c3; data[4] = c4; data[5] = c5;
-    //            data[6] = c6; data[7] = c7; data[8] = c8;
-    //        }
-    //
-    //        /**
-    //         * Sets the matrix to be a diagonal matrix with the given
-    //         * values along the leading diagonal.
-    //         */
-    //        void setDiagonal(real a, real b, real c)
-    //        {
-    //            setInertiaTensorCoeffs(a, b, c);
-    //        }
-    //
-        (**
-         * Sets the value of the matrix from inertia tensor values.
-         *)
+    (**
+     * Creates a new matrix with the given three vectors making
+     * up its columns.
+     *)
+//        Matrix3(const Vector3 &compOne, const Vector3 &compTwo,
+//            const Vector3 &compThree)
+//        {
+//            setComponents(compOne, compTwo, compThree);
+//        }
+//
+//        /**
+//         * Creates a new matrix with explicit coefficients.
+//         */
+//        Matrix3(real c0, real c1, real c2, real c3, real c4, real c5,
+//            real c6, real c7, real c8)
+//        {
+//            data[0] = c0; data[1] = c1; data[2] = c2;
+//            data[3] = c3; data[4] = c4; data[5] = c5;
+//            data[6] = c6; data[7] = c7; data[8] = c8;
+//        }
+//
+//        /**
+//         * Sets the matrix to be a diagonal matrix with the given
+//         * values along the leading diagonal.
+//         */
+//        void setDiagonal(real a, real b, real c)
+//        {
+//            setInertiaTensorCoeffs(a, b, c);
+//        }
+//
+(**
+ * Sets the value of the matrix from inertia tensor values.
+ *)
     Procedure setInertiaTensorCoeffs(ix, iy, iz: Float;
       ixy: Float = 0; ixz: Float = 0; iyz: Float = 0);
 
@@ -545,25 +545,13 @@ Type
     //            data[7] = vector.x;
     //        }
     //
-    //        /**
-    //         * Sets the matrix values from the given three vector components.
-    //         * These are arranged as the three columns of the vector.
-    //         */
-    //        void setComponents(const Vector3 &compOne, const Vector3 &compTwo,
-    //            const Vector3 &compThree)
-    //        {
-    //            data[0] = compOne.x;
-    //            data[1] = compTwo.x;
-    //            data[2] = compThree.x;
-    //            data[3] = compOne.y;
-    //            data[4] = compTwo.y;
-    //            data[5] = compThree.y;
-    //            data[6] = compOne.z;
-    //            data[7] = compTwo.z;
-    //            data[8] = compThree.z;
-    //
-    //        }
-    //
+            (**
+             * Sets the matrix values from the given three vector components.
+             * These are arranged as the three columns of the vector.
+             *)
+    Procedure setComponents(Const compOne: Vector3; Const compTwo: Vector3;
+      Const compThree: Vector3);
+
     //        /**
     //         * Transform the given vector by this matrix.
     //         *
@@ -1125,11 +1113,24 @@ Begin
     0.3 * mass * (squares.x + squares.y));
 End;
 
+Procedure Matrix3.setComponents(Const compOne: Vector3; Const compTwo: Vector3;
+  Const compThree: Vector3);
+Begin
+  data[0] := compOne.x;
+  data[1] := compTwo.x;
+  data[2] := compThree.x;
+  data[3] := compOne.y;
+  data[4] := compTwo.y;
+  data[5] := compThree.y;
+  data[6] := compOne.z;
+  data[7] := compTwo.z;
+  data[8] := compThree.z;
+End;
+
 Procedure Matrix3.setInverse(Const m: Matrix3);
 Var
   t4, t6, t8, t10, t12, t14, t16, t17: float;
 Begin
-
   t4 := m.data[0] * m.data[4];
   t6 := m.data[0] * m.data[5];
   t8 := m.data[1] * m.data[3];

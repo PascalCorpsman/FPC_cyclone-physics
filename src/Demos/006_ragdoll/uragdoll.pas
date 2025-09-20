@@ -32,7 +32,6 @@ Type
   { Bone }
 
   Bone = Class(CollisionBox)
-
   public
     (**
      * We use a sphere to collide bone on bone to allow some limited
@@ -168,9 +167,11 @@ Var
   plane: CollisionPlane;
   transform, otherTransform: Matrix4;
   position, otherPosition: Vector3;
-  bone_, other: Bone;
+  bone_, other: ^Bone;
   i, j: integer;
   boneSphere, otherSphere: CollisionSphere;
+  joint_: ^joint;
+  added: unsigned;
 Begin
   // Create the ground plane data
   plane := CollisionPlane.Create;
@@ -186,23 +187,23 @@ Begin
   // Perform exhaustive collision detection on the ground plane
   For i := 0 To NUM_BONES - 1 Do Begin
     //    for (Bone *bone = bones; bone < bones+NUM_BONES; bone++)
-    bone_ := bones[i];
+    bone_ := @bones[i];
     // Check for collisions with the ground plane
     If (Not cData.hasMoreContacts()) Then exit;
-    CollisionDetector.boxAndHalfSpace(bone_, plane, cdata);
+    CollisionDetector.boxAndHalfSpace(bone_^, plane, cdata);
 
-    boneSphere := bone_.getCollisionSphere();
+    boneSphere := bone_^.getCollisionSphere();
 
     // Check for collisions with each other box
     For j := i + 1 To NUM_BONES - 1 Do Begin
       //        for (Bone *other = bone+1; other < bones+NUM_BONES; other++)
-      other := bones[j];
+      other := @bones[j];
       If (Not cData.hasMoreContacts()) Then Begin
         boneSphere.free;
         exit;
       End;
 
-      otherSphere := other.getCollisionSphere();
+      otherSphere := other^.getCollisionSphere();
 
       CollisionDetector.sphereAndSphere(
         boneSphere,
@@ -212,14 +213,14 @@ Begin
     End;
     boneSphere.free;
   End;
-  //
-  //    // Check for joint violation
-  //    for (cyclone::Joint *joint = joints; joint < joints+NUM_JOINTS; joint++)
-  //    {
-  //        if (!cData.hasMoreContacts()) return;
-  //        unsigned added = joint->addContact(cData.contacts, cData.contactsLeft);
-  //        cData.addContacts(added);
-  //    }
+
+  // Check for joint violation
+  For i := 0 To NUM_JOINTS - 1 Do Begin
+    joint_ := @joints[i];
+    If (Not cData.hasMoreContacts()) Then exit;
+    added := joint_^.addContact(cData.contacts, cData.contactsLeft);
+    cData.addContacts(added);
+  End;
   plane.free;
 End;
 
@@ -234,6 +235,9 @@ Begin
 End;
 
 Procedure RagdollDemo.reset;
+Var
+  strength: Float;
+  i: integer;
 Begin
   bones[0].setState(
     V3(0, 0.993, -0.5),
@@ -272,19 +276,19 @@ Begin
     V3(0, 4.024, 1.066),
     V3(0.267, 0.888, 0.207));
 
-  //    cyclone::real strength = -random.randomReal(500.0f, 1000.0f);
-  //    for (unsigned i = 0; i < NUM_BONES; i++)
-  //    {
-  //        bones[i].body->addForceAtBodyPoint(
-  //            cyclone::Vector3(strength, 0, 0), cyclone::Vector3()
-  //            );
-  //    }
-  //    bones[6].body->addForceAtBodyPoint(
-  //        cyclone::Vector3(strength, 0, random.randomBinomial(1000.0f)),
-  //        cyclone::Vector3(random.randomBinomial(4.0f), random.randomBinomial(3.0f), 0)
-  //        );
-  //
-      // Reset the contacts
+  strength := -random.randomReal(500.0, 1000.0);
+
+  For i := 0 To NUM_BONES - 1 Do Begin
+    bones[i].body.addForceAtBodyPoint(
+      V3(strength, 0, 0), V3(0, 0, 0));
+  End;
+
+  bones[6].body.addForceAtBodyPoint(
+    V3(strength, 0, random.randomBinomial(1000.0)),
+    V3(random.randomBinomial(4.0), random.randomBinomial(3.0), 0)
+    );
+
+  // Reset the contacts
   cData.contactCount := 0;
 End;
 
@@ -301,76 +305,76 @@ Begin
 
   // Right Knee
   joints[0]._Set(
-    bones[0].body, V3(0, 1.07, 0),
-    bones[1].body, V3(0, -1.07, 0),
+    @bones[0].body, V3(0, 1.07, 0),
+    @bones[1].body, V3(0, -1.07, 0),
     0.15
     );
 
   // Left Knee
   joints[1]._set(
-    bones[2].body, V3(0, 1.07, 0),
-    bones[3].body, V3(0, -1.07, 0),
+    @bones[2].body, V3(0, 1.07, 0),
+    @bones[3].body, V3(0, -1.07, 0),
     0.15
     );
 
   // Right elbow
   joints[2]._set(
-    bones[9].body, V3(0, 0.96, 0),
-    bones[8].body, V3(0, -0.96, 0),
+    @bones[9].body, V3(0, 0.96, 0),
+    @bones[8].body, V3(0, -0.96, 0),
     0.15
     );
 
   // Left elbow
   joints[3]._set(
-    bones[11].body, V3(0, 0.96, 0),
-    bones[10].body, V3(0, -0.96, 0),
+    @bones[11].body, V3(0, 0.96, 0),
+    @bones[10].body, V3(0, -0.96, 0),
     0.15
     );
 
   // Stomach to Waist
   joints[4]._set(
-    bones[4].body, V3(0.054, 0.50, 0),
-    bones[5].body, V3(-0.043, -0.45, 0),
+    @bones[4].body, V3(0.054, 0.50, 0),
+    @bones[5].body, V3(-0.043, -0.45, 0),
     0.15
     );
 
   joints[5]._set(
-    bones[5].body, V3(-0.043, 0.411, 0),
-    bones[6].body, V3(0, -0.411, 0),
+    @bones[5].body, V3(-0.043, 0.411, 0),
+    @bones[6].body, V3(0, -0.411, 0),
     0.15
     );
 
   joints[6]._set(
-    bones[6].body, V3(0, 0.521, 0),
-    bones[7].body, V3(0, -0.752, 0),
+    @bones[6].body, V3(0, 0.521, 0),
+    @bones[7].body, V3(0, -0.752, 0),
     0.15
     );
 
   // Right hip
   joints[7]._set(
-    bones[1].body, V3(0, 1.066, 0),
-    bones[4].body, V3(0, -0.458, -0.5),
+    @bones[1].body, V3(0, 1.066, 0),
+    @bones[4].body, V3(0, -0.458, -0.5),
     0.15
     );
 
   // Left Hip
   joints[8]._set(
-    bones[3].body, V3(0, 1.066, 0),
-    bones[4].body, V3(0, -0.458, 0.5),
+    @bones[3].body, V3(0, 1.066, 0),
+    @bones[4].body, V3(0, -0.458, 0.5),
     0.105
     );
 
   // Right shoulder
   joints[9]._set(
-    bones[6].body, V3(0, 0.367, -0.8),
-    bones[8].body, V3(0, 0.888, 0.32),
+    @bones[6].body, V3(0, 0.367, -0.8),
+    @bones[8].body, V3(0, 0.888, 0.32),
     0.15
     );
 
   // Left shoulder
   joints[10]._set(
-    bones[6].body, V3(0, 0.367, 0.8),
-    bones[10].body, V3(0, 0.888, -0.32),
+    @bones[6].body, V3(0, 0.367, 0.8),
+    @bones[10].body, V3(0, 0.888, -0.32),
     0.15
     );
 
@@ -441,8 +445,8 @@ Begin
   glBegin(GL_LINES);
   For i := 0 To NUM_JOINTS - 1 Do Begin
     _Joint := joints[i];
-    a_pos := _joint.body[0].getPointInWorldSpace(@_joint.position[0]);
-    b_pos := _joint.body[1].getPointInWorldSpace(@_joint.position[1]);
+    a_pos := _joint.body[0]^.getPointInWorldSpace(@_joint.position[0]);
+    b_pos := _joint.body[1]^.getPointInWorldSpace(@_joint.position[1]);
     _length := (b_pos - a_pos).magnitude();
 
     If (_length > _joint.error) Then

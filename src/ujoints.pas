@@ -30,7 +30,7 @@ Type
     (**
      * Holds the two rigid bodies that are connected by this joint.
      *)
-    body: Array[0..1] Of RigidBody;
+    body: Array[0..1] Of pRigidBody;
 
     (**
      * Holds the relative location of the connection for each
@@ -50,11 +50,8 @@ Type
     (**
      * Configures the joint in one go.
      *)
-    Procedure _set(
-      a: RigidBody; a_pos: Vector3;
-      b: RigidBody; b_pos: Vector3;
-      _Error: float
-      );
+    procedure _set(a: PRigidBody; a_pos: Vector3; b: PRigidBody; b_pos: Vector3;
+      _Error: float);
 
     (**
      * Generates the contacts required to restore the joint if it
@@ -67,7 +64,7 @@ Implementation
 
 { Joint }
 
-procedure Joint._set(a: RigidBody; a_pos: Vector3; b: RigidBody;
+procedure Joint._set(a: PRigidBody; a_pos: Vector3; b: PRigidBody;
   b_pos: Vector3; _Error: float);
 Begin
   body[0] := a;
@@ -87,8 +84,8 @@ Var
 Begin
   result := 0;
   // Calculate the position of each connection point in world coordinates
-  a_pos_world := body[0].getPointInWorldSpace(@position[0]);
-  b_pos_world := body[1].getPointInWorldSpace(@position[1]);
+  a_pos_world := body[0]^.getPointInWorldSpace(@position[0]);
+  b_pos_world := body[1]^.getPointInWorldSpace(@position[1]);
 
   // Calculate the length of the joint
   a_to_b := b_pos_world - a_pos_world;
