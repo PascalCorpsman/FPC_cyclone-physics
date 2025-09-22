@@ -23,11 +23,6 @@ Uses
 
 Type
 
-
-  // Forward declarations of primitive friends
-  //    class IntersectionTests;
-  //    class CollisionDetector;
-
   (**
    * Represents a primitive to detect collisions against.
    *)
@@ -36,17 +31,10 @@ Type
 
   CollisionPrimitive = Class
   public
-    //        /**
-    //         * This class exists to help the collision detector
-    //         * and intersection routines, so they should have
-    //         * access to its data.
-    //         */
-    //        friend class IntersectionTests;
-    //        friend class CollisionDetector;
 
-            (**
-             * The rigid body that is represented by this primitive.
-             *)
+    (**
+     * The rigid body that is represented by this primitive.
+     *)
     body: RigidBody;
 
     (**
@@ -71,7 +59,7 @@ Type
      * (orientation + position) of the rigid body to which it is
      * attached.
      *)
-    Function getTransform(): PMatrix4;
+    Function getTransform(): Matrix4;
 
   protected
     (**
@@ -85,24 +73,23 @@ Type
     Destructor Destroy; override;
   End;
 
-  //    /**
-  //     * Represents a rigid body that can be treated as a sphere
-  //     * for collision detection.
-  //     */
-  //    class CollisionSphere : public CollisionPrimitive
-  //    {
-  //    public:
-  //        /**
-  //         * The radius of the sphere.
-  //         */
-  //        real radius;
-  //    };
+  (**
+   * Represents a rigid body that can be treated as a sphere
+   * for collision detection.
+   *)
+  CollisionSphere = Class(CollisionPrimitive)
+  public
+    (**
+     * The radius of the sphere.
+     *)
+    radius: float;
+  End;
 
-      (**
-       * The plane is not a primitive: it doesn't represent another
-       * rigid body. It is used for contacts with the immovable
-       * world geometry.
-       *)
+  (**
+   * The plane is not a primitive: it doesn't represent another
+   * rigid body. It is used for contacts with the immovable
+   * world geometry.
+   *)
   CollisionPlane = Class
   public
     (**
@@ -139,19 +126,19 @@ Type
 
   IntersectionTests = Class
   public
-    //
-    //        static bool sphereAndHalfSpace(
-    //            const CollisionSphere &sphere,
-    //            const CollisionPlane &plane);
-    //
-    //        static bool sphereAndSphere(
-    //            const CollisionSphere &one,
-    //            const CollisionSphere &two);
-    //
-    //        static bool boxAndBox(
-    //            const CollisionBox &one,
-    //            const CollisionBox &two);
-    //
+
+    Class Function sphereAndHalfSpace(
+      Const sphere: CollisionSphere;
+      Const plane: CollisionPlane): Boolean;
+
+    Class Function sphereAndSphere(
+      Const one: CollisionSphere;
+      Const two: CollisionSphere): Boolean;
+
+    Class Function boxAndBox(
+      Const one: CollisionBox;
+      Const two: CollisionBox): Boolean;
+
     (**
      * Does an intersection test on an arbitrarily aligned box and a
      * half-space.
@@ -167,18 +154,6 @@ Type
     Class Function boxAndHalfSpace(
       Const box: CollisionBox;
       Const plane: CollisionPlane): Boolean;
-  End;
-
-  (**
-   * Represents a rigid body that can be treated as a sphere
-   * for collision detection.
-   *)
-  CollisionSphere = Class(CollisionPrimitive)
-  public
-    (**
-     * The radius of the sphere.
-     *)
-    radius: float;
   End;
 
   (**
@@ -279,12 +254,13 @@ Type
       Var data: CollisionData
       ): unsigned;
 
-    //        static unsigned boxAndBox(
-    //            const CollisionBox &one,
-    //            const CollisionBox &two,
-    //            CollisionData *data
-    //            );
-    //
+    Class Function boxAndBox(
+      Const one: CollisionBox;
+      Const two: CollisionBox;
+      Var data: CollisionData
+      ): unsigned;
+
+
     //        static unsigned boxAndPoint(
     //            const CollisionBox &box,
     //            const Vector3 &point,
@@ -302,7 +278,7 @@ Implementation
 
 Function transformToAxis(
   Const box: CollisionBox;
-  Const axis: Vector3): Float;
+  Const axis: Vector3): Float Inline;
 Begin
   result :=
     box.halfSize.x * real_abs(axis * box.getAxis(0)) +
@@ -334,12 +310,106 @@ Begin
   result := transform.getAxisVector(index);
 End;
 
-Function CollisionPrimitive.getTransform: PMatrix4;
+Function CollisionPrimitive.getTransform: Matrix4;
 Begin
-  result := @transform;
+  result := transform;
 End;
 
 { IntersectionTests }
+
+Class Function IntersectionTests.sphereAndHalfSpace(
+  Const sphere: CollisionSphere; Const plane: CollisionPlane): Boolean;
+Var
+  ballDistance: float;
+Begin
+  // Find the distance from the origin
+  ballDistance :=
+    plane.direction *
+    sphere.getAxis(3) -
+    sphere.radius;
+
+  // Check for the intersection
+  result := ballDistance <= plane.offset;
+End;
+
+Class Function IntersectionTests.sphereAndSphere(Const one: CollisionSphere;
+  Const two: CollisionSphere): Boolean;
+Var
+  midline: Vector3;
+Begin
+  // Find the vector between the objects
+  midline := one.getAxis(3) - two.getAxis(3);
+
+  // See if it is large enough.
+  result := midline.squareMagnitude() <
+    (one.radius + two.radius) * (one.radius + two.radius);
+End;
+
+(**
+ * This function checks if the two boxes overlap
+ * along the given axis. The final parameter toCentre
+ * is used to pass in the vector between the boxes centre
+ * points, to avoid having to recalculate it each time.
+ *)
+
+Function overlapOnAxis(
+  Const one: CollisionBox;
+  Const two: CollisionBox;
+  Const axis: Vector3;
+  Const toCentre: Vector3
+  ): Boolean;
+Var
+  oneProject, twoProject, distance: Float;
+Begin
+  // Project the half-size of one onto axis
+  oneProject := transformToAxis(one, axis);
+  twoProject := transformToAxis(two, axis);
+
+  // Project this onto the axis
+  distance := real_abs(toCentre * axis);
+
+  // Check for overlap
+  result := (distance < oneProject + twoProject);
+End;
+
+Class Function IntersectionTests.boxAndBox(Const one: CollisionBox;
+  Const two: CollisionBox): Boolean;
+
+Var
+  toCentre: Vector3;
+
+  Function TEST_OVERLAP(Const axis: Vector3): boolean;
+  Begin
+    result := overlapOnAxis(one, two, (axis), toCentre);
+  End;
+
+Begin
+  // Find the vector between the two centres
+  toCentre := two.getAxis(3) - one.getAxis(3);
+
+  result := (
+    // Check on box one's axes first
+    TEST_OVERLAP(one.getAxis(0))) And (
+    TEST_OVERLAP(one.getAxis(1))) And (
+    TEST_OVERLAP(one.getAxis(2))) And (
+
+    // And on two's
+    TEST_OVERLAP(two.getAxis(0))) And (
+    TEST_OVERLAP(two.getAxis(1))) And (
+    TEST_OVERLAP(two.getAxis(2))) And (
+
+    // Now on the cross products
+    TEST_OVERLAP(one.getAxis(0) Mod two.getAxis(0))) And (
+    TEST_OVERLAP(one.getAxis(0) Mod two.getAxis(1))) And (
+    TEST_OVERLAP(one.getAxis(0) Mod two.getAxis(2))) And (
+    TEST_OVERLAP(one.getAxis(1) Mod two.getAxis(0))) And (
+    TEST_OVERLAP(one.getAxis(1) Mod two.getAxis(1))) And (
+    TEST_OVERLAP(one.getAxis(1) Mod two.getAxis(2))) And (
+    TEST_OVERLAP(one.getAxis(2) Mod two.getAxis(0))) And (
+    TEST_OVERLAP(one.getAxis(2) Mod two.getAxis(1))) And (
+    TEST_OVERLAP(one.getAxis(2) Mod two.getAxis(2))
+    );
+End;
 
 Class Function IntersectionTests.boxAndHalfSpace(Const box: CollisionBox;
   Const plane: CollisionPlane): Boolean;
@@ -492,6 +562,306 @@ Begin
 
   data.addContacts(contactsUsed);
   result := contactsUsed;
+End;
+
+(*
+ * This function checks if the two boxes overlap
+ * along the given axis, returning the ammount of overlap.
+ * The final parameter toCentre
+ * is used to pass in the vector between the boxes centre
+ * points, to avoid having to recalculate it each time.
+ *)
+
+Function penetrationOnAxis(
+  Const one: CollisionBox;
+  Const two: CollisionBox;
+  Const axis: Vector3;
+  Const toCentre: Vector3
+  ): Float;
+Var
+  oneProject, twoProject, distance: Float;
+Begin
+  // Project the half-size of one onto axis
+  oneProject := transformToAxis(one, axis);
+  twoProject := transformToAxis(two, axis);
+
+  // Project this onto the axis
+  distance := real_abs(toCentre * axis);
+
+  // Return the overlap (i.e. positive indicates
+  // overlap, negative indicates separation).
+  result := oneProject + twoProject - distance;
+End;
+
+Function tryAxis(
+  Const one: CollisionBox;
+  Const two: CollisionBox;
+  axis: Vector3;
+  Const toCentre: Vector3;
+  index: unsigned;
+
+  // These values may be updated
+  Var smallestPenetration: Float;
+  Var smallestCase: unsigned
+  ): Boolean;
+Var
+  penetration: Float;
+Begin
+  result := true;
+  // Make sure we have a normalized axis, and don't check almost parallel axes
+  If (axis.squareMagnitude() < 0.0001) Then exit;
+  axis.Normalize();
+  result := false;
+
+  penetration := penetrationOnAxis(one, two, axis, toCentre);
+
+  If (penetration < 0) Then exit;
+  If (penetration < smallestPenetration) Then Begin
+    smallestPenetration := penetration;
+    smallestCase := index;
+  End;
+  result := true;
+End;
+
+
+Procedure fillPointFaceBoxBox(
+  Const one: CollisionBox;
+  Const two: CollisionBox;
+  Const toCentre: Vector3;
+  Var data: CollisionData;
+  best: unsigned;
+  pen: float
+  );
+Var
+  contact: pContact;
+  vertex, normal: Vector3;
+
+Begin
+  // This method is called when we know that a vertex from
+  // box two is in contact with box one.
+
+  contact := data.contacts;
+
+  // We know which axis the collision is on (i.e. best),
+  // but we need to work out which of the two faces on
+  // this axis.
+  normal := one.getAxis(best);
+  If (one.getAxis(best) * toCentre > 0) Then Begin
+    normal := normal * -1.0;
+  End;
+
+  // Work out which vertex of box two we're colliding with.
+  // Using toCentre doesn't work!
+  vertex := two.halfSize;
+  If (two.getAxis(0) * normal < 0) Then vertex.x := -vertex.x;
+  If (two.getAxis(1) * normal < 0) Then vertex.y := -vertex.y;
+  If (two.getAxis(2) * normal < 0) Then vertex.z := -vertex.z;
+
+  // Create the contact data
+  contact^.contactNormal := normal;
+  contact^.penetration := pen;
+  contact^.contactPoint := two.getTransform() * vertex;
+  contact^.setBodyData(@one.body, @two.body,
+    data.friction, data.restitution);
+End;
+
+
+Function contactPoint(
+  Const pOne: Vector3;
+  Const dOne: Vector3;
+  oneSize: Float;
+  Const pTwo: Vector3;
+  Const dTwo: Vector3;
+  twoSize: Float;
+
+  // If this is true, and the contact point is outside
+  // the edge (in the case of an edge-face contact) then
+  // we use one's midpoint, otherwise we use two's.
+  useOne: Boolean): Vector3;
+Var
+  toSt, cOne, cTwo: Vector3;
+  dpStaOne, dpStaTwo, dpOneTwo, smOne, smTwo: float;
+  denom, mua, mub: float;
+Begin
+
+  smOne := dOne.squareMagnitude();
+  smTwo := dTwo.squareMagnitude();
+  dpOneTwo := dTwo * dOne;
+
+  toSt := pOne - pTwo;
+  dpStaOne := dOne * toSt;
+  dpStaTwo := dTwo * toSt;
+
+  denom := smOne * smTwo - dpOneTwo * dpOneTwo;
+
+  // Zero denominator indicates parrallel lines
+  If (real_abs(denom) < 0.0001) Then Begin
+    If useOne Then
+      result := pOne
+    Else
+      result := pTwo;
+    exit;
+  End;
+
+  mua := (dpOneTwo * dpStaTwo - smTwo * dpStaOne) / denom;
+  mub := (smOne * dpStaTwo - dpOneTwo * dpStaOne) / denom;
+
+  // If either of the edges has the nearest point out
+  // of bounds, then the edges aren't crossed, we have
+  // an edge-face contact. Our point is on the edge, which
+  // we know from the useOne parameter.
+  If (mua > oneSize) Or (
+    mua < -oneSize) Or (
+    mub > twoSize) Or (
+    mub < -twoSize) Then Begin
+
+    If useOne Then
+      result := pOne
+    Else
+      result := pTwo;
+  End
+  Else Begin
+    cOne := pOne + dOne * mua;
+    cTwo := pTwo + dTwo * mub;
+
+    result := cOne * 0.5 + cTwo * 0.5;
+  End;
+End;
+
+Class Function CollisionDetector.boxAndBox(Const one: CollisionBox;
+  Const two: CollisionBox; Var data: CollisionData): unsigned;
+Var
+  toCentre: Vector3;
+  pen: float;
+  best: unsigned;
+  Function CHECK_OVERLAP(Const axis: vector3; Const index: unsigned): boolean;
+  Begin
+    result := (Not tryAxis(one, two, (axis), toCentre, (index), pen, best));
+  End;
+
+Var
+  bestSingleAxis, oneAxisIndex, twoAxisIndex, i: unsigned;
+  vertex, ptOnOneEdge, ptOnTwoEdge, oneAxis, twoAxis, axis: Vector3;
+  contact: pContact;
+Begin
+  result := 0;
+
+  //if (!IntersectionTests::boxAndBox(one, two)) return 0;
+
+  // Find the vector between the two centres
+  toCentre := two.getAxis(3) - one.getAxis(3);
+
+  // We start assuming there is no contact
+  pen := REAL_MAX;
+  best := $FFFFFF;
+
+  // Now we check each axes, returning if it gives us
+  // a separating axis, and keeping track of the axis with
+  // the smallest penetration otherwise.
+  If CHECK_OVERLAP(one.getAxis(0), 0) Then exit;
+  If CHECK_OVERLAP(one.getAxis(1), 1) Then exit;
+  If CHECK_OVERLAP(one.getAxis(2), 2) Then exit;
+
+  If CHECK_OVERLAP(two.getAxis(0), 3) Then exit;
+  If CHECK_OVERLAP(two.getAxis(1), 4) Then exit;
+  If CHECK_OVERLAP(two.getAxis(2), 5) Then exit;
+
+  // Store the best axis-major, in case we run into almost
+  // parallel edge collisions later
+  bestSingleAxis := best;
+
+  If CHECK_OVERLAP(one.getAxis(0) Mod two.getAxis(0), 6) Then exit;
+  If CHECK_OVERLAP(one.getAxis(0) Mod two.getAxis(1), 7) Then exit;
+  If CHECK_OVERLAP(one.getAxis(0) Mod two.getAxis(2), 8) Then exit;
+  If CHECK_OVERLAP(one.getAxis(1) Mod two.getAxis(0), 9) Then exit;
+  If CHECK_OVERLAP(one.getAxis(1) Mod two.getAxis(1), 10) Then exit;
+  If CHECK_OVERLAP(one.getAxis(1) Mod two.getAxis(2), 11) Then exit;
+  If CHECK_OVERLAP(one.getAxis(2) Mod two.getAxis(0), 12) Then exit;
+  If CHECK_OVERLAP(one.getAxis(2) Mod two.getAxis(1), 13) Then exit;
+  If CHECK_OVERLAP(one.getAxis(2) Mod two.getAxis(2), 14) Then exit;
+
+  // Make sure we've got a result.
+  assert(best <> $FFFFFF);
+
+  // We now know there's a collision, and we know which
+  // of the axes gave the smallest penetration. We now
+  // can deal with it in different ways depending on
+  // the case.
+  If (best < 3) Then Begin
+
+    // We've got a vertex of box two on a face of box one.
+    fillPointFaceBoxBox(one, two, toCentre, data, best, pen);
+    data.addContacts(1);
+    result := 1;
+  End
+  Else If (best < 6) Then Begin
+    // We've got a vertex of box one on a face of box two.
+    // We use the same algorithm as above, but swap around
+    // one and two (and therefore also the vector between their
+    // centres).
+    fillPointFaceBoxBox(two, one, toCentre * -1.0, data, best - 3, pen);
+    data.addContacts(1);
+    result := 1;
+  End
+  Else Begin
+    // We've got an edge-edge contact. Find out which axes
+    best := best - 6;
+    oneAxisIndex := best Div 3;
+    twoAxisIndex := best Mod 3;
+    oneAxis := one.getAxis(oneAxisIndex);
+    twoAxis := two.getAxis(twoAxisIndex);
+    axis := oneAxis Mod twoAxis;
+    axis.Normalize();
+
+    // The axis should point from box one to box two.
+    If (axis * toCentre > 0) Then axis := axis * -1.0;
+
+    // We have the axes, but not the edges: each axis has 4 edges parallel
+    // to it, we need to find which of the 4 for each object. We do
+    // that by finding the point in the centre of the edge. We know
+    // its component in the direction of the box's collision axis is zero
+    // (its a mid-point) and we determine which of the extremes in each
+    // of the other axes is closest.
+    ptOnOneEdge := one.halfSize;
+    ptOnTwoEdge := two.halfSize;
+
+    For i := 0 To 2 Do Begin
+      If (i = oneAxisIndex) Then
+        ptOnOneEdge[i] := 0
+      Else If (one.getAxis(i) * axis > 0) Then
+        ptOnOneEdge[i] := -ptOnOneEdge[i];
+
+      If (i = twoAxisIndex) Then
+        ptOnTwoEdge[i] := 0
+      Else If (two.getAxis(i) * axis < 0) Then
+        ptOnTwoEdge[i] := -ptOnTwoEdge[i];
+    End;
+
+    // Move them into world coordinates (they are already oriented
+    // correctly, since they have been derived from the axes).
+    ptOnOneEdge := one.transform * ptOnOneEdge;
+    ptOnTwoEdge := two.transform * ptOnTwoEdge;
+
+    // So we have a point and a direction for the colliding edges.
+    // We need to find out point of closest approach of the two
+    // line-segments.
+    vertex := contactPoint(
+      ptOnOneEdge, oneAxis, one.halfSize[oneAxisIndex],
+      ptOnTwoEdge, twoAxis, two.halfSize[twoAxisIndex],
+      bestSingleAxis > 2
+      );
+
+    // We can fill the contact.
+    contact := data.contacts;
+
+    contact^.penetration := pen;
+    contact^.contactNormal := axis;
+    contact^.contactPoint := vertex;
+    contact^.setBodyData(@one.body, @two.body,
+      data.friction, data.restitution);
+    data.addContacts(1);
+    result := 1;
+  End;
 End;
 
 End.

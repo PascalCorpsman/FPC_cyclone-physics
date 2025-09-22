@@ -56,8 +56,12 @@ Type
   Vector3 = Object
   private
     pad: float; // Not used at all, just to pad the size to 16 byte instead 12 when using float = single
+    Function getIndex(aIndex: integer): float;
+    Procedure setIndex(aIndex: integer; AValue: float);
   public
     x, y, z: float;
+
+    Property Index[aIndex: integer]: float read getIndex write setIndex; default;
 
     Constructor create(); overload;
     Constructor create(aX, aY, aZ: float); overload;
@@ -762,6 +766,7 @@ Operator * (v: Vector3; s: Float): Vector3;
 Operator * (s: Float; v: Vector3): Vector3;
 Operator * (a, b: Vector3): Float;
 Operator * (m, o: Matrix4): Matrix4;
+Operator * (m: Matrix4; vector: Vector3): Vector3;
 
 Operator Mod (a, b: Vector3): Vector3;
 
@@ -926,6 +931,26 @@ Begin
 End;
 
 { Vector3 }
+
+Function Vector3.getIndex(aIndex: integer): float;
+Begin
+  Case aIndex Of
+    0: result := x;
+    1: result := y;
+  Else
+    result := z;
+  End;
+End;
+
+Procedure Vector3.setIndex(aIndex: integer; AValue: float);
+Begin
+  Case aIndex Of
+    0: x := AValue;
+    1: y := AValue;
+  Else
+    z := AValue;
+  End;
+End;
 
 Constructor Vector3.create;
 Begin
