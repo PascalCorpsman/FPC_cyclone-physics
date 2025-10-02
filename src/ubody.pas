@@ -148,30 +148,29 @@ Type
      *)
     rotation: Vector3;
 
-    //        /*@}*/
+    (*@}*)
 
+    (**
+     * @name Derived Data
+     *
+     * These data members hold information that is derived from
+     * the other data in the class.
+     *)
+    (*@{*)
 
-    //        /**
-    //         * @name Derived Data
-    //         *
-    //         * These data members hold information that is derived from
-    //         * the other data in the class.
-    //         */
-    //        /*@{*/
-    //
-    //        /**
-    //         * Holds the inverse inertia tensor of the body in world
-    //         * space. The inverse inertia tensor member is specified in
-    //         * the body's local space.
-    //         *
-    //         * @see inverseInertiaTensor
-    //         */
-    //        Matrix3 inverseInertiaTensorWorld;
+    (**
+     * Holds the inverse inertia tensor of the body in world
+     * space. The inverse inertia tensor member is specified in
+     * the body's local space.
+     *
+     * @see inverseInertiaTensor
+     *)
+    inverseInertiaTensorWorld: Matrix3;
 
-            (**
-             * Holds the amount of motion of the body. This is a recency
-             * weighted mean that can be used to put a body to sleap.
-             *)
+    (**
+     * Holds the amount of motion of the body. This is a recency
+     * weighted mean that can be used to put a body to sleap.
+     *)
     motion: float;
 
     (**
@@ -198,26 +197,26 @@ Type
      * @see getTransform
      *)
     transformMatrix: Matrix4;
-    //
-    //        /*@}*/
-    //
-    //
-    //        /**
-    //         * @name Force and Torque Accumulators
-    //         *
-    //         * These data members store the current force, torque and
-    //         * acceleration of the rigid body. Forces can be added to the
-    //         * rigid body in any order, and the class decomposes them into
-    //         * their constituents, accumulating them for the next
-    //         * simulation step. At the simulation step, the accelerations
-    //         * are calculated and stored to be applied to the rigid body.
-    //         */
-    //        /*@{*/
 
-            (**
-             * Holds the accumulated force to be applied at the next
-             * integration step.
-             *)
+    (*@}*)
+
+
+    (**
+     * @name Force and Torque Accumulators
+     *
+     * These data members store the current force, torque and
+     * acceleration of the rigid body. Forces can be added to the
+     * rigid body in any order, and the class decomposes them into
+     * their constituents, accumulating them for the next
+     * simulation step. At the simulation step, the accelerations
+     * are calculated and stored to be applied to the rigid body.
+     *)
+    (*@{*)
+
+    (**
+     * Holds the accumulated force to be applied at the next
+     * integration step.
+     *)
     forceAccum: Vector3;
 
     (**
@@ -233,14 +232,14 @@ Type
       *)
     acceleration: Vector3;
 
-    //        /**
-    //         * Holds the linear acceleration of the rigid body, for the
-    //         * previous frame.
-    //         */
-    //        Vector3 lastFrameAcceleration;
-    //
-    //        /*@}*/
-    //
+    (**
+     * Holds the linear acceleration of the rigid body, for the
+     * previous frame.
+     *)
+    lastFrameAcceleration: Vector3;
+
+    (*@}*)
+
   public
     (**
      * @name Constructor and Destructor
@@ -1099,6 +1098,7 @@ Begin
   velocity.create();
   rotation.create();
   inverseInertiaTensor.create();
+  inverseInertiaTensorWorld.create();
   motion := 0;
 End;
 
@@ -1117,54 +1117,59 @@ Begin
 End;
 
 Procedure RigidBody.integrate(duration: float);
+Var
+  angularAcceleration: Vector3;
+  currentMotion, bias: float;
 Begin
   If (Not isAwake) Then exit;
 
-  //    // Calculate linear acceleration from force inputs.
-  //    lastFrameAcceleration = acceleration;
-  //    lastFrameAcceleration.addScaledVector(forceAccum, inverseMass);
-  //
-  //    // Calculate angular acceleration from torque inputs.
-  //    Vector3 angularAcceleration =
-  //        inverseInertiaTensorWorld.transform(torqueAccum);
-  //
-  //    // Adjust velocities
-  //    // Update linear velocity from both acceleration and impulse.
-  //    velocity.addScaledVector(lastFrameAcceleration, duration);
-  //
-  //    // Update angular velocity from both acceleration and impulse.
-  //    rotation.addScaledVector(angularAcceleration, duration);
-  //
-  //    // Impose drag.
-  //    velocity *= real_pow(linearDamping, duration);
-  //    rotation *= real_pow(angularDamping, duration);
-  //
-  //    // Adjust positions
-  //    // Update linear position.
-  //    position.addScaledVector(velocity, duration);
-  //
-  //    // Update angular position.
-  //    orientation.addScaledVector(rotation, duration);
-  //
-      // Normalise the orientation, and update the matrices with the new
-      // position and orientation
+  // Calculate linear acceleration from force inputs.
+  lastFrameAcceleration := acceleration;
+  lastFrameAcceleration.addScaledVector(forceAccum, inverseMass);
+
+  // Calculate angular acceleration from torque inputs.
+  angularAcceleration := inverseInertiaTensorWorld.transform(torqueAccum);
+
+  // Adjust velocities
+  // Update linear velocity from both acceleration and impulse.
+  velocity.addScaledVector(lastFrameAcceleration, duration);
+
+  // Update angular velocity from both acceleration and impulse.
+  rotation.addScaledVector(angularAcceleration, duration);
+
+  // Impose drag.
+  velocity := velocity * real_pow(linearDamping, duration);
+  rotation := rotation * real_pow(angularDamping, duration);
+
+  // Adjust positions
+  // Update linear position.
+  position.addScaledVector(velocity, duration);
+
+  // Update angular position.
+  orientation.addScaledVector(rotation, duration);
+
+  // Normalise the orientation, and update the matrices with the new
+  // position and orientation
   calculateDerivedData();
 
   // Clear accumulators.
-//  clearAccumulators();
-  //
-  //    // Update the kinetic energy store, and possibly put the body to
-  //    // sleep.
-  //    if (canSleep) {
-  //        real currentMotion = velocity.scalarProduct(velocity) +
-  //            rotation.scalarProduct(rotation);
-  //
-  //        real bias = real_pow(0.5, duration);
-  //        motion = bias*motion + (1-bias)*currentMotion;
-  //
-  //        if (motion < sleepEpsilon) setAwake(false);
-  //        else if (motion > 10 * sleepEpsilon) motion = 10 * sleepEpsilon;
-  //    }
+  clearAccumulators();
+
+  // Update the kinetic energy store, and possibly put the body to
+  // sleep.
+  If (canSleep) Then Begin
+    currentMotion := velocity.scalarProduct(velocity) +
+      rotation.scalarProduct(rotation);
+
+    bias := real_pow(0.5, duration);
+    motion := bias * motion + (1 - bias) * currentMotion;
+
+    If (motion < sleepEpsilon) Then Begin
+      setAwake(false);
+    End
+    Else If (motion > 10 * sleepEpsilon) Then
+      motion := 10 * sleepEpsilon;
+  End;
 End;
 
 Procedure RigidBody.setMass(Const mass: float);

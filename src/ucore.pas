@@ -173,46 +173,17 @@ Type
      *)
     Procedure normalise();
 
-    //        /**
-    //         * Multiplies the quaternion by the given quaternion.
-    //         *
-    //         * @param multiplier The quaternion by which to multiply.
-    //         */
-    //        void operator *=(const Quaternion &multiplier)
-    //        {
-    //            Quaternion q = *this;
-    //            r = q.r*multiplier.r - q.i*multiplier.i -
-    //                q.j*multiplier.j - q.k*multiplier.k;
-    //            i = q.r*multiplier.i + q.i*multiplier.r +
-    //                q.j*multiplier.k - q.k*multiplier.j;
-    //            j = q.r*multiplier.j + q.j*multiplier.r +
-    //                q.k*multiplier.i - q.i*multiplier.k;
-    //            k = q.r*multiplier.k + q.k*multiplier.r +
-    //                q.i*multiplier.j - q.j*multiplier.i;
-    //        }
-    //
-    //        /**
-    //         * Adds the given vector to this, scaled by the given amount.
-    //         * This is used to update the orientation quaternion by a rotation
-    //         * and time.
-    //         *
-    //         * @param vector The vector to add.
-    //         *
-    //         * @param scale The amount of the vector to add.
-    //         */
-    //        void addScaledVector(const Vector3& vector, real scale)
-    //        {
-    //            Quaternion q(0,
-    //                vector.x * scale,
-    //                vector.y * scale,
-    //                vector.z * scale);
-    //            q *= *this;
-    //            r += q.r * ((real)0.5);
-    //            i += q.i * ((real)0.5);
-    //            j += q.j * ((real)0.5);
-    //            k += q.k * ((real)0.5);
-    //        }
-    //
+    (**
+     * Adds the given vector to this, scaled by the given amount.
+     * This is used to update the orientation quaternion by a rotation
+     * and time.
+     *
+     * @param vector The vector to add.
+     *
+     * @param scale The amount of the vector to add.
+     *)
+    Procedure addScaledVector(Const vector: Vector3; scale: float);
+
     //        void rotateByVector(const Vector3& vector)
     //        {
     //            Quaternion q(0, vector.x, vector.y, vector.z);
@@ -556,30 +527,13 @@ Type
     Procedure setComponents(Const compOne: Vector3; Const compTwo: Vector3;
       Const compThree: Vector3);
 
-    //        /**
-    //         * Transform the given vector by this matrix.
-    //         *
-    //         * @param vector The vector to transform.
-    //         */
-    //        Vector3 operator*(const Vector3 &vector) const
-    //        {
-    //            return Vector3(
-    //                vector.x * data[0] + vector.y * data[1] + vector.z * data[2],
-    //                vector.x * data[3] + vector.y * data[4] + vector.z * data[5],
-    //                vector.x * data[6] + vector.y * data[7] + vector.z * data[8]
-    //            );
-    //        }
-    //
-    //        /**
-    //         * Transform the given vector by this matrix.
-    //         *
-    //         * @param vector The vector to transform.
-    //         */
-    //        Vector3 transform(const Vector3 &vector) const
-    //        {
-    //            return (*this) * vector;
-    //        }
-    //
+    (**
+     * Transform the given vector by this matrix.
+     *
+     * @param vector The vector to transform.
+     *)
+    Function transform(Const vector: Vector3): Vector3;
+
     //        /**
     //         * Transform the given vector by the transpose of this matrix.
     //         *
@@ -766,7 +720,9 @@ Operator * (v: Vector3; s: Float): Vector3;
 Operator * (s: Float; v: Vector3): Vector3;
 Operator * (a, b: Vector3): Float;
 Operator * (m, o: Matrix4): Matrix4;
+Operator * (m: Matrix3; vector: Vector3): Vector3;
 Operator * (m: Matrix4; vector: Vector3): Vector3;
+Operator * (Const a, b: Quaternion): Quaternion;
 
 Operator Mod (a, b: Vector3): Vector3;
 
@@ -866,6 +822,21 @@ End;
  * @param vector The vector to transform.
  *)
 
+Operator * (m: Matrix3; vector: Vector3): Vector3;
+Begin
+  result.create(
+    vector.x * m.data[0] + vector.y * m.data[1] + vector.z * m.data[2],
+    vector.x * m.data[3] + vector.y * m.data[4] + vector.z * m.data[5],
+    vector.x * m.data[6] + vector.y * m.data[7] + vector.z * m.data[8]
+    );
+End;
+
+(**
+ * Transform the given vector by this matrix.
+ *
+ * @param vector The vector to transform.
+ *)
+
 Operator * (m: Matrix4; vector: Vector3): Vector3;
 Begin
   result.create(
@@ -881,6 +852,24 @@ Begin
     vector.y * m.data[9] +
     vector.z * m.data[10] + m.data[11]
     );
+End;
+
+(**
+ * Multiplies the quaternion by the given quaternion.
+ *
+ * @param multiplier The quaternion by which to multiply.
+ *)
+
+Operator * (Const a, b: Quaternion): Quaternion;
+Begin
+  result._d.r := a._d.r * b._d.r - a._d.i * b._d.i -
+    a._d.j * b._d.j - a._d.k * b._d.k;
+  result._d.i := a._d.r * b._d.i + a._d.i * b._d.r +
+    a._d.j * b._d.k - a._d.k * b._d.j;
+  result._d.j := a._d.r * b._d.j + a._d.j * b._d.r +
+    a._d.k * b._d.i - a._d.i * b._d.k;
+  result._d.k := a._d.r * b._d.k + a._d.k * b._d.r +
+    a._d.i * b._d.j - a._d.j * b._d.i;
 End;
 
 Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
@@ -1071,6 +1060,21 @@ Begin
   _d.k := _d.k * d;
 End;
 
+Procedure Quaternion.addScaledVector(Const vector: Vector3; scale: float);
+Var
+  q: Quaternion;
+Begin
+  q.Create(0,
+    vector.x * scale,
+    vector.y * scale,
+    vector.z * scale);
+  q := q * self;
+  _d.r := _d.r + q._d.r * 0.5;
+  _d.i := _d.i + q._d.i * 0.5;
+  _d.j := _d.j + q._d.j * 0.5;
+  _d.k := _d.k + q._d.k * 0.5;
+End;
+
 { Matrix4 }
 
 Constructor Matrix4.create();
@@ -1150,6 +1154,11 @@ Begin
   data[6] := compOne.z;
   data[7] := compTwo.z;
   data[8] := compThree.z;
+End;
+
+Function Matrix3.transform(Const vector: Vector3): Vector3;
+Begin
+  result := self * vector;
 End;
 
 Procedure Matrix3.setInverse(Const m: Matrix3);
