@@ -748,7 +748,7 @@ Var
 Begin
   // Check whether the Z-axis is nearer to the X or Y axis
   If (real_abs(contactNormal.x) > real_abs(contactNormal.y)) Then Begin
-
+   // hier weiter
     //        // Scaling factor to ensure the results are normalised
     //        const real s = (real)1.0f/real_sqrt(contactNormal.z*contactNormal.z +
     //            contactNormal.x*contactNormal.x);
