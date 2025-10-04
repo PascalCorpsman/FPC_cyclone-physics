@@ -534,20 +534,13 @@ Type
      *)
     Function transform(Const vector: Vector3): Vector3;
 
-    //        /**
-    //         * Transform the given vector by the transpose of this matrix.
-    //         *
-    //         * @param vector The vector to transform.
-    //         */
-    //        Vector3 transformTranspose(const Vector3 &vector) const
-    //        {
-    //            return Vector3(
-    //                vector.x * data[0] + vector.y * data[3] + vector.z * data[6],
-    //                vector.x * data[1] + vector.y * data[4] + vector.z * data[7],
-    //                vector.x * data[2] + vector.y * data[5] + vector.z * data[8]
-    //            );
-    //        }
-    //
+    (**
+     * Transform the given vector by the transpose of this matrix.
+     *
+     * @param vector The vector to transform.
+     *)
+    Function transformTranspose(Const vector: Vector3): Vector3;
+
     //        /**
     //         * Gets a vector representing one row in the matrix.
     //         *
@@ -1159,6 +1152,15 @@ End;
 Function Matrix3.transform(Const vector: Vector3): Vector3;
 Begin
   result := self * vector;
+End;
+
+Function Matrix3.transformTranspose(Const vector: Vector3): Vector3;
+Begin
+  result.create(
+    vector.x * data[0] + vector.y * data[3] + vector.z * data[6],
+    vector.x * data[1] + vector.y * data[4] + vector.z * data[7],
+    vector.x * data[2] + vector.y * data[5] + vector.z * data[8]
+    );
 End;
 
 Procedure Matrix3.setInverse(Const m: Matrix3);

@@ -287,32 +287,32 @@ Type
     (*@}*)
 
 
-//        /**
-//         * @name Accessor Functions for the Rigid Body's State
-//         *
-//         * These functions provide access to the rigid body's
-//         * characteristics or state. These data can be accessed
-//         * individually, or en masse as an array of values
-//         * (e.g. getCharacteristics, getState). When setting new data,
-//         * make sure the calculateInternals function, or an
-//         * integration routine, is called before trying to get data
-//         * from the body, since the class contains a number of
-//         * dependent values that will need recalculating.
-//         */
-//        /*@{*/
-//
-        (**
-         * Sets the mass of the rigid body.
-         *
-         * @param mass The new mass of the body. This may not be zero.
-         * Small masses can produce unstable rigid bodies under
-         * simulation.
-         *
-         * @warning This invalidates internal data for the rigid body.
-         * Either an integration function, or the calculateInternals
-         * function should be called before trying to get any settings
-         * from the rigid body.
-         *)
+    (**
+     * @name Accessor Functions for the Rigid Body's State
+     *
+     * These functions provide access to the rigid body's
+     * characteristics or state. These data can be accessed
+     * individually, or en masse as an array of values
+     * (e.g. getCharacteristics, getState). When setting new data,
+     * make sure the calculateInternals function, or an
+     * integration routine, is called before trying to get data
+     * from the body, since the class contains a number of
+     * dependent values that will need recalculating.
+     *)
+    (*@{*)
+
+    (**
+     * Sets the mass of the rigid body.
+     *
+     * @param mass The new mass of the body. This may not be zero.
+     * Small masses can produce unstable rigid bodies under
+     * simulation.
+     *
+     * @warning This invalidates internal data for the rigid body.
+     * Either an integration function, or the calculateInternals
+     * function should be called before trying to get any settings
+     * from the rigid body.
+     *)
     Procedure setMass(Const mass: float);
 
     //        /**
@@ -729,22 +729,22 @@ Type
     //         * body.
     //         */
     //        void setVelocity(const real x, const real y, const real z);
-    //
-    //        /**
-    //         * Fills the given vector with the velocity of the rigid body.
-    //         *
-    //         * @param velocity A pointer to a vector into which to write
-    //         * the velocity. The velocity is given in world local space.
-    //         */
-    //        void getVelocity(Vector3 *velocity) const;
-    //
-    //        /**
-    //         * Gets the velocity of the rigid body.
-    //         *
-    //         * @return The velocity of the rigid body. The velocity is
-    //         * given in world local space.
-    //         */
-    //        Vector3 getVelocity() const;
+
+            (**
+             * Fills the given vector with the velocity of the rigid body.
+             *
+             * @param velocity A pointer to a vector into which to write
+             * the velocity. The velocity is given in world local space.
+             *)
+    Procedure getVelocity(Var avelocity: Vector3);
+
+    (**
+     * Gets the velocity of the rigid body.
+     *
+     * @return The velocity of the rigid body. The velocity is
+     * given in world local space.
+     *)
+    Function getVelocity(): Vector3;
     //
     //        /**
     //         * Applies the given change in velocity.
@@ -773,23 +773,23 @@ Type
     //         * body.
     //         */
     //        void setRotation(const real x, const real y, const real z);
-    //
-    //        /**
-    //         * Fills the given vector with the rotation of the rigid body.
-    //         *
-    //         * @param rotation A pointer to a vector into which to write
-    //         * the rotation. The rotation is given in world local space.
-    //         */
-    //        void getRotation(Vector3 *rotation) const;
-    //
-    //        /**
-    //         * Gets the rotation of the rigid body.
-    //         *
-    //         * @return The rotation of the rigid body. The rotation is
-    //         * given in world local space.
-    //         */
-    //        Vector3 getRotation() const;
-    //
+
+            (**
+             * Fills the given vector with the rotation of the rigid body.
+             *
+             * @param rotation A pointer to a vector into which to write
+             * the rotation. The rotation is given in world local space.
+             *)
+    Procedure getRotation(Var arotation: Vector3);
+
+    (**
+     * Gets the rotation of the rigid body.
+     *
+     * @return The rotation of the rigid body. The rotation is
+     * given in world local space.
+     *)
+    Function getRotation(): Vector3;
+
     //        /**
     //         * Applies the given change in rotation.
     //         */
@@ -832,60 +832,60 @@ Type
              *)
     Procedure setCanSleep(Const acanSleep: boolean);
 
-    //        /*@}*/
-    //
-    //
-    //        /**
-    //         * @name Retrieval Functions for Dynamic Quantities
-    //         *
-    //         * These functions provide access to the acceleration
-    //         * properties of the body. The acceleration is generated by
-    //         * the simulation from the forces and torques applied to the
-    //         * rigid body. Acceleration cannot be directly influenced, it
-    //         * is set during integration, and represent the acceleration
-    //         * experienced by the body of the previous simulation step.
-    //         */
-    //        /*@{*/
-    //
-    //        /**
-    //         * Fills the given vector with the current accumulated value
-    //         * for linear acceleration. The acceleration accumulators
-    //         * are set during the integration step. They can be read to
-    //         * determine the rigid body's acceleration over the last
-    //         * integration step. The linear acceleration is given in world
-    //         * space.
-    //         *
-    //         * @param linearAcceleration A pointer to a vector to receive
-    //         * the linear acceleration data.
-    //         */
-    //        void getLastFrameAcceleration(Vector3 *linearAcceleration) const;
-    //
-    //        /**
-    //         * Gets the current accumulated value for linear
-    //         * acceleration. The acceleration accumulators are set during
-    //         * the integration step. They can be read to determine the
-    //         * rigid body's acceleration over the last integration
-    //         * step. The linear acceleration is given in world space.
-    //         *
-    //         * @return The rigid body's linear acceleration.
-    //         */
-    //        Vector3 getLastFrameAcceleration() const;
-    //
-    //        /*@}*/
-    //
-    //
-    //        /**
-    //         * @name Force, Torque and Acceleration Set-up Functions
-    //         *
-    //         * These functions set up forces and torques to apply to the
-    //         * rigid body.
-    //         */
-    //        /*@{*/
+    (*@}*)
 
-            (**
-             * Clears the forces and torques in the accumulators. This will
-             * be called automatically after each intergration step.
-             *)
+
+    (**
+     * @name Retrieval Functions for Dynamic Quantities
+     *
+     * These functions provide access to the acceleration
+     * properties of the body. The acceleration is generated by
+     * the simulation from the forces and torques applied to the
+     * rigid body. Acceleration cannot be directly influenced, it
+     * is set during integration, and represent the acceleration
+     * experienced by the body of the previous simulation step.
+     *)
+    (*@{*)
+
+    (**
+     * Fills the given vector with the current accumulated value
+     * for linear acceleration. The acceleration accumulators
+     * are set during the integration step. They can be read to
+     * determine the rigid body's acceleration over the last
+     * integration step. The linear acceleration is given in world
+     * space.
+     *
+     * @param linearAcceleration A pointer to a vector to receive
+     * the linear acceleration data.
+     *)
+    Procedure getLastFrameAcceleration(Var linearAcceleration: Vector3);
+
+    (**
+     * Gets the current accumulated value for linear
+     * acceleration. The acceleration accumulators are set during
+     * the integration step. They can be read to determine the
+     * rigid body's acceleration over the last integration
+     * step. The linear acceleration is given in world space.
+     *
+     * @return The rigid body's linear acceleration.
+     *)
+    Function getLastFrameAcceleration(): Vector3;
+
+    (*@}*)
+
+
+    (**
+     * @name Force, Torque and Acceleration Set-up Functions
+     *
+     * These functions set up forces and torques to apply to the
+     * rigid body.
+     *)
+    (*@{*)
+
+    (**
+     * Clears the forces and torques in the accumulators. This will
+     * be called automatically after each intergration step.
+     *)
     Procedure clearAccumulators();
 
     //        /**
@@ -1215,7 +1215,7 @@ Begin
   aposition := position;
 End;
 
-Function RigidBody.getPosition(): Vector3;
+Function RigidBody.getPosition: Vector3;
 Begin
   result := position;
 End;
@@ -1272,9 +1272,29 @@ Begin
   velocity := avelocity;
 End;
 
+Procedure RigidBody.getVelocity(Var avelocity: Vector3);
+Begin
+  avelocity := velocity;
+End;
+
+Function RigidBody.getVelocity: Vector3;
+Begin
+  result := velocity;
+End;
+
 Procedure RigidBody.setRotation(Const arotation: Vector3);
 Begin
   rotation := arotation;
+End;
+
+Procedure RigidBody.getRotation(Var arotation: Vector3);
+Begin
+  arotation := rotation;
+End;
+
+Function RigidBody.getRotation: Vector3;
+Begin
+  result := rotation;
 End;
 
 Function RigidBody.getAwake: boolean;
@@ -1301,6 +1321,16 @@ Procedure RigidBody.setCanSleep(Const acanSleep: boolean);
 Begin
   canSleep := acanSleep;
   If (Not canSleep) And (Not isAwake) Then setAwake();
+End;
+
+Procedure RigidBody.getLastFrameAcceleration(Var linearAcceleration: Vector3);
+Begin
+  acceleration := lastFrameAcceleration;
+End;
+
+Function RigidBody.getLastFrameAcceleration(): Vector3;
+Begin
+  result := lastFrameAcceleration;
 End;
 
 Procedure RigidBody.clearAccumulators;

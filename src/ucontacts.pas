@@ -671,6 +671,7 @@ End;
 
 Procedure Contact.calculateDesiredDeltaVelocity(duration: float);
 Begin
+  //hier weiter
   //    const static real velocityLimit = (real)0.25f;
   //
   //    // Calculate the acceleration induced velocity accumulated this frame
@@ -704,34 +705,37 @@ End;
 
 Function Contact.calculateLocalVelocity(bodyIndex: unsigned; duration: Float
   ): Vector3;
+Var
+  thisBody: PRigidBody;
+  accVelocity, _contactVelocity, velocity: Vector3;
 Begin
-  //  RigidBody *thisBody = body[bodyIndex];
-  //
-  //    // Work out the velocity of the contact point.
-  //    Vector3 velocity =
-  //        thisBody->getRotation() % relativeContactPosition[bodyIndex];
-  //    velocity += thisBody->getVelocity();
-  //
-  //    // Turn the velocity into contact-coordinates.
-  //    Vector3 contactVelocity = contactToWorld.transformTranspose(velocity);
-  //
-  //    // Calculate the ammount of velocity that is due to forces without
-  //    // reactions.
-  //    Vector3 accVelocity = thisBody->getLastFrameAcceleration() * duration;
-  //
-  //    // Calculate the velocity in contact-coordinates.
-  //    accVelocity = contactToWorld.transformTranspose(accVelocity);
-  //
-  //    // We ignore any component of acceleration in the contact normal
-  //    // direction, we are only interested in planar acceleration
-  //    accVelocity.x = 0;
-  //
-  //    // Add the planar velocities - if there's enough friction they will
-  //    // be removed during velocity resolution
-  //    contactVelocity += accVelocity;
-  //
-  //    // And return it
-  //    return contactVelocity;
+  thisBody := body[bodyIndex];
+
+  // Work out the velocity of the contact point.
+  velocity :=
+    thisBody^.getRotation() Mod relativeContactPosition[bodyIndex];
+  velocity := velocity + thisBody^.getVelocity();
+
+  // Turn the velocity into contact-coordinates.
+  _contactVelocity := contactToWorld.transformTranspose(velocity);
+
+  // Calculate the ammount of velocity that is due to forces without
+  // reactions.
+  accVelocity := thisBody^.getLastFrameAcceleration() * duration;
+
+  // Calculate the velocity in contact-coordinates.
+  accVelocity := contactToWorld.transformTranspose(accVelocity);
+
+  // We ignore any component of acceleration in the contact normal
+  // direction, we are only interested in planar acceleration
+  accVelocity.x := 0;
+
+  // Add the planar velocities - if there's enough friction they will
+  // be removed during velocity resolution
+  _contactVelocity := contactVelocity + accVelocity;
+
+  // And return it
+  result := _contactVelocity;
 End;
 
 (*
@@ -745,40 +749,41 @@ End;
 Procedure Contact.calculateContactBasis;
 Var
   contactTangent: Array[0..1] Of Vector3;
+  s: Float;
 Begin
   // Check whether the Z-axis is nearer to the X or Y axis
   If (real_abs(contactNormal.x) > real_abs(contactNormal.y)) Then Begin
-   // hier weiter
-    //        // Scaling factor to ensure the results are normalised
-    //        const real s = (real)1.0f/real_sqrt(contactNormal.z*contactNormal.z +
-    //            contactNormal.x*contactNormal.x);
-    //
-    //        // The new X-axis is at right angles to the world Y-axis
-    //        contactTangent[0].x = contactNormal.z*s;
-    //        contactTangent[0].y = 0;
-    //        contactTangent[0].z = -contactNormal.x*s;
-    //
-    //        // The new Y-axis is at right angles to the new X- and Z- axes
-    //        contactTangent[1].x = contactNormal.y*contactTangent[0].z;
-    //        contactTangent[1].y = contactNormal.z*contactTangent[0].x -
-    //            contactNormal.x*contactTangent[0].z;
-    //        contactTangent[1].z = -contactNormal.y*contactTangent[0].x;
+
+    // Scaling factor to ensure the results are normalised
+    s := 1.0 / real_sqrt(contactNormal.z * contactNormal.z +
+      contactNormal.x * contactNormal.x);
+
+    // The new X-axis is at right angles to the world Y-axis
+    contactTangent[0].x := contactNormal.z * s;
+    contactTangent[0].y := 0;
+    contactTangent[0].z := -contactNormal.x * s;
+
+    // The new Y-axis is at right angles to the new X- and Z- axes
+    contactTangent[1].x := contactNormal.y * contactTangent[0].z;
+    contactTangent[1].y := contactNormal.z * contactTangent[0].x -
+      contactNormal.x * contactTangent[0].z;
+    contactTangent[1].z := -contactNormal.y * contactTangent[0].x;
   End
   Else Begin
-    //        // Scaling factor to ensure the results are normalised
-    //        const real s = (real)1.0/real_sqrt(contactNormal.z*contactNormal.z +
-    //            contactNormal.y*contactNormal.y);
-    //
-    //        // The new X-axis is at right angles to the world X-axis
-    //        contactTangent[0].x = 0;
-    //        contactTangent[0].y = -contactNormal.z*s;
-    //        contactTangent[0].z = contactNormal.y*s;
-    //
-    //        // The new Y-axis is at right angles to the new X- and Z- axes
-    //        contactTangent[1].x = contactNormal.y*contactTangent[0].z -
-    //            contactNormal.z*contactTangent[0].y;
-    //        contactTangent[1].y = -contactNormal.x*contactTangent[0].z;
-    //        contactTangent[1].z = contactNormal.x*contactTangent[0].y;
+    // Scaling factor to ensure the results are normalised
+    s := 1.0 / real_sqrt(contactNormal.z * contactNormal.z +
+      contactNormal.y * contactNormal.y);
+
+    // The new X-axis is at right angles to the world X-axis
+    contactTangent[0].x := 0;
+    contactTangent[0].y := -contactNormal.z * s;
+    contactTangent[0].z := contactNormal.y * s;
+
+    // The new Y-axis is at right angles to the new X- and Z- axes
+    contactTangent[1].x := contactNormal.y * contactTangent[0].z -
+      contactNormal.z * contactTangent[0].y;
+    contactTangent[1].y := -contactNormal.x * contactTangent[0].z;
+    contactTangent[1].z := contactNormal.x * contactTangent[0].y;
   End;
 
   // Make a matrix from the three vectors.
