@@ -146,17 +146,17 @@ Type
      *)
     Procedure swapBodies();
 
-    //        /**
-    //         * Updates the awake state of rigid bodies that are taking
-    //         * place in the given contact. A body will be made awake if it
-    //         * is in contact with a body that is awake.
-    //         */
-    //        void matchAwakeState();
+    (**
+     * Updates the awake state of rigid bodies that are taking
+     * place in the given contact. A body will be made awake if it
+     * is in contact with a body that is awake.
+     *)
+    Procedure matchAwakeState();
 
-            (**
-             * Calculates and sets the internal value for the desired delta
-             * velocity.
-             *)
+    (**
+     * Calculates and sets the internal value for the desired delta
+     * velocity.
+     *)
     Procedure calculateDesiredDeltaVelocity(duration: float);
 
     (**
@@ -185,15 +185,15 @@ Type
     //         */
     //        void applyVelocityChange(Vector3 velocityChange[2],
     //                                 Vector3 rotationChange[2]);
-    //
-    //        /**
-    //         * Performs an inertia weighted penetration resolution of this
-    //         * contact alone.
-    //         */
-    //        void applyPositionChange(Vector3 linearChange[2],
-    //                                 Vector3 angularChange[2],
-    //                                 real penetration);
-    //
+
+            (**
+             * Performs an inertia weighted penetration resolution of this
+             * contact alone.
+             *)
+    Procedure applyPositionChange(Const linearChange: Array Of Vector3;
+      Const angularChange: Array Of Vector3;
+      _penetration: float);
+
     //        /**
     //         * Calculates the impulse needed to resolve this contact,
     //         * given that the contact has no friction. A pair of inertia
@@ -299,18 +299,18 @@ Type
     positionEpsilon: Float;
 
   public
-    //        /**
-    //         * Stores the number of velocity iterations used in the
-    //         * last call to resolve contacts.
-    //         */
-    //        unsigned velocityIterationsUsed;
-    //
-    //        /**
-    //         * Stores the number of position iterations used in the
-    //         * last call to resolve contacts.
-    //         */
-    //        unsigned positionIterationsUsed;
-    //
+    (**
+     * Stores the number of velocity iterations used in the
+     * last call to resolve contacts.
+     *)
+    velocityIterationsUsed: unsigned;
+
+    (**
+     * Stores the number of position iterations used in the
+     * last call to resolve contacts.
+     *)
+    positionIterationsUsed: unsigned;
+
   private
     //        /**
     //         * Keeps track of whether the internal settings are valid.
@@ -408,9 +408,7 @@ Type
      * Resolves the positional issues with the given array of constraints,
      * using the given number of iterations.
      *)
-    Procedure adjustPositions(contacts: PContact;
-      numContacts: unsigned;
-      duration: float);
+    Procedure adjustPositions(c: PContact; numContacts: unsigned; duration: float);
   End;
 
   (**
@@ -558,70 +556,71 @@ Begin
   //    }
 End;
 
-Procedure ContactResolver.adjustPositions(contacts: PContact;
+Procedure ContactResolver.adjustPositions(c: PContact;
   numContacts: unsigned; duration: float);
+Var
+  index, i, b: unsigned;
+  linearChange: Array[0..1] Of Vector3;
+  angularChange: Array[0..1] Of Vector3;
+  _max: float;
+  deltaPosition: Vector3;
 Begin
-  //    unsigned i,index;
-  //    Vector3 linearChange[2], angularChange[2];
-  //    real max;
-  //    Vector3 deltaPosition;
-  //
-  //    // iteratively resolve interpenetrations in order of severity.
-  //    positionIterationsUsed = 0;
-  //    while (positionIterationsUsed < positionIterations)
-  //    {
-  //        // Find biggest penetration
-  //        max = positionEpsilon;
-  //        index = numContacts;
-  //        for (i=0; i<numContacts; i++)
-  //        {
-  //            if (c[i].penetration > max)
-  //            {
-  //                max = c[i].penetration;
-  //                index = i;
-  //            }
-  //        }
-  //        if (index == numContacts) break;
-  //
-  //        // Match the awake state at the contact
-  //        c[index].matchAwakeState();
-  //
-  //        // Resolve the penetration.
-  //        c[index].applyPositionChange(
-  //            linearChange,
-  //            angularChange,
-  //            max);
-  //
-  //        // Again this action may have changed the penetration of other
-  //        // bodies, so we update contacts.
-  //        for (i = 0; i < numContacts; i++)
-  //        {
-  //            // Check each body in the contact
-  //            for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
-  //            {
-  //                // Check for a match with each body in the newly
-  //                // resolved contact
-  //                for (unsigned d = 0; d < 2; d++)
-  //                {
-  //                    if (c[i].body[b] == c[index].body[d])
-  //                    {
-  //                        deltaPosition = linearChange[d] +
-  //                            angularChange[d].vectorProduct(
-  //                                c[i].relativeContactPosition[b]);
-  //
-  //                        // The sign of the change is positive if we're
-  //                        // dealing with the second body in a contact
-  //                        // and negative otherwise (because we're
-  //                        // subtracting the resolution)..
-  //                        c[i].penetration +=
-  //                            deltaPosition.scalarProduct(c[i].contactNormal)
-  //                            * (b?1:-1);
-  //                    }
-  //                }
-  //            }
-  //        }
-  //        positionIterationsUsed++;
-  //    }
+  // iteratively resolve interpenetrations in order of severity.
+  positionIterationsUsed := 0;
+  While (positionIterationsUsed < positionIterations) Do Begin
+
+    // Find biggest penetration
+    _max := positionEpsilon;
+    index := numContacts;
+    For i := 0 To numContacts - 1 Do Begin
+      If (c[i].penetration > _max) Then Begin
+        _max := c[i].penetration;
+        index := i;
+      End;
+    End;
+    If (index = numContacts) Then break;
+
+    // Match the awake state at the contact
+    c[index].matchAwakeState();
+
+    // Resolve the penetration.
+    c[index].applyPositionChange(
+      linearChange,
+      angularChange,
+      _max);
+
+    // Again this action may have changed the penetration of other
+    // bodies, so we update contacts.
+    For i := 0 To numContacts - 1 Do Begin
+
+      // Check each body in the contact
+      For b := 0 To 1 Do Begin
+        If assigned(c[i].body[b]) Then Begin
+          //            {
+          //                // Check for a match with each body in the newly
+          //                // resolved contact
+          //                for (unsigned d = 0; d < 2; d++)
+          //                {
+          //                    if (c[i].body[b] == c[index].body[d])
+          //                    {
+          //                        deltaPosition = linearChange[d] +
+          //                            angularChange[d].vectorProduct(
+          //                                c[i].relativeContactPosition[b]);
+          //
+          //                        // The sign of the change is positive if we're
+          //                        // dealing with the second body in a contact
+          //                        // and negative otherwise (because we're
+          //                        // subtracting the resolution)..
+          //                        c[i].penetration +=
+          //                            deltaPosition.scalarProduct(c[i].contactNormal)
+          //                            * (b?1:-1);
+          //                    }
+          //                }
+        End;
+      End;
+    End;
+    positionIterationsUsed := positionIterationsUsed + 1;
+  End;
 End;
 
 Procedure Contact.setBodyData(one, two: PRigidBody; afriction,
@@ -669,38 +668,57 @@ Begin
   body[1] := temp;
 End;
 
-Procedure Contact.calculateDesiredDeltaVelocity(duration: float);
+Procedure Contact.matchAwakeState;
+Var
+  body0awake, body1awake: Boolean;
 Begin
-  //hier weiter
-  //    const static real velocityLimit = (real)0.25f;
-  //
-  //    // Calculate the acceleration induced velocity accumulated this frame
-  //    real velocityFromAcc = 0;
-  //
-  //    if (body[0]->getAwake())
-  //    {
-  //	velocityFromAcc+=
-  //	    body[0]->getLastFrameAcceleration() * duration * contactNormal;
-  //    }
-  //
-  //    if (body[1] && body[1]->getAwake())
-  //    {
-  //        velocityFromAcc -=
-  //            body[1]->getLastFrameAcceleration() * duration * contactNormal;
-  //    }
-  //
-  //    // If the velocity is very slow, limit the restitution
-  //    real thisRestitution = restitution;
-  //    if (real_abs(contactVelocity.x) < velocityLimit)
-  //    {
-  //        thisRestitution = (real)0.0f;
-  //    }
-  //
-  //    // Combine the bounce velocity with the removed
-  //    // acceleration velocity.
-  //    desiredDeltaVelocity =
-  //        -contactVelocity.x
-  //        -thisRestitution * (contactVelocity.x - velocityFromAcc);
+  // Collisions with the world never cause a body to wake up.
+  If (body[1] = Nil) Then exit;
+
+  body0awake := body[0]^.getAwake();
+  body1awake := body[1]^.getAwake();
+
+  // Wake up only the sleeping one
+  If (body0awake Xor body1awake) Then Begin
+    If (body0awake) Then
+      body[1]^.setAwake()
+    Else
+      body[0]^.setAwake();
+  End;
+End;
+
+Procedure Contact.calculateDesiredDeltaVelocity(duration: float);
+Const
+  velocityLimit = 0.25;
+Var
+  thisRestitution, velocityFromAcc: float;
+
+Begin
+  // Calculate the acceleration induced velocity accumulated this frame
+  velocityFromAcc := 0;
+
+  If (body[0]^.getAwake()) Then Begin
+
+    velocityFromAcc := velocityFromAcc +
+      body[0]^.getLastFrameAcceleration() * duration * contactNormal;
+  End;
+
+  If assigned(body[1]) And (body[1]^.getAwake()) Then Begin
+    velocityFromAcc := velocityFromAcc -
+      body[1]^.getLastFrameAcceleration() * duration * contactNormal;
+  End;
+
+  // If the velocity is very slow, limit the restitution
+  thisRestitution := restitution;
+  If (real_abs(contactVelocity.x) < velocityLimit) Then Begin
+    thisRestitution := 0.0;
+  End;
+
+  // Combine the bounce velocity with the removed
+  // acceleration velocity.
+  desiredDeltaVelocity :=
+    -contactVelocity.x
+    - thisRestitution * (contactVelocity.x - velocityFromAcc);
 End;
 
 Function Contact.calculateLocalVelocity(bodyIndex: unsigned; duration: Float
@@ -791,6 +809,133 @@ Begin
     contactNormal,
     contactTangent[0],
     contactTangent[1]);
+End;
+
+Procedure Contact.applyPositionChange(Const linearChange: Array Of Vector3;
+  Const angularChange: Array Of Vector3; _penetration: float);
+Begin
+  // hier weiter
+    //    const real angularLimit = (real)0.2f;
+//    real angularMove[2];
+//    real linearMove[2];
+//
+//    real totalInertia = 0;
+//    real linearInertia[2];
+//    real angularInertia[2];
+//
+//    // We need to work out the inertia of each object in the direction
+//    // of the contact normal, due to angular inertia only.
+//    for (unsigned i = 0; i < 2; i++) if (body[i])
+//    {
+//        Matrix3 inverseInertiaTensor;
+//        body[i]->getInverseInertiaTensorWorld(&inverseInertiaTensor);
+//
+//        // Use the same procedure as for calculating frictionless
+//        // velocity change to work out the angular inertia.
+//        Vector3 angularInertiaWorld =
+//            relativeContactPosition[i] % contactNormal;
+//        angularInertiaWorld =
+//            inverseInertiaTensor.transform(angularInertiaWorld);
+//        angularInertiaWorld =
+//            angularInertiaWorld % relativeContactPosition[i];
+//        angularInertia[i] =
+//            angularInertiaWorld * contactNormal;
+//
+//        // The linear component is simply the inverse mass
+//        linearInertia[i] = body[i]->getInverseMass();
+//
+//        // Keep track of the total inertia from all components
+//        totalInertia += linearInertia[i] + angularInertia[i];
+//
+//        // We break the loop here so that the totalInertia value is
+//        // completely calculated (by both iterations) before
+//        // continuing.
+//    }
+//
+//    // Loop through again calculating and applying the changes
+//    for (unsigned i = 0; i < 2; i++) if (body[i])
+//    {
+//        // The linear and angular movements required are in proportion to
+//        // the two inverse inertias.
+//        real sign = (i == 0)?1:-1;
+//        angularMove[i] =
+//            sign * _penetration * (angularInertia[i] / totalInertia);
+//        linearMove[i] =
+//            sign * _penetration * (linearInertia[i] / totalInertia);
+//
+//        // To avoid angular projections that are too great (when mass is large
+//        // but inertia tensor is small) limit the angular move.
+//        Vector3 projection = relativeContactPosition[i];
+//        projection.addScaledVector(
+//            contactNormal,
+//            -relativeContactPosition[i].scalarProduct(contactNormal)
+//            );
+//
+//        // Use the small angle approximation for the sine of the angle (i.e.
+//        // the magnitude would be sine(angularLimit) * projection.magnitude
+//        // but we approximate sine(angularLimit) to angularLimit).
+//        real maxMagnitude = angularLimit * projection.magnitude();
+//
+//        if (angularMove[i] < -maxMagnitude)
+//        {
+//            real totalMove = angularMove[i] + linearMove[i];
+//            angularMove[i] = -maxMagnitude;
+//            linearMove[i] = totalMove - angularMove[i];
+//        }
+//        else if (angularMove[i] > maxMagnitude)
+//        {
+//            real totalMove = angularMove[i] + linearMove[i];
+//            angularMove[i] = maxMagnitude;
+//            linearMove[i] = totalMove - angularMove[i];
+//        }
+//
+//        // We have the linear amount of movement required by turning
+//        // the rigid body (in angularMove[i]). We now need to
+//        // calculate the desired rotation to achieve that.
+//        if (angularMove[i] == 0)
+//        {
+//            // Easy case - no angular movement means no rotation.
+//            angularChange[i].clear();
+//        }
+//        else
+//        {
+//            // Work out the direction we'd like to rotate in.
+//            Vector3 targetAngularDirection =
+//                relativeContactPosition[i].vectorProduct(contactNormal);
+//
+//            Matrix3 inverseInertiaTensor;
+//            body[i]->getInverseInertiaTensorWorld(&inverseInertiaTensor);
+//
+//            // Work out the direction we'd need to rotate to achieve that
+//            angularChange[i] =
+//                inverseInertiaTensor.transform(targetAngularDirection) *
+//                (angularMove[i] / angularInertia[i]);
+//        }
+//
+//        // Velocity change is easier - it is just the linear movement
+//        // along the contact normal.
+//        linearChange[i] = contactNormal * linearMove[i];
+//
+//        // Now we can start to apply the values we've calculated.
+//        // Apply the linear movement
+//        Vector3 pos;
+//        body[i]->getPosition(&pos);
+//        pos.addScaledVector(contactNormal, linearMove[i]);
+//        body[i]->setPosition(pos);
+//
+//        // And the change in orientation
+//        Quaternion q;
+//        body[i]->getOrientation(&q);
+//        q.addScaledVector(angularChange[i], ((real)1.0));
+//        body[i]->setOrientation(q);
+//
+//        // We need to calculate the derived data for any body that is
+//        // asleep, so that the changes are reflected in the object's
+//        // data. Otherwise the resolution will not change the position
+//        // of the object, and the next collision detection round will
+//        // have the same penetration.
+//        if (!body[i]->getAwake()) body[i]->calculateDerivedData();
+//    }
 End;
 
 End.
