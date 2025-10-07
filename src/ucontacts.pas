@@ -190,9 +190,8 @@ Type
              * Performs an inertia weighted penetration resolution of this
              * contact alone.
              *)
-    Procedure applyPositionChange(Const linearChange: Array Of Vector3;
-      Const angularChange: Array Of Vector3;
-      _penetration: float);
+    Procedure applyPositionChange(Out linearChange: Array Of Vector3; Out
+      angularChange: Array Of Vector3; _penetration: float);
 
     //        /**
     //         * Calculates the impulse needed to resolve this contact,
@@ -498,6 +497,7 @@ End;
 Procedure ContactResolver.adjustVelocities(contactArray: PContact;
   numContacts: unsigned; duration: Float);
 Begin
+  // hier weiter
   //    Vector3 velocityChange[2], rotationChange[2];
   //    Vector3 deltaVel;
   //
@@ -559,7 +559,7 @@ End;
 Procedure ContactResolver.adjustPositions(c: PContact;
   numContacts: unsigned; duration: float);
 Var
-  index, i, b: unsigned;
+  index, i, b, d: unsigned;
   linearChange: Array[0..1] Of Vector3;
   angularChange: Array[0..1] Of Vector3;
   _max: float;
@@ -596,26 +596,27 @@ Begin
       // Check each body in the contact
       For b := 0 To 1 Do Begin
         If assigned(c[i].body[b]) Then Begin
-          //            {
-          //                // Check for a match with each body in the newly
-          //                // resolved contact
-          //                for (unsigned d = 0; d < 2; d++)
-          //                {
-          //                    if (c[i].body[b] == c[index].body[d])
-          //                    {
-          //                        deltaPosition = linearChange[d] +
-          //                            angularChange[d].vectorProduct(
-          //                                c[i].relativeContactPosition[b]);
-          //
-          //                        // The sign of the change is positive if we're
-          //                        // dealing with the second body in a contact
-          //                        // and negative otherwise (because we're
-          //                        // subtracting the resolution)..
-          //                        c[i].penetration +=
-          //                            deltaPosition.scalarProduct(c[i].contactNormal)
-          //                            * (b?1:-1);
-          //                    }
-          //                }
+
+          // Check for a match with each body in the newly
+          // resolved contact
+
+          For d := 0 To 1 Do Begin
+
+            If (c[i].body[b] = c[index].body[d]) Then Begin
+
+              deltaPosition := linearChange[d] +
+                angularChange[d].vectorProduct(
+                c[i].relativeContactPosition[b]);
+
+              // The sign of the change is positive if we're
+              // dealing with the second body in a contact
+              // and negative otherwise (because we're
+              // subtracting the resolution)..
+              c[i].penetration := c[i].penetration +
+                deltaPosition.scalarProduct(c[i].contactNormal)
+                * ifthen(b = 1, 1, -1);
+            End;
+          End;
         End;
       End;
     End;
@@ -811,131 +812,136 @@ Begin
     contactTangent[1]);
 End;
 
-Procedure Contact.applyPositionChange(Const linearChange: Array Of Vector3;
-  Const angularChange: Array Of Vector3; _penetration: float);
+Procedure Contact.applyPositionChange(Out linearChange: Array Of Vector3;
+  Out angularChange: Array Of Vector3; _penetration: float);
+Const
+  angularLimit = 0.2;
+Var
+  angularMove: Array[0..1] Of float;
+  linearMove: Array[0..1] Of float;
+
+  totalMove, maxMagnitude, _sign, totalInertia: float;
+  linearInertia: Array[0..1] Of float;
+  angularInertia: Array[0..1] Of float;
+  i: unsigned;
+  inverseInertiaTensor: Matrix3;
+  pos, targetAngularDirection, projection, angularInertiaWorld: Vector3;
+  q: Quaternion;
 Begin
-  // hier weiter
-    //    const real angularLimit = (real)0.2f;
-//    real angularMove[2];
-//    real linearMove[2];
-//
-//    real totalInertia = 0;
-//    real linearInertia[2];
-//    real angularInertia[2];
-//
-//    // We need to work out the inertia of each object in the direction
-//    // of the contact normal, due to angular inertia only.
-//    for (unsigned i = 0; i < 2; i++) if (body[i])
-//    {
-//        Matrix3 inverseInertiaTensor;
-//        body[i]->getInverseInertiaTensorWorld(&inverseInertiaTensor);
-//
-//        // Use the same procedure as for calculating frictionless
-//        // velocity change to work out the angular inertia.
-//        Vector3 angularInertiaWorld =
-//            relativeContactPosition[i] % contactNormal;
-//        angularInertiaWorld =
-//            inverseInertiaTensor.transform(angularInertiaWorld);
-//        angularInertiaWorld =
-//            angularInertiaWorld % relativeContactPosition[i];
-//        angularInertia[i] =
-//            angularInertiaWorld * contactNormal;
-//
-//        // The linear component is simply the inverse mass
-//        linearInertia[i] = body[i]->getInverseMass();
-//
-//        // Keep track of the total inertia from all components
-//        totalInertia += linearInertia[i] + angularInertia[i];
-//
-//        // We break the loop here so that the totalInertia value is
-//        // completely calculated (by both iterations) before
-//        // continuing.
-//    }
-//
-//    // Loop through again calculating and applying the changes
-//    for (unsigned i = 0; i < 2; i++) if (body[i])
-//    {
-//        // The linear and angular movements required are in proportion to
-//        // the two inverse inertias.
-//        real sign = (i == 0)?1:-1;
-//        angularMove[i] =
-//            sign * _penetration * (angularInertia[i] / totalInertia);
-//        linearMove[i] =
-//            sign * _penetration * (linearInertia[i] / totalInertia);
-//
-//        // To avoid angular projections that are too great (when mass is large
-//        // but inertia tensor is small) limit the angular move.
-//        Vector3 projection = relativeContactPosition[i];
-//        projection.addScaledVector(
-//            contactNormal,
-//            -relativeContactPosition[i].scalarProduct(contactNormal)
-//            );
-//
-//        // Use the small angle approximation for the sine of the angle (i.e.
-//        // the magnitude would be sine(angularLimit) * projection.magnitude
-//        // but we approximate sine(angularLimit) to angularLimit).
-//        real maxMagnitude = angularLimit * projection.magnitude();
-//
-//        if (angularMove[i] < -maxMagnitude)
-//        {
-//            real totalMove = angularMove[i] + linearMove[i];
-//            angularMove[i] = -maxMagnitude;
-//            linearMove[i] = totalMove - angularMove[i];
-//        }
-//        else if (angularMove[i] > maxMagnitude)
-//        {
-//            real totalMove = angularMove[i] + linearMove[i];
-//            angularMove[i] = maxMagnitude;
-//            linearMove[i] = totalMove - angularMove[i];
-//        }
-//
-//        // We have the linear amount of movement required by turning
-//        // the rigid body (in angularMove[i]). We now need to
-//        // calculate the desired rotation to achieve that.
-//        if (angularMove[i] == 0)
-//        {
-//            // Easy case - no angular movement means no rotation.
-//            angularChange[i].clear();
-//        }
-//        else
-//        {
-//            // Work out the direction we'd like to rotate in.
-//            Vector3 targetAngularDirection =
-//                relativeContactPosition[i].vectorProduct(contactNormal);
-//
-//            Matrix3 inverseInertiaTensor;
-//            body[i]->getInverseInertiaTensorWorld(&inverseInertiaTensor);
-//
-//            // Work out the direction we'd need to rotate to achieve that
-//            angularChange[i] =
-//                inverseInertiaTensor.transform(targetAngularDirection) *
-//                (angularMove[i] / angularInertia[i]);
-//        }
-//
-//        // Velocity change is easier - it is just the linear movement
-//        // along the contact normal.
-//        linearChange[i] = contactNormal * linearMove[i];
-//
-//        // Now we can start to apply the values we've calculated.
-//        // Apply the linear movement
-//        Vector3 pos;
-//        body[i]->getPosition(&pos);
-//        pos.addScaledVector(contactNormal, linearMove[i]);
-//        body[i]->setPosition(pos);
-//
-//        // And the change in orientation
-//        Quaternion q;
-//        body[i]->getOrientation(&q);
-//        q.addScaledVector(angularChange[i], ((real)1.0));
-//        body[i]->setOrientation(q);
-//
-//        // We need to calculate the derived data for any body that is
-//        // asleep, so that the changes are reflected in the object's
-//        // data. Otherwise the resolution will not change the position
-//        // of the object, and the next collision detection round will
-//        // have the same penetration.
-//        if (!body[i]->getAwake()) body[i]->calculateDerivedData();
-//    }
+
+  totalInertia := 0;
+
+  // We need to work out the inertia of each object in the direction
+  // of the contact normal, due to angular inertia only.
+  For i := 0 To 1 Do Begin
+    If assigned(body[i]) Then Begin
+      body[i]^.getInverseInertiaTensorWorld(inverseInertiaTensor);
+
+      // Use the same procedure as for calculating frictionless
+      // velocity change to work out the angular inertia.
+      angularInertiaWorld :=
+        relativeContactPosition[i] Mod contactNormal;
+      angularInertiaWorld :=
+        inverseInertiaTensor.transform(angularInertiaWorld);
+      angularInertiaWorld :=
+        angularInertiaWorld Mod relativeContactPosition[i];
+      angularInertia[i] :=
+        angularInertiaWorld * contactNormal;
+
+      // The linear component is simply the inverse mass
+      linearInertia[i] := body[i]^.getInverseMass();
+
+      // Keep track of the total inertia from all components
+      totalInertia := totalInertia + linearInertia[i] + angularInertia[i];
+
+      // We break the loop here so that the totalInertia value is
+      // completely calculated (by both iterations) before
+      // continuing.
+    End;
+  End;
+
+  // Loop through again calculating and applying the changes
+  For i := 0 To 1 Do Begin
+    If assigned(body[i]) Then Begin
+      // The linear and angular movements required are in proportion to
+      // the two inverse inertias.
+      _sign := IfThen((i = 0), 1, -1);
+      angularMove[i] :=
+        _sign * _penetration * (angularInertia[i] / totalInertia);
+      linearMove[i] :=
+        _sign * _penetration * (linearInertia[i] / totalInertia);
+
+      // To avoid angular projections that are too great (when mass is large
+      // but inertia tensor is small) limit the angular move.
+      projection := relativeContactPosition[i];
+      projection.addScaledVector(
+        contactNormal,
+        -relativeContactPosition[i].scalarProduct(contactNormal)
+        );
+
+      // Use the small angle approximation for the sine of the angle (i.e.
+      // the magnitude would be sine(angularLimit) * projection.magnitude
+      // but we approximate sine(angularLimit) to angularLimit).
+      maxMagnitude := angularLimit * projection.magnitude();
+
+      If (angularMove[i] < -maxMagnitude) Then Begin
+        totalMove := angularMove[i] + linearMove[i];
+        angularMove[i] := -maxMagnitude;
+        linearMove[i] := totalMove - angularMove[i];
+      End
+      Else If (angularMove[i] > maxMagnitude) Then Begin
+        totalMove := angularMove[i] + linearMove[i];
+        angularMove[i] := maxMagnitude;
+        linearMove[i] := totalMove - angularMove[i];
+      End;
+
+      // We have the linear amount of movement required by turning
+      // the rigid body (in angularMove[i]). We now need to
+      // calculate the desired rotation to achieve that.
+      If (angularMove[i] = 0) Then Begin
+
+        // Easy case - no angular movement means no rotation.
+        angularChange[i].clear();
+      End
+      Else Begin
+        // Work out the direction we'd like to rotate in.
+        targetAngularDirection :=
+          relativeContactPosition[i].vectorProduct(contactNormal);
+
+
+        body[i]^.getInverseInertiaTensorWorld(inverseInertiaTensor);
+
+        // Work out the direction we'd need to rotate to achieve that
+        angularChange[i] :=
+          inverseInertiaTensor.transform(targetAngularDirection) *
+          (angularMove[i] / angularInertia[i]);
+      End;
+
+      // Velocity change is easier - it is just the linear movement
+      // along the contact normal.
+      linearChange[i] := contactNormal * linearMove[i];
+
+      // Now we can start to apply the values we've calculated.
+      // Apply the linear movement
+
+      body[i]^.getPosition(&pos);
+      pos.addScaledVector(contactNormal, linearMove[i]);
+      body[i]^.setPosition(pos);
+
+      // And the change in orientation
+
+      body[i]^.getOrientation(q);
+      q.addScaledVector(angularChange[i], 1.0);
+      body[i]^.setOrientation(q);
+
+      // We need to calculate the derived data for any body that is
+      // asleep, so that the changes are reflected in the object's
+      // data. Otherwise the resolution will not change the position
+      // of the object, and the next collision detection round will
+      // have the same penetration.
+      If (Not body[i]^.getAwake()) Then body[i]^.calculateDerivedData();
+    End;
+  End;
 End;
 
 End.

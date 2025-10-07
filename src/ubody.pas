@@ -335,14 +335,14 @@ Type
     //         * from the rigid body.
     //         */
     //        void setInverseMass(const real inverseMass);
-    //
-    //        /**
-    //         * Gets the inverse mass of the rigid body.
-    //         *
-    //         * @return The current inverse mass of the rigid body.
-    //         */
-    //        real getInverseMass() const;
-    //
+
+            (**
+             * Gets the inverse mass of the rigid body.
+             *
+             * @return The current inverse mass of the rigid body.
+             *)
+    Function getInverseMass(): float;
+
     //        /**
     //         * Returns true if the mass of the body is not-infinite.
     //         */
@@ -433,39 +433,39 @@ Type
     //         * rigid body's local space.
     //         */
     //        Matrix3 getInverseInertiaTensor() const;
-    //
-    //        /**
-    //         * Copies the current inverse inertia tensor of the rigid body
-    //         * into the given matrix.
-    //         *
-    //         * @param inverseInertiaTensor A pointer to a matrix to hold
-    //         * the current inverse inertia tensor of the rigid body. The
-    //         * inertia tensor is expressed in world space.
-    //         */
-    //        void getInverseInertiaTensorWorld(Matrix3 *inverseInertiaTensor) const;
-    //
-    //        /**
-    //         * Gets a copy of the current inverse inertia tensor of the
-    //         * rigid body.
-    //         *
-    //         * @return A new matrix containing the current inverse
-    //         * intertia tensor. The inertia tensor is expressed in world
-    //         * space.
-    //         */
-    //        Matrix3 getInverseInertiaTensorWorld() const;
-    //
+
             (**
-             * Sets both linear and angular damping in one function call.
+             * Copies the current inverse inertia tensor of the rigid body
+             * into the given matrix.
              *
-             * @param linearDamping The speed that velocity is shed from
-             * the rigid body.
-             *
-             * @param angularDamping The speed that rotation is shed from
-             * the rigid body.
-             *
-             * @see setLinearDamping
-             * @see setAngularDamping
+             * @param inverseInertiaTensor A pointer to a matrix to hold
+             * the current inverse inertia tensor of the rigid body. The
+             * inertia tensor is expressed in world space.
              *)
+    Procedure getInverseInertiaTensorWorld(Out _inverseInertiaTensor: Matrix3);
+
+    (**
+     * Gets a copy of the current inverse inertia tensor of the
+     * rigid body.
+     *
+     * @return A new matrix containing the current inverse
+     * intertia tensor. The inertia tensor is expressed in world
+     * space.
+     *)
+    Function getInverseInertiaTensorWorld(): Matrix3;
+
+    (**
+     * Sets both linear and angular damping in one function call.
+     *
+     * @param linearDamping The speed that velocity is shed from
+     * the rigid body.
+     *
+     * @param angularDamping The speed that rotation is shed from
+     * the rigid body.
+     *
+     * @see setLinearDamping
+     * @see setAngularDamping
+     *)
     Procedure setDamping(Const alinearDamping: Float; Const aangularDamping: Float);
 
     (**
@@ -572,16 +572,16 @@ Type
     //         */
     //        void setOrientation(const real r, const real i,
     //            const real j, const real k);
-    //
-    //        /**
-    //         * Fills the given quaternion with the current value of the
-    //         * rigid body's orientation.
-    //         *
-    //         * @param orientation A pointer to a quaternion to receive the
-    //         * orientation data.
-    //         */
-    //        void getOrientation(Quaternion *orientation) const;
-    //
+
+            (**
+             * Fills the given quaternion with the current value of the
+             * rigid body's orientation.
+             *
+             * @param orientation A pointer to a quaternion to receive the
+             * orientation data.
+             *)
+    Procedure getOrientation(Out aorientation: Quaternion);
+
     //        /**
     //         * Gets the orientation of the rigid body.
     //         *
@@ -1112,7 +1112,6 @@ Begin
   // Calculate the transform matrix for the body.
   _calculateTransformMatrix(transformMatrix, position, orientation);
 
-
   // Calculate the inertiaTensor in world space.
   _transformInertiaTensor(inverseInertiaTensorWorld,
     orientation,
@@ -1182,10 +1181,26 @@ Begin
   inverseMass := (1.0) / mass;
 End;
 
+Function RigidBody.getInverseMass: float;
+Begin
+  result := inverseMass;
+End;
+
 Procedure RigidBody.setInertiaTensor(Const inertiaTensor: Matrix3);
 Begin
   inverseInertiaTensor.setInverse(inertiaTensor);
   _checkInverseInertiaTensor(inverseInertiaTensor);
+End;
+
+Procedure RigidBody.getInverseInertiaTensorWorld(Out
+  _inverseInertiaTensor: Matrix3);
+Begin
+  _inverseInertiaTensor := inverseInertiaTensorWorld;
+End;
+
+Function RigidBody.getInverseInertiaTensorWorld: Matrix3;
+Begin
+  result := inverseInertiaTensorWorld;
 End;
 
 Procedure RigidBody.setDamping(Const alinearDamping: Float;
@@ -1224,6 +1239,11 @@ Procedure RigidBody.setOrientation(Const aorientation: Quaternion);
 Begin
   orientation := aorientation;
   orientation.normalise();
+End;
+
+Procedure RigidBody.getOrientation(Out aorientation: Quaternion);
+Begin
+  aorientation := orientation;
 End;
 
 Procedure RigidBody.getTransform(Out transform: Matrix4);
@@ -1328,7 +1348,7 @@ Begin
   acceleration := lastFrameAcceleration;
 End;
 
-Function RigidBody.getLastFrameAcceleration(): Vector3;
+Function RigidBody.getLastFrameAcceleration: Vector3;
 Begin
   result := lastFrameAcceleration;
 End;

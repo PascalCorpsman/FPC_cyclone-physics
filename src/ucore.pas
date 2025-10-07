@@ -127,8 +127,6 @@ Type
       false: (data: Array[0..3] Of Float);
   End;
 
-
-
   { Quaternion }
 
   Quaternion = Object
@@ -736,7 +734,17 @@ Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 
 Function V3(x, y, z: float): Vector3;
 
+Function ifthen(value: Boolean; truecase, falsecase: Float): Float; // ka warum math.pas includiert und alles knallt ..
+
 Implementation
+
+Function ifthen(value: Boolean; truecase, falsecase: Float): Float;
+Begin
+  If value Then
+    result := truecase
+  Else
+    result := falsecase;
+End;
 
 Function V3(x, y, z: float): Vector3;
 Begin
