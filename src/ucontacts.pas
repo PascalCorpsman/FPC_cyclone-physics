@@ -179,37 +179,37 @@ Type
     //        void applyImpulse(const Vector3 &impulse, RigidBody *body,
     //                          Vector3 *velocityChange, Vector3 *rotationChange);
     //
-    //        /**
-    //         * Performs an inertia-weighted impulse based resolution of this
-    //         * contact alone.
-    //         */
-    //        void applyVelocityChange(Vector3 velocityChange[2],
-    //                                 Vector3 rotationChange[2]);
-
             (**
-             * Performs an inertia weighted penetration resolution of this
+             * Performs an inertia-weighted impulse based resolution of this
              * contact alone.
              *)
+    Procedure applyVelocityChange(velocityChange: Array Of Vector3;
+      rotationChange: Array Of Vector3);
+
+    (**
+     * Performs an inertia weighted penetration resolution of this
+     * contact alone.
+     *)
     Procedure applyPositionChange(Out linearChange: Array Of Vector3; Out
       angularChange: Array Of Vector3; _penetration: float);
 
-    //        /**
-    //         * Calculates the impulse needed to resolve this contact,
-    //         * given that the contact has no friction. A pair of inertia
-    //         * tensors - one for each contact object - is specified to
-    //         * save calculation time: the calling function has access to
-    //         * these anyway.
-    //         */
-    //        Vector3 calculateFrictionlessImpulse(Matrix3 *inverseInertiaTensor);
-    //
-    //        /**
-    //         * Calculates the impulse needed to resolve this contact,
-    //         * given that the contact has a non-zero coefficient of
-    //         * friction. A pair of inertia tensors - one for each contact
-    //         * object - is specified to save calculation time: the calling
-    //         * function has access to these anyway.
-    //         */
-    //        Vector3 calculateFrictionImpulse(Matrix3 *inverseInertiaTensor);
+    (**
+     * Calculates the impulse needed to resolve this contact,
+     * given that the contact has no friction. A pair of inertia
+     * tensors - one for each contact object - is specified to
+     * save calculation time: the calling function has access to
+     * these anyway.
+     *)
+    Function calculateFrictionlessImpulse(Const inverseInertiaTensor: Array Of Matrix3): Vector3;
+
+    (**
+     * Calculates the impulse needed to resolve this contact,
+     * given that the contact has a non-zero coefficient of
+     * friction. A pair of inertia tensors - one for each contact
+     * object - is specified to save calculation time: the calling
+     * function has access to these anyway.
+     *)
+    Function calculateFrictionImpulse(Const inverseInertiaTensor: Array Of Matrix3): Vector3;
   End;
 
   pContact = ^Contact;
@@ -399,7 +399,7 @@ Type
      * Resolves the velocity issues with the given array of constraints,
      * using the given number of iterations.
      *)
-    Procedure adjustVelocities(contactArray: PContact;
+    Procedure adjustVelocities(c: PContact;
       numContacts: unsigned;
       duration: Float);
 
@@ -494,66 +494,70 @@ Begin
   End;
 End;
 
-Procedure ContactResolver.adjustVelocities(contactArray: PContact;
+Procedure ContactResolver.adjustVelocities(c: PContact;
   numContacts: unsigned; duration: Float);
+Var
+  velocityChange, rotationChange: Array[0..1] Of Vector3;
+  deltaVel: Vector3;
+  _max: float;
+  d, b, i, index: unsigned;
 Begin
-  // hier weiter
-  //    Vector3 velocityChange[2], rotationChange[2];
-  //    Vector3 deltaVel;
-  //
-  //    // iteratively handle impacts in order of severity.
-  //    velocityIterationsUsed = 0;
-  //    while (velocityIterationsUsed < velocityIterations)
-  //    {
-  //        // Find contact with maximum magnitude of probable velocity change.
-  //        real max = velocityEpsilon;
-  //        unsigned index = numContacts;
-  //        for (unsigned i = 0; i < numContacts; i++)
-  //        {
-  //            if (c[i].desiredDeltaVelocity > max)
-  //            {
-  //                max = c[i].desiredDeltaVelocity;
-  //                index = i;
-  //            }
-  //        }
-  //        if (index == numContacts) break;
-  //
-  //        // Match the awake state at the contact
-  //        c[index].matchAwakeState();
-  //
-  //        // Do the resolution on the contact that came out top.
-  //        c[index].applyVelocityChange(velocityChange, rotationChange);
-  //
-  //        // With the change in velocity of the two bodies, the update of
-  //        // contact velocities means that some of the relative closing
-  //        // velocities need recomputing.
-  //        for (unsigned i = 0; i < numContacts; i++)
-  //        {
-  //            // Check each body in the contact
-  //            for (unsigned b = 0; b < 2; b++) if (c[i].body[b])
-  //            {
-  //                // Check for a match with each body in the newly
-  //                // resolved contact
-  //                for (unsigned d = 0; d < 2; d++)
-  //                {
-  //                    if (c[i].body[b] == c[index].body[d])
-  //                    {
-  //                        deltaVel = velocityChange[d] +
-  //                            rotationChange[d].vectorProduct(
-  //                                c[i].relativeContactPosition[b]);
-  //
-  //                        // The sign of the change is negative if we're dealing
-  //                        // with the second body in a contact.
-  //                        c[i].contactVelocity +=
-  //                            c[i].contactToWorld.transformTranspose(deltaVel)
-  //                            * (b?-1:1);
-  //                        c[i].calculateDesiredDeltaVelocity(duration);
-  //                    }
-  //                }
-  //            }
-  //        }
-  //        velocityIterationsUsed++;
-  //    }
+
+
+  // iteratively handle impacts in order of severity.
+  velocityIterationsUsed := 0;
+  While (velocityIterationsUsed < velocityIterations) Do Begin
+
+    // Find contact with maximum magnitude of probable velocity change.
+    _max := velocityEpsilon;
+    index := numContacts;
+
+    For i := 0 To numContacts - 1 Do Begin
+      If (c[i].desiredDeltaVelocity > _max) Then Begin
+        _max := c[i].desiredDeltaVelocity;
+        index := i;
+      End;
+    End;
+    If (index = numContacts) Then break;
+
+    // Match the awake state at the contact
+    c[index].matchAwakeState();
+
+    // Do the resolution on the contact that came out top.
+    c[index].applyVelocityChange(velocityChange, rotationChange);
+
+    // With the change in velocity of the two bodies, the update of
+    // contact velocities means that some of the relative closing
+    // velocities need recomputing.
+
+    For i := 0 To numContacts - 1 Do Begin
+      // Check each body in the contact
+      For b := 0 To 1 Do Begin
+        If assigned(c[i].body[b]) Then Begin
+          // Check for a match with each body in the newly
+          // resolved contact
+
+          For d := 0 To 1 Do Begin
+
+            If (c[i].body[b] = c[index].body[d]) Then Begin
+
+              deltaVel := velocityChange[d] +
+                rotationChange[d].vectorProduct(
+                c[i].relativeContactPosition[b]);
+
+              // The sign of the change is negative if we're dealing
+              // with the second body in a contact.
+              c[i].contactVelocity := c[i].contactVelocity +
+                c[i].contactToWorld.transformTranspose(deltaVel)
+                * ifthen(b <> 0, -1, 1);
+              c[i].calculateDesiredDeltaVelocity(duration);
+            End;
+          End;
+        End;
+      End;
+    End;
+    velocityIterationsUsed := velocityIterationsUsed + 1;
+  End;
 End;
 
 Procedure ContactResolver.adjustPositions(c: PContact;
@@ -812,8 +816,59 @@ Begin
     contactTangent[1]);
 End;
 
-Procedure Contact.applyPositionChange(Out linearChange: Array Of Vector3;
-  Out angularChange: Array Of Vector3; _penetration: float);
+Procedure Contact.applyVelocityChange(velocityChange: Array Of Vector3;
+  rotationChange: Array Of Vector3);
+Var
+  inverseInertiaTensor: Array[0..1] Of Matrix3;
+  impulsiveTorque, impulse, impulseContact: Vector3;
+Begin
+  // Get hold of the inverse mass and inverse inertia tensor, both in
+  // world coordinates.
+
+  body[0]^.getInverseInertiaTensorWorld(&inverseInertiaTensor[0]);
+  If assigned(body[1]) Then
+    body[1]^.getInverseInertiaTensorWorld(&inverseInertiaTensor[1]);
+
+  // We will calculate the impulse for each contact axis
+  If (friction = 0.0) Then Begin
+    // Use the short format for frictionless contacts
+    impulseContact := calculateFrictionlessImpulse(inverseInertiaTensor);
+  End
+  Else Begin
+    // Otherwise we may have impulses that aren't in the direction of the
+    // contact, so we need the more complex version.
+    impulseContact := calculateFrictionImpulse(inverseInertiaTensor);
+  End;
+
+  // Convert impulse to world coordinates
+  impulse := contactToWorld.transform(impulseContact);
+
+  // Split in the impulse into linear and rotational components
+  impulsiveTorque := relativeContactPosition[0] Mod impulse;
+  rotationChange[0] := inverseInertiaTensor[0].transform(impulsiveTorque);
+  velocityChange[0].clear();
+  velocityChange[0].addScaledVector(impulse, body[0]^.getInverseMass());
+
+  // Apply the changes
+  body[0]^.addVelocity(velocityChange[0]);
+  body[0]^.addRotation(rotationChange[0]);
+
+  If assigned(body[1]) Then Begin
+
+    // Work out body one's linear and angular changes
+    impulsiveTorque := impulse Mod relativeContactPosition[1];
+    rotationChange[1] := inverseInertiaTensor[1].transform(impulsiveTorque);
+    velocityChange[1].clear();
+    velocityChange[1].addScaledVector(impulse, -body[1]^.getInverseMass());
+
+    // And apply them.
+    body[1]^.addVelocity(velocityChange[1]);
+    body[1]^.addRotation(rotationChange[1]);
+  End;
+End;
+
+Procedure Contact.applyPositionChange(Out linearChange: Array Of Vector3; Out
+  angularChange: Array Of Vector3; _penetration: float);
 Const
   angularLimit = 0.2;
 Var
@@ -942,6 +997,128 @@ Begin
       If (Not body[i]^.getAwake()) Then body[i]^.calculateDerivedData();
     End;
   End;
+End;
+
+Function Contact.calculateFrictionlessImpulse(
+  Const inverseInertiaTensor: Array Of Matrix3): Vector3;
+Begin
+  Raise exception.create('Hier weiter');
+  //Vector3 impulseContact;
+  //
+  // // Build a vector that shows the change in velocity in
+  // // world space for a unit impulse in the direction of the contact
+  // // normal.
+  // Vector3 deltaVelWorld = relativeContactPosition[0] % contactNormal;
+  // deltaVelWorld = inverseInertiaTensor[0].transform(deltaVelWorld);
+  // deltaVelWorld = deltaVelWorld % relativeContactPosition[0];
+  //
+  // // Work out the change in velocity in contact coordiantes.
+  // real deltaVelocity = deltaVelWorld * contactNormal;
+  //
+  // // Add the linear component of velocity change
+  // deltaVelocity += body[0]->getInverseMass();
+  //
+  // // Check if we need to the second body's data
+  // if (body[1])
+  // {
+  //     // Go through the same transformation sequence again
+  //     Vector3 deltaVelWorld = relativeContactPosition[1] % contactNormal;
+  //     deltaVelWorld = inverseInertiaTensor[1].transform(deltaVelWorld);
+  //     deltaVelWorld = deltaVelWorld % relativeContactPosition[1];
+  //
+  //     // Add the change in velocity due to rotation
+  //     deltaVelocity += deltaVelWorld * contactNormal;
+  //
+  //     // Add the change in velocity due to linear motion
+  //     deltaVelocity += body[1]->getInverseMass();
+  // }
+  //
+  // // Calculate the required size of the impulse
+  // impulseContact.x = desiredDeltaVelocity / deltaVelocity;
+  // impulseContact.y = 0;
+  // impulseContact.z = 0;
+  // return impulseContact;
+End;
+
+Function Contact.calculateFrictionImpulse(
+  Const inverseInertiaTensor: Array Of Matrix3): Vector3;
+Begin
+  Raise exception.create('Hier weiter');
+  //Vector3 impulseContact;
+  // real inverseMass = body[0]->getInverseMass();
+  //
+  // // The equivalent of a cross product in matrices is multiplication
+  // // by a skew symmetric matrix - we build the matrix for converting
+  // // between linear and angular quantities.
+  // Matrix3 impulseToTorque;
+  // impulseToTorque.setSkewSymmetric(relativeContactPosition[0]);
+  //
+  // // Build the matrix to convert contact impulse to change in velocity
+  // // in world coordinates.
+  // Matrix3 deltaVelWorld = impulseToTorque;
+  // deltaVelWorld *= inverseInertiaTensor[0];
+  // deltaVelWorld *= impulseToTorque;
+  // deltaVelWorld *= -1;
+  //
+  // // Check if we need to add body two's data
+  // if (body[1])
+  // {
+  //     // Set the cross product matrix
+  //     impulseToTorque.setSkewSymmetric(relativeContactPosition[1]);
+  //
+  //     // Calculate the velocity change matrix
+  //     Matrix3 deltaVelWorld2 = impulseToTorque;
+  //     deltaVelWorld2 *= inverseInertiaTensor[1];
+  //     deltaVelWorld2 *= impulseToTorque;
+  //     deltaVelWorld2 *= -1;
+  //
+  //     // Add to the total delta velocity.
+  //     deltaVelWorld += deltaVelWorld2;
+  //
+  //     // Add to the inverse mass
+  //     inverseMass += body[1]->getInverseMass();
+  // }
+  //
+  // // Do a change of basis to convert into contact coordinates.
+  // Matrix3 deltaVelocity = contactToWorld.transpose();
+  // deltaVelocity *= deltaVelWorld;
+  // deltaVelocity *= contactToWorld;
+  //
+  // // Add in the linear velocity change
+  // deltaVelocity.data[0] += inverseMass;
+  // deltaVelocity.data[4] += inverseMass;
+  // deltaVelocity.data[8] += inverseMass;
+  //
+  // // Invert to get the impulse needed per unit velocity
+  // Matrix3 impulseMatrix = deltaVelocity.inverse();
+  //
+  // // Find the target velocities to kill
+  // Vector3 velKill(desiredDeltaVelocity,
+  //     -contactVelocity.y,
+  //     -contactVelocity.z);
+  //
+  // // Find the impulse to kill target velocities
+  // impulseContact = impulseMatrix.transform(velKill);
+  //
+  // // Check for exceeding friction
+  // real planarImpulse = real_sqrt(
+  //     impulseContact.y*impulseContact.y +
+  //     impulseContact.z*impulseContact.z
+  //     );
+  // if (planarImpulse > impulseContact.x * friction)
+  // {
+  //     // We need to use dynamic friction
+  //     impulseContact.y /= planarImpulse;
+  //     impulseContact.z /= planarImpulse;
+  //
+  //     impulseContact.x = deltaVelocity.data[0] +
+  //         deltaVelocity.data[1]*friction*impulseContact.y +
+  //         deltaVelocity.data[2]*friction*impulseContact.z;
+  //     impulseContact.x = desiredDeltaVelocity / impulseContact.x;
+  //     impulseContact.y *= friction * impulseContact.x;
+  //     impulseContact.z *= friction * impulseContact.x;
+  // }
+  // return impulseContact;
 End;
 
 End.

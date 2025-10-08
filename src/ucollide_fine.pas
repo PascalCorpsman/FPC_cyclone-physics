@@ -260,7 +260,6 @@ Type
       Var data: CollisionData
       ): unsigned;
 
-
     //        static unsigned boxAndPoint(
     //            const CollisionBox &box,
     //            const Vector3 &point,

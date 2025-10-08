@@ -745,18 +745,18 @@ Type
      * given in world local space.
      *)
     Function getVelocity(): Vector3;
-    //
-    //        /**
-    //         * Applies the given change in velocity.
-    //         */
-    //        void addVelocity(const Vector3 &deltaVelocity);
 
-            (**
-             * Sets the rotation of the rigid body.
-             *
-             * @param rotation The new rotation of the rigid body. The
-             * rotation is given in world space.
-             *)
+    (**
+     *Applies the given change in velocity.
+     *)
+    Procedure addVelocity(Const deltaVelocity: Vector3);
+
+    (**
+     * Sets the rotation of the rigid body.
+     *
+     * @param rotation The new rotation of the rigid body. The
+     * rotation is given in world space.
+     *)
     Procedure setRotation(Const arotation: Vector3);
 
     //        /**
@@ -790,17 +790,17 @@ Type
      *)
     Function getRotation(): Vector3;
 
-    //        /**
-    //         * Applies the given change in rotation.
-    //         */
-    //        void addRotation(const Vector3 &deltaRotation);
+    (**
+     * Applies the given change in rotation.
+     *)
+    Procedure addRotation(Const deltaRotation: Vector3);
 
-            (**
-             * Returns true if the body is awake and responding to
-             * integration.
-             *
-             * @return The awake state of the body.
-             *)
+    (**
+     * Returns true if the body is awake and responding to
+     * integration.
+     *
+     * @return The awake state of the body.
+     *)
     Function getAwake(): boolean;
 
     (**
@@ -1302,6 +1302,11 @@ Begin
   result := velocity;
 End;
 
+Procedure RigidBody.addVelocity(Const deltaVelocity: Vector3);
+Begin
+  velocity := velocity + deltaVelocity;
+End;
+
 Procedure RigidBody.setRotation(Const arotation: Vector3);
 Begin
   rotation := arotation;
@@ -1315,6 +1320,11 @@ End;
 Function RigidBody.getRotation: Vector3;
 Begin
   result := rotation;
+End;
+
+Procedure RigidBody.addRotation(Const deltaRotation: Vector3);
+Begin
+  rotation := rotation + deltaRotation;
 End;
 
 Function RigidBody.getAwake: boolean;
