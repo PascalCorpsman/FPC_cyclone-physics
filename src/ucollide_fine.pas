@@ -290,13 +290,12 @@ End;
 Constructor CollisionPrimitive.Create;
 Begin
   Inherited create;
-  body := RigidBody.create();
+  body := Nil; // Der wird nicht erzeugt, weil die manchmal "geteilt" werden -> Wird damit auch nicht gefreed !
   offset.create();
 End;
 
 Destructor CollisionPrimitive.Destroy;
 Begin
-  body.Free;
 End;
 
 Procedure CollisionPrimitive.calculateInternals;

@@ -165,8 +165,6 @@ End;
 Procedure RagdollDemo.generateContacts();
 Var
   plane: CollisionPlane;
-  transform, otherTransform: Matrix4;
-  position, otherPosition: Vector3;
   bone_, other: ^Bone;
   i, j: integer;
   boneSphere, otherSphere: CollisionSphere;
@@ -300,8 +298,10 @@ Begin
   // Set up the bone hierarchy.
   For i := 0 To high(joints) Do
     joints[i] := Joint.Create;
-  For i := 0 To high(bones) Do
+  For i := 0 To high(bones) Do Begin
     bones[i] := bone.Create;
+    bones[i].body := RigidBody.Create();
+  End;
 
   // Right Knee
   joints[0]._Set(
@@ -388,8 +388,10 @@ Var
 Begin
   For i := 0 To high(Joints) Do
     joints[i].Free;
-  For i := 0 To high(bones) Do
+  For i := 0 To high(bones) Do Begin
+    bones[i].body.Free;
     bones[i].Free;
+  End;
   Inherited Destroy();
 End;
 
