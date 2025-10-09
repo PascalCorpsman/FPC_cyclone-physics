@@ -508,7 +508,7 @@ Begin
   // Exit immediately if we aren't running the simulation
   If (pauseSimulation) Then Begin
     Inherited update();
-     exit;
+    exit;
   End
   Else If (autoPauseSimulation) Then Begin
     pauseSimulation := true;
@@ -522,11 +522,12 @@ Begin
   generateContacts();
 
   // Resolve detected contacts
-  resolver.resolveContacts(
-    cData.contactArray,
-    cData.contactCount,
-    duration
-    );
+  Der Resolver erzeugt noch einen Crash
+//  resolver.resolveContacts(
+//    cData.contactArray,
+//    cData.contactCount,
+//    duration
+//    );
 
   Inherited update();
 End;
@@ -584,4 +585,5 @@ Begin
 End;
 
 End.
+
 
