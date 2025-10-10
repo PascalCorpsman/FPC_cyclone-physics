@@ -736,7 +736,14 @@ Function V3(x, y, z: float): Vector3;
 
 Function ifthen(value: Boolean; truecase, falsecase: Float): Float; // ka warum math.pas includiert und alles knallt ..
 
+Procedure Nop;
+
 Implementation
+
+Procedure Nop;
+Begin
+
+End;
 
 Function ifthen(value: Boolean; truecase, falsecase: Float): Float;
 Begin

@@ -522,12 +522,11 @@ Begin
   generateContacts();
 
   // Resolve detected contacts
-  Der Resolver erzeugt noch einen Crash
-//  resolver.resolveContacts(
-//    cData.contactArray,
-//    cData.contactCount,
-//    duration
-//    );
+  resolver.resolveContacts(
+    cData.contactArray,
+    cData.contactCount,
+    duration
+    );
 
   Inherited update();
 End;
@@ -585,5 +584,4 @@ Begin
 End;
 
 End.
-
 

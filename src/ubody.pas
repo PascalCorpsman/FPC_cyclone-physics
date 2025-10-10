@@ -250,6 +250,7 @@ Type
      *)
     (*@{*)
     Constructor Create(); virtual;
+    Destructor Destroy(); override;
     (*@}*)
 
 
@@ -1103,6 +1104,11 @@ Begin
   inverseInertiaTensor.create();
   inverseInertiaTensorWorld.create();
   motion := 0;
+End;
+
+Destructor RigidBody.Destroy();
+Begin
+  Nop(); // Nur zum Debuggen ;)
 End;
 
 Procedure RigidBody.calculateDerivedData;

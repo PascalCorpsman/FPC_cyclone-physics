@@ -183,7 +183,7 @@ Type
              * Performs an inertia-weighted impulse based resolution of this
              * contact alone.
              *)
-    Procedure applyVelocityChange(velocityChange: Array Of Vector3;
+    Procedure applyVelocityChange(Out velocityChange: Array Of Vector3; Out
       rotationChange: Array Of Vector3);
 
     (**
@@ -502,8 +502,6 @@ Var
   _max: float;
   d, b, i, index: unsigned;
 Begin
-
-
   // iteratively handle impacts in order of severity.
   velocityIterationsUsed := 0;
   While (velocityIterationsUsed < velocityIterations) Do Begin
@@ -596,18 +594,13 @@ Begin
     // Again this action may have changed the penetration of other
     // bodies, so we update contacts.
     For i := 0 To numContacts - 1 Do Begin
-
       // Check each body in the contact
       For b := 0 To 1 Do Begin
         If assigned(c[i].body[b]) Then Begin
-
           // Check for a match with each body in the newly
           // resolved contact
-
           For d := 0 To 1 Do Begin
-
             If (c[i].body[b] = c[index].body[d]) Then Begin
-
               deltaPosition := linearChange[d] +
                 angularChange[d].vectorProduct(
                 c[i].relativeContactPosition[b]);
@@ -618,7 +611,7 @@ Begin
               // subtracting the resolution)..
               c[i].penetration := c[i].penetration +
                 deltaPosition.scalarProduct(c[i].contactNormal)
-                * ifthen(b = 1, 1, -1);
+                * ifthen(b <> 0, 1, -1);
             End;
           End;
         End;
@@ -703,7 +696,6 @@ Begin
   velocityFromAcc := 0;
 
   If (body[0]^.getAwake()) Then Begin
-
     velocityFromAcc := velocityFromAcc +
       body[0]^.getLastFrameAcceleration() * duration * contactNormal;
   End;
@@ -816,8 +808,8 @@ Begin
     contactTangent[1]);
 End;
 
-Procedure Contact.applyVelocityChange(velocityChange: Array Of Vector3;
-  rotationChange: Array Of Vector3);
+Procedure Contact.applyVelocityChange(Out velocityChange: Array Of Vector3;
+  Out rotationChange: Array Of Vector3);
 Var
   inverseInertiaTensor: Array[0..1] Of Matrix3;
   impulsiveTorque, impulse, impulseContact: Vector3;
@@ -846,7 +838,7 @@ Begin
   // Split in the impulse into linear and rotational components
   impulsiveTorque := relativeContactPosition[0] Mod impulse;
   rotationChange[0] := inverseInertiaTensor[0].transform(impulsiveTorque);
-  velocityChange[0].clear();
+  velocityChange[0] := V3(0, 0, 0); // .clear ohne Warnung ;)
   velocityChange[0].addScaledVector(impulse, body[0]^.getInverseMass());
 
   // Apply the changes
@@ -956,7 +948,7 @@ Begin
       If (angularMove[i] = 0) Then Begin
 
         // Easy case - no angular movement means no rotation.
-        angularChange[i].clear();
+        angularChange[i] := v3(0, 0, 0); // .clear(); ohne Warnung
       End
       Else Begin
         // Work out the direction we'd like to rotate in.
