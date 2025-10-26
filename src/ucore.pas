@@ -130,7 +130,6 @@ Type
   { Quaternion }
 
   Quaternion = Object
-
   public
     _d: TQuaternionInternal;
     (**
@@ -204,12 +203,11 @@ Type
      *)
     data: Array[0..11] Of float;
 
-    //         // ... Other Matrix4 code as before ...
-    //
-    //
-    //         /**
-    //          * Creates an identity matrix.
-    //          */
+    // ... Other Matrix4 code as before ...
+
+    (**
+     * Creates an identity matrix.
+     *)
     Constructor create();
     //
     //         /**
@@ -501,27 +499,18 @@ Type
      *)
     Procedure setBlockInertiaTensor(Const halfSizes: Vector3; mass: Float);
 
-    //        /**
-    //         * Sets the matrix to be a skew symmetric matrix based on
-    //         * the given vector. The skew symmetric matrix is the equivalent
-    //         * of the vector product. So if a,b are vectors. a x b = A_s b
-    //         * where A_s is the skew symmetric form of a.
-    //         */
-    //        void setSkewSymmetric(const Vector3 vector)
-    //        {
-    //            data[0] = data[4] = data[8] = 0;
-    //            data[1] = -vector.z;
-    //            data[2] = vector.y;
-    //            data[3] = vector.z;
-    //            data[5] = -vector.x;
-    //            data[6] = -vector.y;
-    //            data[7] = vector.x;
-    //        }
-    //
-            (**
-             * Sets the matrix values from the given three vector components.
-             * These are arranged as the three columns of the vector.
-             *)
+    (**
+     * Sets the matrix to be a skew symmetric matrix based on
+     * the given vector. The skew symmetric matrix is the equivalent
+     * of the vector product. So if a,b are vectors. a x b = A_s b
+     * where A_s is the skew symmetric form of a.
+     *)
+    Procedure setSkewSymmetric(Const vector: Vector3);
+
+    (**
+     * Sets the matrix values from the given three vector components.
+     * These are arranged as the three columns of the vector.
+     *)
     Procedure setComponents(Const compOne: Vector3; Const compTwo: Vector3;
       Const compThree: Vector3);
 
@@ -568,15 +557,10 @@ Type
              *)
     Procedure setInverse(Const m: Matrix3);
 
-    //
-    //        /** Returns a new matrix containing the inverse of this matrix. */
-    //        Matrix3 inverse() const
-    //        {
-    //            Matrix3 result;
-    //            result.setInverse(*this);
-    //            return result;
-    //        }
-    //
+
+    (** Returns a new matrix containing the inverse of this matrix. *)
+    Function inverse(): Matrix3;
+
     //        /**
     //         * Inverts the matrix.
     //         */
@@ -584,54 +568,17 @@ Type
     //        {
     //            setInverse(*this);
     //        }
-    //
-    //        /**
-    //         * Sets the matrix to be the transpose of the given matrix.
-    //         *
-    //         * @param m The matrix to transpose and use to set this.
-    //         */
-    //        void setTranspose(const Matrix3 &m)
-    //        {
-    //            data[0] = m.data[0];
-    //            data[1] = m.data[3];
-    //            data[2] = m.data[6];
-    //            data[3] = m.data[1];
-    //            data[4] = m.data[4];
-    //            data[5] = m.data[7];
-    //            data[6] = m.data[2];
-    //            data[7] = m.data[5];
-    //            data[8] = m.data[8];
-    //        }
-    //
-    //        /** Returns a new matrix containing the transpose of this matrix. */
-    //        Matrix3 transpose() const
-    //        {
-    //            Matrix3 result;
-    //            result.setTranspose(*this);
-    //            return result;
-    //        }
-    //
-    //        /**
-    //         * Returns a matrix which is this matrix multiplied by the given
-    //         * other matrix.
-    //         */
-    //        Matrix3 operator*(const Matrix3 &o) const
-    //        {
-    //            return Matrix3(
-    //                data[0]*o.data[0] + data[1]*o.data[3] + data[2]*o.data[6],
-    //                data[0]*o.data[1] + data[1]*o.data[4] + data[2]*o.data[7],
-    //                data[0]*o.data[2] + data[1]*o.data[5] + data[2]*o.data[8],
-    //
-    //                data[3]*o.data[0] + data[4]*o.data[3] + data[5]*o.data[6],
-    //                data[3]*o.data[1] + data[4]*o.data[4] + data[5]*o.data[7],
-    //                data[3]*o.data[2] + data[4]*o.data[5] + data[5]*o.data[8],
-    //
-    //                data[6]*o.data[0] + data[7]*o.data[3] + data[8]*o.data[6],
-    //                data[6]*o.data[1] + data[7]*o.data[4] + data[8]*o.data[7],
-    //                data[6]*o.data[2] + data[7]*o.data[5] + data[8]*o.data[8]
-    //                );
-    //        }
-    //
+
+            (**
+             * Sets the matrix to be the transpose of the given matrix.
+             *
+             * @param m The matrix to transpose and use to set this.
+             *)
+    Procedure setTranspose(Const m: Matrix3);
+
+    (** Returns a new matrix containing the transpose of this matrix. *)
+    Function transpose(): Matrix3;
+
     //        /**
     //         * Multiplies this matrix in place by the given other matrix.
     //         */
@@ -664,27 +611,6 @@ Type
     //        }
     //
     //        /**
-    //         * Multiplies this matrix in place by the given scalar.
-    //         */
-    //        void operator*=(const real scalar)
-    //        {
-    //            data[0] *= scalar; data[1] *= scalar; data[2] *= scalar;
-    //            data[3] *= scalar; data[4] *= scalar; data[5] *= scalar;
-    //            data[6] *= scalar; data[7] *= scalar; data[8] *= scalar;
-    //        }
-    //
-    //        /**
-    //         * Does a component-wise addition of this matrix and the given
-    //         * matrix.
-    //         */
-    //        void operator+=(const Matrix3 &o)
-    //        {
-    //            data[0] += o.data[0]; data[1] += o.data[1]; data[2] += o.data[2];
-    //            data[3] += o.data[3]; data[4] += o.data[4]; data[5] += o.data[5];
-    //            data[6] += o.data[6]; data[7] += o.data[7]; data[8] += o.data[8];
-    //        }
-    //
-    //        /**
     //         * Sets this matrix to be the rotation matrix corresponding to
     //         * the given quaternion.
     //         */
@@ -713,6 +639,12 @@ Operator * (a, b: Vector3): Float;
 Operator * (m, o: Matrix4): Matrix4;
 Operator * (m: Matrix3; vector: Vector3): Vector3;
 Operator * (m: Matrix4; vector: Vector3): Vector3;
+Operator * (Const s, o: Matrix3): Matrix3;
+Operator + (Const s, o: Matrix3): Matrix3;
+
+Operator * (Const m: Matrix3; Const scalar: float): Matrix3;
+
+
 Operator * (Const a, b: Quaternion): Quaternion;
 
 Operator Mod (a, b: Vector3): Vector3;
@@ -860,6 +792,61 @@ Begin
     vector.y * m.data[9] +
     vector.z * m.data[10] + m.data[11]
     );
+End;
+
+(**
+ * Returns a matrix which is this matrix multiplied by the given
+ * other matrix.
+ *)
+
+Operator * (Const s, o: Matrix3): Matrix3;
+Begin
+  result.data[0] := s.data[0] * o.data[0] + s.data[1] * o.data[3] + s.data[2] * o.data[6];
+  result.data[1] := s.data[0] * o.data[1] + s.data[1] * o.data[4] + s.data[2] * o.data[7];
+  result.data[2] := s.data[0] * o.data[2] + s.data[1] * o.data[5] + s.data[2] * o.data[8];
+
+  result.data[3] := s.data[3] * o.data[0] + s.data[4] * o.data[3] + s.data[5] * o.data[6];
+  result.data[4] := s.data[3] * o.data[1] + s.data[4] * o.data[4] + s.data[5] * o.data[7];
+  result.data[5] := s.data[3] * o.data[2] + s.data[4] * o.data[5] + s.data[5] * o.data[8];
+
+  result.data[6] := s.data[6] * o.data[0] + s.data[7] * o.data[3] + s.data[8] * o.data[6];
+  result.data[7] := s.data[6] * o.data[1] + s.data[7] * o.data[4] + s.data[8] * o.data[7];
+  result.data[8] := s.data[6] * o.data[2] + s.data[7] * o.data[5] + s.data[8] * o.data[8];
+End;
+
+(**
+ * Does a component-wise addition of this matrix and the given
+ * matrix.
+ *)
+
+Operator + (Const s, o: Matrix3): Matrix3;
+Begin
+  result.data[0] := s.data[0] + o.data[0];
+  result.data[1] := s.data[1] + o.data[1];
+  result.data[2] := s.data[2] + o.data[2];
+  result.data[3] := s.data[3] + o.data[3];
+  result.data[4] := s.data[4] + o.data[4];
+  result.data[5] := s.data[5] + o.data[5];
+  result.data[6] := s.data[6] + o.data[6];
+  result.data[7] := s.data[7] + o.data[7];
+  result.data[8] := s.data[8] + o.data[8];
+End;
+
+(**
+ * Multiplies this matrix in place by the given scalar.
+ *)
+
+Operator * (Const m: Matrix3; Const scalar: float): Matrix3;
+Begin
+  result.data[0] := m.data[0] * scalar;
+  result.data[1] := m.data[1] * scalar;
+  result.data[2] := m.data[2] * scalar;
+  result.data[3] := m.data[3] * scalar;
+  result.data[4] := m.data[4] * scalar;
+  result.data[5] := m.data[5] * scalar;
+  result.data[6] := m.data[6] * scalar;
+  result.data[7] := m.data[7] * scalar;
+  result.data[8] := m.data[8] * scalar;
 End;
 
 (**
@@ -1115,15 +1102,17 @@ End;
 
 Constructor Matrix3.Create;
 Begin
-  data[0] := 0;
+  data[0] := 1;
   data[1] := 0;
   data[2] := 0;
+
   data[3] := 0;
-  data[4] := 0;
+  data[4] := 1;
   data[5] := 0;
+
   data[6] := 0;
   data[7] := 0;
-  data[8] := 0;
+  data[8] := 1;
 End;
 
 Procedure Matrix3.setInertiaTensorCoeffs(ix, iy, iz: Float; ixy: Float;
@@ -1148,6 +1137,19 @@ Begin
   setInertiaTensorCoeffs(0.3 * mass * (squares.y + squares.z),
     0.3 * mass * (squares.x + squares.z),
     0.3 * mass * (squares.x + squares.y));
+End;
+
+Procedure Matrix3.setSkewSymmetric(Const vector: Vector3);
+Begin
+  data[0] := 0;
+  data[4] := 0;
+  data[8] := 0;
+  data[1] := -vector.z;
+  data[2] := vector.y;
+  data[3] := vector.z;
+  data[5] := -vector.x;
+  data[6] := -vector.y;
+  data[7] := vector.x;
 End;
 
 Procedure Matrix3.setComponents(Const compOne: Vector3; Const compTwo: Vector3;
@@ -1206,6 +1208,29 @@ Begin
   data[6] := (m.data[3] * m.data[7] - m.data[4] * m.data[6]) * t17;
   data[7] := -(m.data[0] * m.data[7] - t12) * t17;
   data[8] := (t4 - t8) * t17;
+End;
+
+Function Matrix3.inverse(): Matrix3;
+Begin
+  result.setInverse(self);
+End;
+
+Procedure Matrix3.setTranspose(Const m: Matrix3);
+Begin
+  data[0] := m.data[0];
+  data[1] := m.data[3];
+  data[2] := m.data[6];
+  data[3] := m.data[1];
+  data[4] := m.data[4];
+  data[5] := m.data[7];
+  data[6] := m.data[2];
+  data[7] := m.data[5];
+  data[8] := m.data[8];
+End;
+
+Function Matrix3.transpose: Matrix3;
+Begin
+  result.setTranspose(self);
 End;
 
 Initialization
