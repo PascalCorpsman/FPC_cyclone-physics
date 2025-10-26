@@ -1,6 +1,6 @@
 # Demo ballistic
 
-The most simple demo is the ballistic, in the book it is already labeled as physics engine.
+The most simple demo is the ballistic, in the book it is already labeled as physics engine and shown on page 63.
 
 ![](preview.png)
 

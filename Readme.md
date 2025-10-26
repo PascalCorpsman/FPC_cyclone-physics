@@ -4,7 +4,7 @@
 > As i got stuck in writing my own 3D physics engine [CorP3D](https://github.com/PascalCorpsman/CorP3D) i decided to "recode" a existing one in order to learn enough to finish CorP3D.
 >
 
-FPC cyclone-physics is a 3D physics game engine. It is developed in the book [Game Physics Engine Development](https://www.amazon.de/-/en/Game-Physics-Engine-Development-Commercial-Grade/dp/0123819768).
+FPC cyclone-physics is a 3D physics game engine. It is developed in the book [Game Physics Engine Development, second edition](https://www.amazon.de/-/en/Game-Physics-Engine-Development-Commercial-Grade/dp/0123819768).
 
 Ian Millington starts from scratch in his book, and so do i here in this repository. The plan is to read trough the book and implement step by step the whole engine in FreePascal (aka crossporting the C++ code given in the book).
 
@@ -21,5 +21,5 @@ Now you have everything to compile the engine.
 
 ### Progress
 - 2025.05.23: created repository, readme.md and license.md
-- 2025.05.25: demo ballistic
-- 2025.05.26: demo fireworks
+- 2025.05.25: demo 001 ballistic
+- 2025.05.26: demo 002 fireworks
