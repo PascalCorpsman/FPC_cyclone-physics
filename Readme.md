@@ -10,6 +10,22 @@ Ian Millington starts from scratch in his book, and so do i here in this reposit
 
 Goal is to have at the end a fully working 3D physics library (the same as in the book) and also port the [Demos](src/Demos).
 
+There are eleven demo's available in total. The first seven demos are part of the particle engine and the last four for the rigid body physics.
+
+| Number | Page in Book | Name
+| ---    | ---          | ---
+| 001    |  63          | [ballistic](src/Demos/001_ballistic)
+| 002    |  66          | [fireworks](src/Demos/002_fireworks)
+| 003    | 151          | [bridge](src/Demos/003_bridge)
+| 004    | 152          | platform
+| 005    | 153          | blob
+| 006    | 241          | flightsim
+| 007    | 247          | sailboat
+| 008    |  65          | bigballistic
+| 009    | 441          | [ragdoll](src/Demos/009_ragdoll)
+| 010    | 446          | fracture
+| 011    | 457          | explosion
+
 If you do not wan't to wait up until i finished reading the book you can try look at the books github repository which is located [here](https://github.com/idmillington/cyclone-physics).
 
 ### What is needed to compile and run the code ?

@@ -1,6 +1,6 @@
 # Demo ballistic
 
-The most simple demo is the ballistic, in the book it is already labeled as physics engine and shown on page 63.
+The most simple demo is the ballistic, it proofes the particle engine.
 
 ![](preview.png)
 

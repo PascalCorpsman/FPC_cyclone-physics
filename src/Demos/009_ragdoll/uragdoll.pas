@@ -194,7 +194,6 @@ Begin
 
     // Check for collisions with each other box
     For j := i + 1 To NUM_BONES - 1 Do Begin
-      //        for (Bone *other = bone+1; other < bones+NUM_BONES; other++)
       other := @bones[j];
       If (Not cData.hasMoreContacts()) Then Begin
         boneSphere.free;
@@ -276,7 +275,6 @@ Begin
 
   strength := -random.randomReal(500.0, 1000.0);
 
-  (* -- Debug forces are removed -> Radgoll will fall to floor ..
   For i := 0 To NUM_BONES - 1 Do Begin
     bones[i].body.addForceAtBodyPoint(
       V3(strength, 0, 0), V3(0, 0, 0));
@@ -286,7 +284,6 @@ Begin
     V3(strength, 0, random.randomBinomial(1000.0)),
     V3(random.randomBinomial(4.0), random.randomBinomial(3.0), 0)
     );
-  // *)
 
   // Reset the contacts
   cData.contactCount := 0;

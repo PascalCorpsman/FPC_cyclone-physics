@@ -1,6 +1,6 @@
 # Demo fireworks
 
-Usage of the particle class to create "fireworks" like effects, in the book listed on page 66.
+Usage of the particle class to create "fireworks" like effects.
 
 ![](preview.png)
 
