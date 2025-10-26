@@ -8,8 +8,11 @@ Usage of the rigidbody physics engine to simulate a ragdoll, in the book first m
 
 ![](preview.png)
 
-<!---
+
  Usage:
-- 
--->
+- Space: simulate 1 step
+- P: toggle pause
+- R: reset everything
+- c: toggle debugdisplay
+
 
