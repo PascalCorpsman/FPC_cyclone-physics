@@ -531,7 +531,7 @@ Begin
     For i := 0 To numContacts - 1 Do Begin
       // Check each body in the contact
       For b := 0 To 1 Do Begin
-        If assigned(c[i].body[b]) Then Begin
+        If assigned(c[i].body[b]) And assigned(c[i].body[b]^) Then Begin
           // Check for a match with each body in the newly
           // resolved contact
 
@@ -596,7 +596,7 @@ Begin
     For i := 0 To numContacts - 1 Do Begin
       // Check each body in the contact
       For b := 0 To 1 Do Begin
-        If assigned(c[i].body[b]) Then Begin
+        If assigned(c[i].body[b]) And assigned(c[i].body[b]^) Then Begin
           // Check for a match with each body in the newly
           // resolved contact
           For d := 0 To 1 Do Begin
@@ -633,21 +633,21 @@ End;
 Procedure Contact.calculateInternals(duration: Float);
 Begin
   // Check if the first object is NULL, and swap if it is.
-  If (body[0] = Nil) Then swapBodies();
-  assert(assigned(body[0]));
+  If (body[0]^ = Nil) Then swapBodies();
+  assert(assigned(body[0]^));
 
   // Calculate an set of axis at the contact point.
   calculateContactBasis();
 
   // Store the relative position of the contact relative to each body
   relativeContactPosition[0] := contactPoint - body[0]^.getPosition();
-  If assigned(body[1]) Then Begin
+  If assigned(body[1]) And assigned(body[1]^) Then Begin
     relativeContactPosition[1] := contactPoint - body[1]^.getPosition();
   End;
 
   // Find the relative velocity of the bodies at the contact point.
   contactVelocity := calculateLocalVelocity(0, duration);
-  If assigned(body[1]) Then Begin
+  If assigned(body[1]) And assigned(body[1]^) Then Begin
     contactVelocity := contactVelocity - calculateLocalVelocity(1, duration);
   End;
 
@@ -671,7 +671,7 @@ Var
   body0awake, body1awake: Boolean;
 Begin
   // Collisions with the world never cause a body to wake up.
-  If (body[1] = Nil) Then exit;
+  If (body[1] = Nil) Or (body[1]^ = Nil) Then exit;
 
   body0awake := body[0]^.getAwake();
   body1awake := body[1]^.getAwake();
@@ -690,7 +690,6 @@ Const
   velocityLimit = 0.25;
 Var
   thisRestitution, velocityFromAcc: float;
-
 Begin
   // Calculate the acceleration induced velocity accumulated this frame
   velocityFromAcc := 0;
@@ -700,7 +699,7 @@ Begin
       body[0]^.getLastFrameAcceleration() * duration * contactNormal;
   End;
 
-  If assigned(body[1]) And (body[1]^.getAwake()) Then Begin
+  If assigned(body[1]) And assigned(body[1]^) And (body[1]^.getAwake()) Then Begin
     velocityFromAcc := velocityFromAcc -
       body[1]^.getLastFrameAcceleration() * duration * contactNormal;
   End;
@@ -747,7 +746,7 @@ Begin
 
   // Add the planar velocities - if there's enough friction they will
   // be removed during velocity resolution
-  _contactVelocity := contactVelocity + accVelocity;
+  _contactVelocity := _contactVelocity + accVelocity;
 
   // And return it
   result := _contactVelocity;
@@ -818,7 +817,7 @@ Begin
   // world coordinates.
 
   body[0]^.getInverseInertiaTensorWorld(&inverseInertiaTensor[0]);
-  If assigned(body[1]) Then
+  If assigned(body[1]) And assigned(body[1]^) Then
     body[1]^.getInverseInertiaTensorWorld(&inverseInertiaTensor[1]);
 
   // We will calculate the impulse for each contact axis
@@ -845,7 +844,7 @@ Begin
   body[0]^.addVelocity(velocityChange[0]);
   body[0]^.addRotation(rotationChange[0]);
 
-  If assigned(body[1]) Then Begin
+  If assigned(body[1]) And assigned(body[1]^) Then Begin
 
     // Work out body one's linear and angular changes
     impulsiveTorque := impulse Mod relativeContactPosition[1];
@@ -881,7 +880,7 @@ Begin
   // We need to work out the inertia of each object in the direction
   // of the contact normal, due to angular inertia only.
   For i := 0 To 1 Do Begin
-    If assigned(body[i]) Then Begin
+    If assigned(body[i]) And assigned(body[i]^) Then Begin
       body[i]^.getInverseInertiaTensorWorld(inverseInertiaTensor);
 
       // Use the same procedure as for calculating frictionless
@@ -909,7 +908,7 @@ Begin
 
   // Loop through again calculating and applying the changes
   For i := 0 To 1 Do Begin
-    If assigned(body[i]) Then Begin
+    If assigned(body[i]) And assigned(body[i]^) Then Begin
       // The linear and angular movements required are in proportion to
       // the two inverse inertias.
       _sign := IfThen((i = 0), 1, -1);
@@ -1011,19 +1010,18 @@ Begin
   // deltaVelocity += body[0]->getInverseMass();
   //
   // // Check if we need to the second body's data
-  // if (body[1])
-  // {
-  //     // Go through the same transformation sequence again
-  //     Vector3 deltaVelWorld = relativeContactPosition[1] % contactNormal;
-  //     deltaVelWorld = inverseInertiaTensor[1].transform(deltaVelWorld);
-  //     deltaVelWorld = deltaVelWorld % relativeContactPosition[1];
-  //
-  //     // Add the change in velocity due to rotation
-  //     deltaVelocity += deltaVelWorld * contactNormal;
-  //
-  //     // Add the change in velocity due to linear motion
-  //     deltaVelocity += body[1]->getInverseMass();
-  // }
+  If assigned(body[1]) And assigned(body[1]^) Then Begin
+    //     // Go through the same transformation sequence again
+    //     Vector3 deltaVelWorld = relativeContactPosition[1] % contactNormal;
+    //     deltaVelWorld = inverseInertiaTensor[1].transform(deltaVelWorld);
+    //     deltaVelWorld = deltaVelWorld % relativeContactPosition[1];
+    //
+    //     // Add the change in velocity due to rotation
+    //     deltaVelocity += deltaVelWorld * contactNormal;
+    //
+    //     // Add the change in velocity due to linear motion
+    //     deltaVelocity += body[1]->getInverseMass();
+  End;
   //
   // // Calculate the required size of the impulse
   // impulseContact.x = desiredDeltaVelocity / deltaVelocity;
@@ -1034,83 +1032,90 @@ End;
 
 Function Contact.calculateFrictionImpulse(
   Const inverseInertiaTensor: Array Of Matrix3): Vector3;
+Var
+  impulseContact: Vector3;
+  planarImpulse, inverseMass: float;
+  impulseToTorque: Matrix3;
+  deltaVelWorld: Matrix3;
+  deltaVelWorld2: Matrix3;
+  deltaVelocity: Matrix3;
+  impulseMatrix: Matrix3;
+  velKill: Vector3;
 Begin
-  Raise exception.create('Hier weiter');
-  //Vector3 impulseContact;
-  // real inverseMass = body[0]->getInverseMass();
-  //
-  // // The equivalent of a cross product in matrices is multiplication
-  // // by a skew symmetric matrix - we build the matrix for converting
-  // // between linear and angular quantities.
-  // Matrix3 impulseToTorque;
-  // impulseToTorque.setSkewSymmetric(relativeContactPosition[0]);
-  //
-  // // Build the matrix to convert contact impulse to change in velocity
-  // // in world coordinates.
-  // Matrix3 deltaVelWorld = impulseToTorque;
-  // deltaVelWorld *= inverseInertiaTensor[0];
-  // deltaVelWorld *= impulseToTorque;
-  // deltaVelWorld *= -1;
-  //
-  // // Check if we need to add body two's data
-  // if (body[1])
-  // {
-  //     // Set the cross product matrix
-  //     impulseToTorque.setSkewSymmetric(relativeContactPosition[1]);
-  //
-  //     // Calculate the velocity change matrix
-  //     Matrix3 deltaVelWorld2 = impulseToTorque;
-  //     deltaVelWorld2 *= inverseInertiaTensor[1];
-  //     deltaVelWorld2 *= impulseToTorque;
-  //     deltaVelWorld2 *= -1;
-  //
-  //     // Add to the total delta velocity.
-  //     deltaVelWorld += deltaVelWorld2;
-  //
-  //     // Add to the inverse mass
-  //     inverseMass += body[1]->getInverseMass();
-  // }
-  //
-  // // Do a change of basis to convert into contact coordinates.
-  // Matrix3 deltaVelocity = contactToWorld.transpose();
-  // deltaVelocity *= deltaVelWorld;
-  // deltaVelocity *= contactToWorld;
-  //
-  // // Add in the linear velocity change
-  // deltaVelocity.data[0] += inverseMass;
-  // deltaVelocity.data[4] += inverseMass;
-  // deltaVelocity.data[8] += inverseMass;
-  //
-  // // Invert to get the impulse needed per unit velocity
-  // Matrix3 impulseMatrix = deltaVelocity.inverse();
-  //
-  // // Find the target velocities to kill
-  // Vector3 velKill(desiredDeltaVelocity,
-  //     -contactVelocity.y,
-  //     -contactVelocity.z);
-  //
-  // // Find the impulse to kill target velocities
-  // impulseContact = impulseMatrix.transform(velKill);
-  //
-  // // Check for exceeding friction
-  // real planarImpulse = real_sqrt(
-  //     impulseContact.y*impulseContact.y +
-  //     impulseContact.z*impulseContact.z
-  //     );
-  // if (planarImpulse > impulseContact.x * friction)
-  // {
-  //     // We need to use dynamic friction
-  //     impulseContact.y /= planarImpulse;
-  //     impulseContact.z /= planarImpulse;
-  //
-  //     impulseContact.x = deltaVelocity.data[0] +
-  //         deltaVelocity.data[1]*friction*impulseContact.y +
-  //         deltaVelocity.data[2]*friction*impulseContact.z;
-  //     impulseContact.x = desiredDeltaVelocity / impulseContact.x;
-  //     impulseContact.y *= friction * impulseContact.x;
-  //     impulseContact.z *= friction * impulseContact.x;
-  // }
-  // return impulseContact;
+
+  inverseMass := body[0]^.getInverseMass();
+
+  // The equivalent of a cross product in matrices is multiplication
+  // by a skew symmetric matrix - we build the matrix for converting
+  // between linear and angular quantities.
+
+  impulseToTorque.setSkewSymmetric(relativeContactPosition[0]);
+
+  // Build the matrix to convert contact impulse to change in velocity
+  // in world coordinates.
+  deltaVelWorld := impulseToTorque;
+  deltaVelWorld := deltaVelWorld * inverseInertiaTensor[0];
+  deltaVelWorld := deltaVelWorld * impulseToTorque;
+  deltaVelWorld := deltaVelWorld * -1;
+
+  // Check if we need to add body two's data
+  If assigned(body[1]) And assigned(body[1]^) Then Begin
+    // Set the cross product matrix
+    impulseToTorque.setSkewSymmetric(relativeContactPosition[1]);
+
+    // Calculate the velocity change matrix
+    deltaVelWorld2 := impulseToTorque;
+    deltaVelWorld2 := deltaVelWorld2 * inverseInertiaTensor[1];
+    deltaVelWorld2 := deltaVelWorld2 * impulseToTorque;
+    deltaVelWorld2 := deltaVelWorld2 * -1;
+
+    // Add to the total delta velocity.
+    deltaVelWorld := deltaVelWorld + deltaVelWorld2;
+
+    // Add to the inverse mass
+    inverseMass := inverseMass + body[1]^.getInverseMass();
+  End;
+
+  // Do a change of basis to convert into contact coordinates.
+  deltaVelocity := contactToWorld.transpose();
+  deltaVelocity := deltaVelocity * deltaVelWorld;
+  deltaVelocity := deltaVelocity * contactToWorld;
+
+  // Add in the linear velocity change
+  deltaVelocity.data[0] := deltaVelocity.data[0] + inverseMass;
+  deltaVelocity.data[4] := deltaVelocity.data[4] + inverseMass;
+  deltaVelocity.data[8] := deltaVelocity.data[8] + inverseMass;
+
+  // Invert to get the impulse needed per unit velocity
+  impulseMatrix := deltaVelocity.inverse();
+
+  // Find the target velocities to kill
+  velKill.create(desiredDeltaVelocity,
+    -contactVelocity.y,
+    -contactVelocity.z);
+
+  // Find the impulse to kill target velocities
+  impulseContact := impulseMatrix.transform(velKill);
+
+  // Check for exceeding friction
+  planarImpulse := real_sqrt(
+    impulseContact.y * impulseContact.y +
+    impulseContact.z * impulseContact.z
+    );
+  If (planarImpulse > impulseContact.x * friction) Then Begin
+
+    // We need to use dynamic friction
+    impulseContact.y := impulseContact.y / planarImpulse;
+    impulseContact.z := impulseContact.z / planarImpulse;
+
+    impulseContact.x := deltaVelocity.data[0] +
+      deltaVelocity.data[1] * friction * impulseContact.y +
+      deltaVelocity.data[2] * friction * impulseContact.z;
+    impulseContact.x := desiredDeltaVelocity / impulseContact.x;
+    impulseContact.y := impulseContact.y * friction * impulseContact.x;
+    impulseContact.z := impulseContact.z * friction * impulseContact.x;
+  End;
+  result := impulseContact;
 End;
 
 End.
