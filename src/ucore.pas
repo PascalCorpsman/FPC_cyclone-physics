@@ -300,82 +300,48 @@ Type
     //                 vector.z * data[10]
     //             );
     //         }
-    //
-    //         /**
-    //          * Transform the given direction vector by the
-    //          * transformational inverse of this matrix.
-    //          *
-    //          * @note This function relies on the fact that the inverse of
-    //          * a pure rotation matrix is its transpose. It separates the
-    //          * translational and rotation components, transposes the
-    //          * rotation, and multiplies out. If the matrix is not a
-    //          * scale and shear free transform matrix, then this function
-    //          * will not give correct results.
-    //          *
-    //          * @note When a direction is converted between frames of
-    //          * reference, there is no translation required.
-    //          *
-    //          * @param vector The vector to transform.
-    //          */
-    //         Vector3 transformInverseDirection(const Vector3 &vector) const
-    //         {
-    //             return Vector3(
-    //                 vector.x * data[0] +
-    //                 vector.y * data[4] +
-    //                 vector.z * data[8],
-    //
-    //                 vector.x * data[1] +
-    //                 vector.y * data[5] +
-    //                 vector.z * data[9],
-    //
-    //                 vector.x * data[2] +
-    //                 vector.y * data[6] +
-    //                 vector.z * data[10]
-    //             );
-    //         }
-    //
-    //         /**
-    //          * Transform the given vector by the transformational inverse
-    //          * of this matrix.
-    //          *
-    //          * @note This function relies on the fact that the inverse of
-    //          * a pure rotation matrix is its transpose. It separates the
-    //          * translational and rotation components, transposes the
-    //          * rotation, and multiplies out. If the matrix is not a
-    //          * scale and shear free transform matrix, then this function
-    //          * will not give correct results.
-    //          *
-    //          * @param vector The vector to transform.
-    //          */
-    //         Vector3 transformInverse(const Vector3 &vector) const
-    //         {
-    //             Vector3 tmp = vector;
-    //             tmp.x -= data[3];
-    //             tmp.y -= data[7];
-    //             tmp.z -= data[11];
-    //             return Vector3(
-    //                 tmp.x * data[0] +
-    //                 tmp.y * data[4] +
-    //                 tmp.z * data[8],
-    //
-    //                 tmp.x * data[1] +
-    //                 tmp.y * data[5] +
-    //                 tmp.z * data[9],
-    //
-    //                 tmp.x * data[2] +
-    //                 tmp.y * data[6] +
-    //                 tmp.z * data[10]
-    //             );
-    //         }
 
              (**
-              * Gets a vector representing one axis (i.e. one column) in the matrix.
+              * Transform the given direction vector by the
+              * transformational inverse of this matrix.
               *
-              * @param i The row to return. Row 3 corresponds to the position
-              * of the transform matrix.
+              * @note This function relies on the fact that the inverse of
+              * a pure rotation matrix is its transpose. It separates the
+              * translational and rotation components, transposes the
+              * rotation, and multiplies out. If the matrix is not a
+              * scale and shear free transform matrix, then this function
+              * will not give correct results.
               *
-              * @return The vector.
+              * @note When a direction is converted between frames of
+              * reference, there is no translation required.
+              *
+              * @param vector The vector to transform.
               *)
+    Function transformInverseDirection(Const vector: Vector3): Vector3;
+
+    (**
+     * Transform the given vector by the transformational inverse
+     * of this matrix.
+     *
+     * @note This function relies on the fact that the inverse of
+     * a pure rotation matrix is its transpose. It separates the
+     * translational and rotation components, transposes the
+     * rotation, and multiplies out. If the matrix is not a
+     * scale and shear free transform matrix, then this function
+     * will not give correct results.
+     *
+     * @param vector The vector to transform.
+     *)
+    Function transformInverse(Const vector: Vector3): Vector3;
+
+    (**
+     * Gets a vector representing one axis (i.e. one column) in the matrix.
+     *
+     * @param i The row to return. Row 3 corresponds to the position
+     * of the transform matrix.
+     *
+     * @return The vector.
+     *)
     Function getAxisVector(i: integer): Vector3;
 
     //         /**
@@ -1072,7 +1038,7 @@ End;
 
 { Matrix4 }
 
-Constructor Matrix4.create();
+Constructor Matrix4.create;
 Begin
   data[0] := 1;
   data[1] := 0;
@@ -1091,6 +1057,46 @@ End;
 Function Matrix4.transform(Const vector: Vector3): Vector3;
 Begin
   result := self * vector;
+End;
+
+Function Matrix4.transformInverseDirection(Const vector: Vector3): Vector3;
+Begin
+  result.create(
+    vector.x * data[0] +
+    vector.y * data[4] +
+    vector.z * data[8],
+
+    vector.x * data[1] +
+    vector.y * data[5] +
+    vector.z * data[9],
+
+    vector.x * data[2] +
+    vector.y * data[6] +
+    vector.z * data[10]
+    );
+End;
+
+Function Matrix4.transformInverse(Const vector: Vector3): Vector3;
+Var
+  tmp: Vector3;
+Begin
+  tmp := vector;
+  tmp.x := tmp.x - data[3];
+  tmp.y := tmp.y - data[7];
+  tmp.z := tmp.z - data[11];
+  result.create(
+    tmp.x * data[0] +
+    tmp.y * data[4] +
+    tmp.z * data[8],
+
+    tmp.x * data[1] +
+    tmp.y * data[5] +
+    tmp.z * data[9],
+
+    tmp.x * data[2] +
+    tmp.y * data[6] +
+    tmp.z * data[10]
+    );
 End;
 
 Function Matrix4.getAxisVector(i: integer): Vector3;

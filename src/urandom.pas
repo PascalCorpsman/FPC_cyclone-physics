@@ -119,10 +119,10 @@ Type
     //    */
     //   Vector3 randomXZVector(real scale);
     //
-    //   /**
-    //    * Returns a random orientation (i.e. normalized) quaternion.
-    //    */
-    //   Quaternion randomQuaternion();
+       (**
+        * Returns a random orientation (i.e. normalized) quaternion.
+        *)
+    Function randomQuaternion(): Quaternion;
 
 
   End;
@@ -210,6 +210,20 @@ Begin
     randomReal(min.y, max.y),
     randomReal(min.z, max.z)
     );
+End;
+
+Function TRandom.randomQuaternion(): Quaternion;
+Var
+  q: Quaternion;
+Begin
+  q.create(
+    randomReal(),
+    randomReal(),
+    randomReal(),
+    randomReal()
+    );
+  q.normalise();
+  result := q;
 End;
 
 Initialization

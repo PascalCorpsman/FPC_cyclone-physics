@@ -24,7 +24,7 @@ Uses
 (*
  * Default is single precision to be 1:1 compatible with OpenGL
  *)
-{.$ DOUBLE_PRECISION}
+{$DEFINE DOUBLE_PRECISION}
 
 {$IFDEF DOUBLE_PRECISION}
 

@@ -889,26 +889,26 @@ Type
      *)
     Procedure clearAccumulators();
 
-    //        /**
-    //         * Adds the given force to centre of mass of the rigid body.
-    //         * The force is expressed in world-coordinates.
-    //         *
-    //         * @param force The force to apply.
-    //         */
-    //        void addForce(const Vector3 &force);
+    (**
+     * Adds the given force to centre of mass of the rigid body.
+     * The force is expressed in world-coordinates.
+     *
+     * @param force The force to apply.
+     *)
+    Procedure addForce(Const force: Vector3);
 
-            (**
-             * Adds the given force to the given point on the rigid body.
-             * Both the force and the
-             * application point are given in world space. Because the
-             * force is not applied at the centre of mass, it may be split
-             * into both a force and torque.
-             *
-             * @param force The force to apply.
-             *
-             * @param point The location at which to apply the force, in
-             * world-coordinates.
-             *)
+    (**
+     * Adds the given force to the given point on the rigid body.
+     * Both the force and the
+     * application point are given in world space. Because the
+     * force is not applied at the centre of mass, it may be split
+     * into both a force and torque.
+     *
+     * @param force The force to apply.
+     *
+     * @param point The location at which to apply the force, in
+     * world-coordinates.
+     *)
     Procedure addForceAtPoint(Const force: Vector3; Const point: Vector3);
 
     (**
@@ -940,20 +940,20 @@ Type
              *)
     Procedure setAcceleration(Const aacceleration: Vector3);
 
-    //        /**
-    //         * Sets the constant acceleration of the rigid body by component.
-    //         *
-    //         * @param x The x coordinate of the new acceleration of the rigid
-    //         * body.
-    //         *
-    //         * @param y The y coordinate of the new acceleration of the rigid
-    //         * body.
-    //         *
-    //         * @param z The z coordinate of the new acceleration of the rigid
-    //         * body.
-    //         */
-    //        void setAcceleration(const real x, const real y, const real z);
-    //
+    (**
+     * Sets the constant acceleration of the rigid body by component.
+     *
+     * @param x The x coordinate of the new acceleration of the rigid
+     * body.
+     *
+     * @param y The y coordinate of the new acceleration of the rigid
+     * body.
+     *
+     * @param z The z coordinate of the new acceleration of the rigid
+     * body.
+     *)
+    Procedure setAcceleration(x, y, z: Float);
+
     //        /**
     //         * Fills the given vector with the acceleration of the rigid body.
     //         *
@@ -1106,7 +1106,7 @@ Begin
   motion := 0;
 End;
 
-Destructor RigidBody.Destroy();
+Destructor RigidBody.Destroy;
 Begin
   Nop(); // Nur zum Debuggen ;)
 End;
@@ -1375,6 +1375,12 @@ Begin
   torqueAccum.clear();
 End;
 
+Procedure RigidBody.addForce(Const force: Vector3);
+Begin
+  forceAccum := forceAccum + force;
+  isAwake := true;
+End;
+
 Procedure RigidBody.addForceAtPoint(Const force: Vector3; Const point: Vector3);
 Var
   pt: Vector3;
@@ -1402,6 +1408,13 @@ End;
 Procedure RigidBody.setAcceleration(Const aacceleration: Vector3);
 Begin
   acceleration := aacceleration;
+End;
+
+Procedure RigidBody.setAcceleration(x, y, z: Float);
+Begin
+  acceleration.x := x;
+  acceleration.y := y;
+  acceleration.z := z;
 End;
 
 End.

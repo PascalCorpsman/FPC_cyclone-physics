@@ -224,13 +224,13 @@ Type
 
   CollisionDetector = Class
   public
-    //
-    //        static unsigned sphereAndHalfSpace(
-    //            const CollisionSphere &sphere,
-    //            const CollisionPlane &plane,
-    //            CollisionData *data
-    //            );
-    //
+
+    Class Function sphereAndHalfSpace(
+      Const sphere: CollisionSphere;
+      Const plane: CollisionPlane;
+      Var data: CollisionData
+      ): unsigned;
+
     //        static unsigned sphereAndTruePlane(
     //            const CollisionSphere &sphere,
     //            const CollisionPlane &plane,
@@ -265,12 +265,12 @@ Type
     //            const Vector3 &point,
     //            CollisionData *data
     //            );
-    //
-    //        static unsigned boxAndSphere(
-    //            const CollisionBox &box,
-    //            const CollisionSphere &sphere,
-    //            CollisionData *data
-    //            );
+
+    Class Function boxAndSphere(
+      Const box: CollisionBox;
+      Const sphere: CollisionSphere;
+      Var data: CollisionData
+      ): unsigned;
   End;
 
 Implementation
@@ -451,6 +451,41 @@ Begin
 End;
 
 { CollisionDetector }
+
+Class Function CollisionDetector.sphereAndHalfSpace(
+  Const sphere: CollisionSphere; Const plane: CollisionPlane;
+  Var data: CollisionData): unsigned;
+Var
+  position: Vector3;
+  ballDistance: float;
+  contact: pContact;
+Begin
+  result := 0;
+  // Make sure we have contacts
+  If (data.contactsLeft <= 0) Then exit;
+
+  // Cache the sphere position
+  position := sphere.getAxis(3);
+
+  // Find the distance from the plane
+  ballDistance :=
+    plane.direction * position -
+    sphere.radius - plane.offset;
+
+  If (ballDistance >= 0) Then exit;
+
+  // Create the contact - it has a normal in the plane direction.
+  contact := data.contacts;
+  contact^.contactNormal := plane.direction;
+  contact^.penetration := -ballDistance;
+  contact^.contactPoint :=
+    position - plane.direction * (ballDistance + sphere.radius);
+  contact^.setBodyData(@sphere.body, Nil,
+    data.friction, data.restitution);
+
+  data.addContacts(1);
+  result := 1;
+End;
 
 Class Function CollisionDetector.sphereAndSphere(Const one: CollisionSphere;
   Const two: CollisionSphere; Var data: CollisionData): unsigned;
@@ -860,6 +895,65 @@ Begin
     data.addContacts(1);
     result := 1;
   End;
+End;
+
+Class Function CollisionDetector.boxAndSphere(Const box: CollisionBox;
+  Const sphere: CollisionSphere; Var data: CollisionData): unsigned;
+Var
+  centre: Vector3;
+  relCentre: Vector3;
+  closestPt: Vector3;
+  dist: float;
+  closestPtWorld: Vector3;
+  contact: pContact;
+Begin
+  result := 0;
+  // Transform the centre of the sphere into box coordinates
+  centre := sphere.getAxis(3);
+  relCentre := box.transform.transformInverse(centre);
+
+  // Early out check to see if we can exclude the contact
+  If (real_abs(relCentre.x) - sphere.radius > box.halfSize.x) Or (
+    real_abs(relCentre.y) - sphere.radius > box.halfSize.y) Or (
+    real_abs(relCentre.z) - sphere.radius > box.halfSize.z) Then Begin
+    exit;
+  End;
+
+  closestPt.create(0, 0, 0);
+
+  // Clamp each coordinate to the box.
+  dist := relCentre.x;
+  If (dist > box.halfSize.x) Then dist := box.halfSize.x;
+  If (dist < -box.halfSize.x) Then dist := -box.halfSize.x;
+  closestPt.x := dist;
+
+  dist := relCentre.y;
+  If (dist > box.halfSize.y) Then dist := box.halfSize.y;
+  If (dist < -box.halfSize.y) Then dist := -box.halfSize.y;
+  closestPt.y := dist;
+
+  dist := relCentre.z;
+  If (dist > box.halfSize.z) Then dist := box.halfSize.z;
+  If (dist < -box.halfSize.z) Then dist := -box.halfSize.z;
+  closestPt.z := dist;
+
+  // Check we're in contact
+  dist := (closestPt - relCentre).squareMagnitude();
+  If (dist > sphere.radius * sphere.radius) Then exit;
+
+  // Compile the contact
+  closestPtWorld := box.transform.transform(closestPt);
+
+  contact := data.contacts;
+  contact^.contactNormal := (closestPtWorld - centre);
+  contact^.contactNormal.Normalize();
+  contact^.contactPoint := closestPtWorld;
+  contact^.penetration := sphere.radius - real_sqrt(dist);
+  contact^.setBodyData(@box.body, @sphere.body,
+    data.friction, data.restitution);
+
+  data.addContacts(1);
+  result := 1;
 End;
 
 End.
