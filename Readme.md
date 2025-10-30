@@ -24,7 +24,7 @@ There are eleven demo's available in total. The first seven demos are part of th
 | 008    |  65          | bigballistic
 | 009    | 441          | [ragdoll](src/Demos/009_ragdoll)
 | 010    | 446          | fracture
-| 011    | 457          | explosion
+| 011    | 457          | [explosion](src/Demos/011_explosion)
 
 If you do not wan't to wait up until i finished reading the book you can try look at the books github repository which is located [here](https://github.com/idmillington/cyclone-physics).
 

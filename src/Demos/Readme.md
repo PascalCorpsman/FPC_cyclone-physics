@@ -10,7 +10,8 @@ This is the folder that holds the source of the different demos.
 
 ### Rigid body demos
 
-* [ragdoll](006_ragdoll) - Demonstration of a ragdoll that can be "punshed"
+* [ragdoll](006_ragdoll) - Demonstration of a ragdoll that is "punshed"
+* [explosion](011_explosion) - Demonstration of a simple scene
 
 ### What is needed to compile and run the code ?
 
