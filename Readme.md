@@ -39,3 +39,5 @@ Now you have everything to compile the engine.
 - 2025.05.23: created repository, readme.md and license.md
 - 2025.05.25: demo 001 ballistic
 - 2025.05.26: demo 002 fireworks
+- 2025.10.26: demo 009 ragdoll
+- 2025.10.30: demo 011 explosion
