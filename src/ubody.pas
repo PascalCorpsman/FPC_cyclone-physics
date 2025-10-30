@@ -316,32 +316,32 @@ Type
      *)
     Procedure setMass(Const mass: float);
 
-    //        /**
-    //         * Gets the mass of the rigid body.
-    //         *
-    //         * @return The current mass of the rigid body.
-    //         */
-    //        real getMass() const;
-    //
-    //        /**
-    //         * Sets the inverse mass of the rigid body.
-    //         *
-    //         * @param inverseMass The new inverse mass of the body. This
-    //         * may be zero, for a body with infinite mass
-    //         * (i.e. unmovable).
-    //         *
-    //         * @warning This invalidates internal data for the rigid body.
-    //         * Either an integration function, or the calculateInternals
-    //         * function should be called before trying to get any settings
-    //         * from the rigid body.
-    //         */
-    //        void setInverseMass(const real inverseMass);
+    (**
+     * Gets the mass of the rigid body.
+     *
+     * @return The current mass of the rigid body.
+     *)
+    Function getMass(): float;
 
-            (**
-             * Gets the inverse mass of the rigid body.
-             *
-             * @return The current inverse mass of the rigid body.
-             *)
+    (**
+     * Sets the inverse mass of the rigid body.
+     *
+     * @param inverseMass The new inverse mass of the body. This
+     * may be zero, for a body with infinite mass
+     * (i.e. unmovable).
+     *
+     * @warning This invalidates internal data for the rigid body.
+     * Either an integration function, or the calculateInternals
+     * function should be called before trying to get any settings
+     * from the rigid body.
+     *)
+    Procedure setInverseMass(Const ainverseMass: Float);
+
+    (**
+     * Gets the inverse mass of the rigid body.
+     *
+     * @return The current inverse mass of the rigid body.
+     *)
     Function getInverseMass(): float;
 
     //        /**
@@ -399,21 +399,21 @@ Type
     //         * tensor. The inertia tensor is expressed in world space.
     //         */
     //        Matrix3 getInertiaTensorWorld() const;
-    //
-    //        /**
-    //         * Sets the inverse intertia tensor for the rigid body.
-    //         *
-    //         * @param inverseInertiaTensor The inverse inertia tensor for
-    //         * the rigid body. This must be a full rank matrix and must be
-    //         * invertible.
-    //         *
-    //         * @warning This invalidates internal data for the rigid body.
-    //         * Either an integration function, or the calculateInternals
-    //         * function should be called before trying to get any settings
-    //         * from the rigid body.
-    //         */
-    //        void setInverseInertiaTensor(const Matrix3 &inverseInertiaTensor);
-    //
+
+            (**
+             * Sets the inverse intertia tensor for the rigid body.
+             *
+             * @param inverseInertiaTensor The inverse inertia tensor for
+             * the rigid body. This must be a full rank matrix and must be
+             * invertible.
+             *
+             * @warning This invalidates internal data for the rigid body.
+             * Either an integration function, or the calculateInternals
+             * function should be called before trying to get any settings
+             * from the rigid body.
+             *)
+    Procedure setInverseInertiaTensor(Const ainverseInertiaTensor: Matrix3);
+
     //        /**
     //         * Copies the current inverse inertia tensor of the rigid body
     //         * into the given matrix.
@@ -425,24 +425,24 @@ Type
     //         */
     //        void getInverseInertiaTensor(Matrix3 *inverseInertiaTensor) const;
     //
-    //        /**
-    //         * Gets a copy of the current inverse inertia tensor of the
-    //         * rigid body.
-    //         *
-    //         * @return A new matrix containing the current inverse
-    //         * intertia tensor. The inertia tensor is expressed in the
-    //         * rigid body's local space.
-    //         */
-    //        Matrix3 getInverseInertiaTensor() const;
-
             (**
-             * Copies the current inverse inertia tensor of the rigid body
-             * into the given matrix.
+             * Gets a copy of the current inverse inertia tensor of the
+             * rigid body.
              *
-             * @param inverseInertiaTensor A pointer to a matrix to hold
-             * the current inverse inertia tensor of the rigid body. The
-             * inertia tensor is expressed in world space.
+             * @return A new matrix containing the current inverse
+             * intertia tensor. The inertia tensor is expressed in the
+             * rigid body's local space.
              *)
+    Function getInverseInertiaTensor(): Matrix3;
+
+    (**
+     * Copies the current inverse inertia tensor of the rigid body
+     * into the given matrix.
+     *
+     * @param inverseInertiaTensor A pointer to a matrix to hold
+     * the current inverse inertia tensor of the rigid body. The
+     * inertia tensor is expressed in world space.
+     *)
     Procedure getInverseInertiaTensorWorld(Out _inverseInertiaTensor: Matrix3);
 
     (**
@@ -479,57 +479,57 @@ Type
      *)
     Procedure setLinearDamping(Const alinearDamping: float);
 
-    //        /**
-    //         * Gets the current linear damping value.
-    //         *
-    //         * @return The current linear damping value.
-    //         */
-    //        real getLinearDamping() const;
-    //
-            (**
-             * Sets the angular damping for the rigid body.
-             *
-             * @param angularDamping The speed that rotation is shed from
-             * the rigid body.
-             *
-             * @see setLinearDamping
-             *)
-    Procedure setAngularDamping(Const aangularDamping: Float);
-    //
-    //        /**
-    //         * Gets the current angular damping value.
-    //         *
-    //         * @return The current angular damping value.
-    //         */
-    //        real getAngularDamping() const;
+    (**
+     * Gets the current linear damping value.
+     *
+     * @return The current linear damping value.
+     *)
+    Function getLinearDamping(): float;
 
-        (**
-         * Sets the position of the rigid body.
-         *
-         * @param position The new position of the rigid body.
-         *)
+    (**
+     * Sets the angular damping for the rigid body.
+     *
+     * @param angularDamping The speed that rotation is shed from
+     * the rigid body.
+     *
+     * @see setLinearDamping
+     *)
+    Procedure setAngularDamping(Const aangularDamping: Float);
+
+    (**
+     * Gets the current angular damping value.
+     *
+     * @return The current angular damping value.
+     *)
+    Function getAngularDamping(): float;
+
+    (**
+     * Sets the position of the rigid body.
+     *
+     * @param position The new position of the rigid body.
+     *)
     Procedure setPosition(Const aposition: Vector3);
 
-    //        /**
-    //         * Sets the position of the rigid body by component.
-    //         *
-    //         * @param x The x coordinate of the new position of the rigid
-    //         * body.
-    //         *
-    //         * @param y The y coordinate of the new position of the rigid
-    //         * body.
-    //         *
-    //         * @param z The z coordinate of the new position of the rigid
-    //         * body.
-    //         */
-    //        void setPosition(const real x, const real y, const real z);
-    //
-            (**
-             * Fills the given vector with the position of the rigid body.
-             *
-             * @param position A pointer to a vector into which to write
-             * the position.
-             *)
+    (**
+     * Sets the position of the rigid body by component.
+     *
+     * @param x The x coordinate of the new position of the rigid
+     * body.
+     *
+     * @param y The y coordinate of the new position of the rigid
+     * body.
+     *
+     * @param z The z coordinate of the new position of the rigid
+     * body.
+     *)
+    Procedure setPosition(x, y, z: Float);
+
+    (**
+     * Fills the given vector with the position of the rigid body.
+     *
+     * @param position A pointer to a vector into which to write
+     * the position.
+     *)
     Procedure getPosition(Out aposition: Vector3);
 
     (**
@@ -551,45 +551,44 @@ Type
      *)
     Procedure setOrientation(Const aorientation: Quaternion);
 
-    //        /**
-    //         * Sets the orientation of the rigid body by component.
-    //         *
-    //         * @param r The real component of the rigid body's orientation
-    //         * quaternion.
-    //         *
-    //         * @param i The first complex component of the rigid body's
-    //         * orientation quaternion.
-    //         *
-    //         * @param j The second complex component of the rigid body's
-    //         * orientation quaternion.
-    //         *
-    //         * @param k The third complex component of the rigid body's
-    //         * orientation quaternion.
-    //         *
-    //         * @note The given orientation does not need to be normalised,
-    //         * and can be zero. This function automatically constructs a
-    //         * valid rotation quaternion with (0,0,0,0) mapping to
-    //         * (1,0,0,0).
-    //         */
-    //        void setOrientation(const real r, const real i,
-    //            const real j, const real k);
+    (**
+     * Sets the orientation of the rigid body by component.
+     *
+     * @param r The real component of the rigid body's orientation
+     * quaternion.
+     *
+     * @param i The first complex component of the rigid body's
+     * orientation quaternion.
+     *
+     * @param j The second complex component of the rigid body's
+     * orientation quaternion.
+     *
+     * @param k The third complex component of the rigid body's
+     * orientation quaternion.
+     *
+     * @note The given orientation does not need to be normalised,
+     * and can be zero. This function automatically constructs a
+     * valid rotation quaternion with (0,0,0,0) mapping to
+     * (1,0,0,0).
+     *)
+    Procedure setOrientation(r, i, j, k: float);
 
-            (**
-             * Fills the given quaternion with the current value of the
-             * rigid body's orientation.
-             *
-             * @param orientation A pointer to a quaternion to receive the
-             * orientation data.
-             *)
+    (**
+     * Fills the given quaternion with the current value of the
+     * rigid body's orientation.
+     *
+     * @param orientation A pointer to a quaternion to receive the
+     * orientation data.
+     *)
     Procedure getOrientation(Out aorientation: Quaternion);
 
-    //        /**
-    //         * Gets the orientation of the rigid body.
-    //         *
-    //         * @return The orientation of the rigid body.
-    //         */
-    //        Quaternion getOrientation() const;
-    //
+    (**
+     * Gets the orientation of the rigid body.
+     *
+     * @return The orientation of the rigid body.
+     *)
+    Function getOrientation(): Quaternion;
+
     //        /**
     //         * Fills the given matrix with a transformation representing
     //         * the rigid body's orientation.
@@ -659,41 +658,41 @@ Type
      * @return The transform matrix for the rigid body.
      *)
     Function getTransform(): Matrix4; overload;
-    //
-    //        /**
-    //         * Converts the given point from world space into the body's
-    //         * local space.
-    //         *
-    //         * @param point The point to covert, given in world space.
-    //         *
-    //         * @return The converted point, in local space.
-    //         */
-    //        Vector3 getPointInLocalSpace(const Vector3 &point) const;
-    //
-            (**
-             * Converts the given point from world space into the body's
-             * local space.
-             *
-             * @param point The point to covert, given in local space.
-             *
-             * @return The converted point, in world space.
-             *)
+
+    (**
+     * Converts the given point from world space into the body's
+     * local space.
+     *
+     * @param point The point to covert, given in world space.
+     *
+     * @return The converted point, in local space.
+     *)
+    Function getPointInLocalSpace(Const point: Vector3): Vector3;
+
+    (**
+     * Converts the given point from world space into the body's
+     * local space.
+     *
+     * @param point The point to covert, given in local space.
+     *
+     * @return The converted point, in world space.
+     *)
     Function getPointInWorldSpace(Const point: PVector3): Vector3;
-    //
-    //        /**
-    //         * Converts the given direction from world space into the
-    //         * body's local space.
-    //         *
-    //         * @note When a direction is converted between frames of
-    //         * reference, there is no translation required.
-    //         *
-    //         * @param direction The direction to covert, given in world
-    //         * space.
-    //         *
-    //         * @return The converted direction, in local space.
-    //         */
-    //        Vector3 getDirectionInLocalSpace(const Vector3 &direction) const;
-    //
+
+    (**
+     * Converts the given direction from world space into the
+     * body's local space.
+     *
+     * @note When a direction is converted between frames of
+     * reference, there is no translation required.
+     *
+     * @param direction The direction to covert, given in world
+     * space.
+     *
+     * @return The converted direction, in local space.
+     *)
+    Function getDirectionInLocalSpace(Const direction: Vector3): Vector3;
+
     //        /**
     //         * Converts the given direction from world space into the
     //         * body's local space.
@@ -716,27 +715,27 @@ Type
              *)
     Procedure setVelocity(Const avelocity: Vector3);
 
-    //        /**
-    //         * Sets the velocity of the rigid body by component. The
-    //         * velocity is given in world space.
-    //         *
-    //         * @param x The x coordinate of the new velocity of the rigid
-    //         * body.
-    //         *
-    //         * @param y The y coordinate of the new velocity of the rigid
-    //         * body.
-    //         *
-    //         * @param z The z coordinate of the new velocity of the rigid
-    //         * body.
-    //         */
-    //        void setVelocity(const real x, const real y, const real z);
+    (**
+     * Sets the velocity of the rigid body by component. The
+     * velocity is given in world space.
+     *
+     * @param x The x coordinate of the new velocity of the rigid
+     * body.
+     *
+     * @param y The y coordinate of the new velocity of the rigid
+     * body.
+     *
+     * @param z The z coordinate of the new velocity of the rigid
+     * body.
+     *)
+    Procedure setVelocity(x, y, z: Float);
 
-            (**
-             * Fills the given vector with the velocity of the rigid body.
-             *
-             * @param velocity A pointer to a vector into which to write
-             * the velocity. The velocity is given in world local space.
-             *)
+    (**
+     * Fills the given vector with the velocity of the rigid body.
+     *
+     * @param velocity A pointer to a vector into which to write
+     * the velocity. The velocity is given in world local space.
+     *)
     Procedure getVelocity(Var avelocity: Vector3);
 
     (**
@@ -760,27 +759,27 @@ Type
      *)
     Procedure setRotation(Const arotation: Vector3);
 
-    //        /**
-    //         * Sets the rotation of the rigid body by component. The
-    //         * rotation is given in world space.
-    //         *
-    //         * @param x The x coordinate of the new rotation of the rigid
-    //         * body.
-    //         *
-    //         * @param y The y coordinate of the new rotation of the rigid
-    //         * body.
-    //         *
-    //         * @param z The z coordinate of the new rotation of the rigid
-    //         * body.
-    //         */
-    //        void setRotation(const real x, const real y, const real z);
+    (**
+     * Sets the rotation of the rigid body by component. The
+     * rotation is given in world space.
+     *
+     * @param x The x coordinate of the new rotation of the rigid
+     * body.
+     *
+     * @param y The y coordinate of the new rotation of the rigid
+     * body.
+     *
+     * @param z The z coordinate of the new rotation of the rigid
+     * body.
+     *)
+    Procedure setRotation(x, y, z: Float);
 
-            (**
-             * Fills the given vector with the rotation of the rigid body.
-             *
-             * @param rotation A pointer to a vector into which to write
-             * the rotation. The rotation is given in world local space.
-             *)
+    (**
+     * Fills the given vector with the rotation of the rigid body.
+     *
+     * @param rotation A pointer to a vector into which to write
+     * the rotation. The rotation is given in world local space.
+     *)
     Procedure getRotation(Var arotation: Vector3);
 
     (**
@@ -1096,6 +1095,7 @@ End;
 Constructor RigidBody.Create;
 Begin
   Inherited create;
+  canSleep := true;
   isAwake := false;
   transformMatrix.create();
   orientation.Create();
@@ -1187,6 +1187,21 @@ Begin
   inverseMass := (1.0) / mass;
 End;
 
+Function RigidBody.getMass(): float;
+Begin
+  If (inverseMass = 0) Then Begin
+    result := REAL_MAX;
+  End
+  Else Begin
+    result := 1.0 / inverseMass;
+  End;
+End;
+
+Procedure RigidBody.setInverseMass(Const ainverseMass: Float);
+Begin
+  inverseMass := ainverseMass;
+End;
+
 Function RigidBody.getInverseMass: float;
 Begin
   result := inverseMass;
@@ -1196,6 +1211,18 @@ Procedure RigidBody.setInertiaTensor(Const inertiaTensor: Matrix3);
 Begin
   inverseInertiaTensor.setInverse(inertiaTensor);
   _checkInverseInertiaTensor(inverseInertiaTensor);
+End;
+
+Procedure RigidBody.setInverseInertiaTensor(Const ainverseInertiaTensor: Matrix3
+  );
+Begin
+  _checkInverseInertiaTensor(ainverseInertiaTensor);
+  inverseInertiaTensor := ainverseInertiaTensor;
+End;
+
+Function RigidBody.getInverseInertiaTensor: Matrix3;
+Begin
+  result := inverseInertiaTensor;
 End;
 
 Procedure RigidBody.getInverseInertiaTensorWorld(Out
@@ -1221,14 +1248,29 @@ Begin
   linearDamping := alinearDamping;
 End;
 
+Function RigidBody.getLinearDamping: float;
+Begin
+  result := linearDamping;
+End;
+
 Procedure RigidBody.setAngularDamping(Const aangularDamping: Float);
 Begin
   angularDamping := aangularDamping;
 End;
 
+Function RigidBody.getAngularDamping: float;
+Begin
+  result := angularDamping;
+End;
+
 Procedure RigidBody.setPosition(Const aposition: Vector3);
 Begin
   position := aposition;
+End;
+
+Procedure RigidBody.setPosition(x, y, z: Float);
+Begin
+  position.create(x, y, z);
 End;
 
 Procedure RigidBody.getPosition(Out aposition: Vector3);
@@ -1247,9 +1289,23 @@ Begin
   orientation.normalise();
 End;
 
+Procedure RigidBody.setOrientation(r, i, j, k: float);
+Begin
+  orientation._d.r := r;
+  orientation._d.i := i;
+  orientation._d.j := j;
+  orientation._d.k := k;
+  orientation.normalise();
+End;
+
 Procedure RigidBody.getOrientation(Out aorientation: Quaternion);
 Begin
   aorientation := orientation;
+End;
+
+Function RigidBody.getOrientation: Quaternion;
+Begin
+  result := orientation;
 End;
 
 Procedure RigidBody.getTransform(Out transform: Matrix4);
@@ -1288,14 +1344,29 @@ Begin
   result := transformMatrix;
 End;
 
+Function RigidBody.getPointInLocalSpace(Const point: Vector3): Vector3;
+Begin
+  result := transformMatrix.transformInverse(point);
+End;
+
 Function RigidBody.getPointInWorldSpace(Const point: PVector3): Vector3;
 Begin
   result := transformMatrix.transform(point^);
 End;
 
+Function RigidBody.getDirectionInLocalSpace(Const direction: Vector3): Vector3;
+Begin
+  result := transformMatrix.transformInverseDirection(direction);
+End;
+
 Procedure RigidBody.setVelocity(Const avelocity: Vector3);
 Begin
   velocity := avelocity;
+End;
+
+Procedure RigidBody.setVelocity(x, y, z: Float);
+Begin
+  velocity.create(x, y, z);
 End;
 
 Procedure RigidBody.getVelocity(Var avelocity: Vector3);
@@ -1316,6 +1387,11 @@ End;
 Procedure RigidBody.setRotation(Const arotation: Vector3);
 Begin
   rotation := arotation;
+End;
+
+Procedure RigidBody.setRotation(x, y, z: Float);
+Begin
+  rotation.create(x, y, z);
 End;
 
 Procedure RigidBody.getRotation(Var arotation: Vector3);

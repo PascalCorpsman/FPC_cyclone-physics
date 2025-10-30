@@ -442,19 +442,16 @@ Type
 //            data[3] = c3; data[4] = c4; data[5] = c5;
 //            data[6] = c6; data[7] = c7; data[8] = c8;
 //        }
-//
-//        /**
-//         * Sets the matrix to be a diagonal matrix with the given
-//         * values along the leading diagonal.
-//         */
-//        void setDiagonal(real a, real b, real c)
-//        {
-//            setInertiaTensorCoeffs(a, b, c);
-//        }
-//
-(**
- * Sets the value of the matrix from inertia tensor values.
- *)
+
+        (**
+         * Sets the matrix to be a diagonal matrix with the given
+         * values along the leading diagonal.
+         *)
+    Procedure setDiagonal(a, b, c: float);
+
+    (**
+     * Sets the value of the matrix from inertia tensor values.
+     *)
     Procedure setInertiaTensorCoeffs(ix, iy, iz: Float;
       ixy: Float = 0; ixz: Float = 0; iyz: Float = 0);
 
@@ -1121,6 +1118,11 @@ Begin
   data[8] := 1;
 End;
 
+Procedure Matrix3.setDiagonal(a, b, c: float);
+Begin
+  setInertiaTensorCoeffs(a, b, c);
+End;
+
 Procedure Matrix3.setInertiaTensorCoeffs(ix, iy, iz: Float; ixy: Float;
   ixz: Float; iyz: Float);
 Begin
@@ -1216,7 +1218,7 @@ Begin
   data[8] := (t4 - t8) * t17;
 End;
 
-Function Matrix3.inverse(): Matrix3;
+Function Matrix3.inverse: Matrix3;
 Begin
   result.setInverse(self);
 End;
