@@ -42,6 +42,7 @@ Type
   GroundContacts = Class(ParticleContactGenerator)
     Particles: Tparticles;
     Procedure init(aParticles: Tparticles);
+    Function addContact(contact: PParticleContact; limit: integer): integer; override;
   End;
 
 Implementation
@@ -60,24 +61,23 @@ End;
 Function ParticleWorld.generateContacts(): integer;
 Var
   limit: integer;
+  nextContact, i: integer;
+  g: ParticleContactGenerator;
+  used: Unsigned;
 Begin
   limit := maxContacts;
-  //    ParticleContact *nextContact = contacts;
-  //
-  //    for (ContactGenerators::iterator g = contactGenerators.begin();
-  //        g != contactGenerators.end();
-  //        g++)
-  //    {
-  //        unsigned used =(*g)->addContact(nextContact, limit);
-  //        limit -= used;
-  //        nextContact += used;
-  //
-  //        // We've run out of contacts to fill. This means we're missing
-  //        // contacts.
-  //        if (limit <= 0) break;
-  //    }
-  //
-  //    // Return the number of contacts used.
+  nextContact := 0;
+  For i := 0 To contactGenerators.Count - 1 Do Begin
+    g := contactGenerators.Element[i];
+    used := g.addContact(@contacts[nextContact], limit);
+    limit := limit - used;
+    nextContact := nextContact + used;
+
+    // We've run out of contacts to fill. This means we're missing
+    // contacts.
+    If (limit <= 0) Then break;
+  End;
+  // Return the number of contacts used.
   result := maxContacts - limit;
 End;
 
@@ -128,7 +128,6 @@ Var
   usedContacts: integer;
 Begin
   // First apply the force generators
-
   registry.updateForces(duration);
 
   // Then integrate the objects
@@ -150,6 +149,33 @@ End;
 Procedure GroundContacts.init(aParticles: Tparticles);
 Begin
   Particles := aParticles;
+End;
+
+Function GroundContacts.addContact(contact: PParticleContact; limit: integer
+  ): integer;
+Var
+  count: unsigned;
+  y: float;
+  i: Integer;
+Begin
+  count := 0;
+  For i := 0 To Particles.Count - 1 Do Begin
+    y := Particles.Element[i]^.getPosition().y;
+    If (y < 0.0) Then Begin
+      contact^.contactNormal := UP;
+      contact^.particle[0] := Particles.Element[i];
+      contact^.particle[1] := Nil;
+      contact^.penetration := -y;
+      contact^.restitution := 0.2;
+      contact := contact + 1;
+      count := count + 1;
+    End;
+    If (count >= limit) Then Begin
+      result := count;
+      exit;
+    End;
+  End;
+  result := count;
 End;
 
 End.

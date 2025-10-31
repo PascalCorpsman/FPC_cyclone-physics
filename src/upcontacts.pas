@@ -42,10 +42,12 @@ Type
     Function CalculateSeparatingVelocity(): float;
   End;
 
+  PParticleContact = ^ParticleContact;
+
   { ParticleContactGenerator }
 
   ParticleContactGenerator = Class
-    Function addContact(Var contact: Array Of ParticleContact; limit: integer): integer; virtual;
+    Function addContact(contact: PParticleContact; limit: integer): integer; virtual;
   End;
 
   PParticleContactGenerator = ^ParticleContactGenerator;
@@ -59,7 +61,7 @@ Type
   public
     Constructor Create(aiterations: integer);
     Procedure setIterations(aiterations: integer);
-    Procedure resolveContacts(Const contactArray: Array Of ParticleContact; numContacts: integer; duration: float);
+    Procedure resolveContacts(Var contactArray: Array Of ParticleContact; numContacts: integer; duration: float);
   End;
 
 Implementation
@@ -190,8 +192,8 @@ End;
 
 { ParticleContactGenerator }
 
-Function ParticleContactGenerator.addContact(
-  Var contact: Array Of ParticleContact; limit: integer): integer;
+Function ParticleContactGenerator.addContact(contact: PParticleContact;
+  limit: integer): integer;
 Begin
   result := 0;
 End;
@@ -209,10 +211,55 @@ Begin
 End;
 
 Procedure ParticleContactResolver.resolveContacts(
-  Const contactArray: Array Of ParticleContact; numContacts: integer;
+  Var contactArray: Array Of ParticleContact; numContacts: integer;
   duration: float);
+Var
+  maxIndex, i: unsigned;
+  _max: float;
+  sepVel: float;
+  move: ^Vector3;
 Begin
+  iterationsUsed := 0;
+  While (iterationsUsed < iterations) Do Begin
 
+    // Find the contact with the largest closing velocity;
+    _max := REAL_MAX;
+    maxIndex := numContacts;
+    For i := 0 To numContacts - 1 Do Begin
+      sepVel := contactArray[i].calculateSeparatingVelocity();
+      If (sepVel < _max) And ((sepVel < 0) Or (contactArray[i].penetration > 0)) Then Begin
+        _max := sepVel;
+        maxIndex := i;
+      End;
+    End;
+
+    // Do we have anything worth resolving?
+    If (maxIndex = numContacts) Then break;
+
+    // Resolve this contact
+    contactArray[maxIndex].resolve(duration);
+
+    // Update the interpenetrations for all particles
+    move := contactArray[maxIndex].particleMovement;
+
+    For i := 0 To numContacts - 1 Do Begin
+      If (contactArray[i].particle[0] = contactArray[maxIndex].particle[0]) Then Begin
+        contactArray[i].penetration := contactArray[i].penetration - move[0] * contactArray[i].contactNormal;
+      End
+      Else If (contactArray[i].particle[0] = contactArray[maxIndex].particle[1]) Then Begin
+        contactArray[i].penetration := contactArray[i].penetration - move[1] * contactArray[i].contactNormal;
+      End;
+      If assigned(contactArray[i].particle[1]) Then Begin
+        If (contactArray[i].particle[1] = contactArray[maxIndex].particle[0]) Then Begin
+          contactArray[i].penetration := contactArray[i].penetration + move[0] * contactArray[i].contactNormal;
+        End
+        Else If (contactArray[i].particle[1] = contactArray[maxIndex].particle[1]) Then Begin
+          contactArray[i].penetration := contactArray[i].penetration + move[1] * contactArray[i].contactNormal;
+        End;
+      End;
+    End;
+    iterationsUsed := iterationsUsed + 1;
+  End;
 End;
 
 End.

@@ -47,6 +47,8 @@ Type
 
     Procedure Push_back(aValue: T);
     Function Length: Integer;
+    Function _Begin: T;
+    Function _End: T;
   End;
 
   TOpenGLMatrix = Array[0..15] Of Single;
@@ -875,6 +877,16 @@ End;
 Function TArray.Length: Integer;
 Begin
   result := system.length(data);
+End;
+
+Function TArray._Begin: T;
+Begin
+  result := data[0];
+End;
+
+Function TArray._End: T;
+Begin
+  result := data[high(data)];
 End;
 
 { Vector3 }

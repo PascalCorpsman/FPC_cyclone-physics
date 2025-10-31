@@ -41,3 +41,4 @@ Now you have everything to compile the engine.
 - 2025.05.26: demo 002 fireworks
 - 2025.10.26: demo 009 ragdoll
 - 2025.10.30: demo 011 explosion
+- 2025.10.31: demo 003 bridge

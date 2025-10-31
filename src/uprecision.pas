@@ -49,6 +49,7 @@ Type
 {$ENDIF}
 
 Function real_pow(base, exp: float): Float;
+Function real_mod(dividend, divisor: float): float;
 Function real_sqrt(a: float): float;
 Function real_cos(a: FLoat): float;
 Function real_sin(a: FLoat): float;
@@ -60,6 +61,11 @@ Implementation
 Function real_pow(base, exp: float): Float;
 Begin
   result := Power(base, exp);
+End;
+
+Function real_mod(dividend, divisor: float): float;
+Begin
+  result := dividend - trunc(dividend / divisor) * divisor
 End;
 
 Function real_sqrt(a: float): float;
