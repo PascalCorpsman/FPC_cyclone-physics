@@ -34,6 +34,10 @@ If you do not wan't to wait up until i finished reading the book you can try loo
 
 Now you have everything to compile the engine.
 
+### What is needed to compile and run the demos ?
+
+1. install LazOpenGLControl into the Lazarus IDE
+2. download [dglOpenGL.pas](https://github.com/SaschaWillems/dglOpenGL/blob/master/dglOpenGL.pas)
 
 ### Progress
 - 2025.05.23: created repository, readme.md and license.md
