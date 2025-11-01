@@ -81,7 +81,7 @@ End;
 
 Procedure Particle.addForce(Const aForce: Vector3);
 Begin
-  acceleration := acceleration + aForce;
+  forceAccum := forceAccum + aForce;
 End;
 
 Procedure Particle.setInverseMass(aInverseMass: float);
@@ -189,15 +189,21 @@ Procedure Particle.Integrate(duration: float);
 Var
   resultingAcc: Vector3;
 Begin
+  // We don't integrate things with zero mass.
   If inverseMass <= 0 Then exit;
   assert(duration > 0);
+  // Update linear position.
   position.addScaledVector(velocity, duration);
+  // Work out the acceleration from the force
   resultingAcc := acceleration;
   resultingAcc.addScaledVector(forceAccum, inverseMass);
-
+  // Update linear velocity from the acceleration.
   velocity.addScaledVector(resultingAcc, duration);
 
+  // Impose drag.
   velocity := velocity * real_pow(damping, duration);
+
+  // Clear the forces.
   clearAccumulator();
 End;
 
