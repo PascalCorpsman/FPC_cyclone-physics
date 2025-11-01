@@ -17,7 +17,7 @@ There are eleven demo's available in total. The first seven demos are part of th
 | 001    |  63          | [ballistic](src/Demos/001_ballistic)
 | 002    |  66          | [fireworks](src/Demos/002_fireworks)
 | 003    | 151          | [bridge](src/Demos/003_bridge)
-| 004    | 152          | platform
+| 004    | 152          | [platform](src/Demos/004_platform)
 | 005    | 153          | blob
 | 006    | 241          | flightsim
 | 007    | 247          | sailboat
@@ -42,3 +42,4 @@ Now you have everything to compile the engine.
 - 2025.10.26: demo 009 ragdoll
 - 2025.10.30: demo 011 explosion
 - 2025.10.31: demo 003 bridge
+- 2025.11.01: demo 004 platform

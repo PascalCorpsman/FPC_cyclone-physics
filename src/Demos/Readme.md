@@ -7,6 +7,7 @@ This is the folder that holds the source of the different demos.
 * [ballistic](001_ballistic) - Demonstrates the most simple particle
 * [fireworks](002_fireworks) - more advanced demo
 * [bridge](003_bridge) - Demonstrates a simulation of a bridge
+* [platform](004_platform) - Demonstrates a simulation of a seesaw
 
 ### Rigid body demos
 
