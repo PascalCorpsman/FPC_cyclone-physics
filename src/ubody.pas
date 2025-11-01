@@ -677,7 +677,7 @@ Type
      *
      * @return The converted point, in world space.
      *)
-    Function getPointInWorldSpace(Const point: PVector3): Vector3;
+    Function getPointInWorldSpace(Const point: Vector3): Vector3;
 
     (**
      * Converts the given direction from world space into the
@@ -1349,9 +1349,9 @@ Begin
   result := transformMatrix.transformInverse(point);
 End;
 
-Function RigidBody.getPointInWorldSpace(Const point: PVector3): Vector3;
+Function RigidBody.getPointInWorldSpace(Const point: Vector3): Vector3;
 Begin
-  result := transformMatrix.transform(point^);
+  result := transformMatrix.transform(point);
 End;
 
 Function RigidBody.getDirectionInLocalSpace(Const direction: Vector3): Vector3;
@@ -1477,7 +1477,7 @@ Var
   pt: Vector3;
 Begin
   // Convert to coordinates relative to center of mass.
-  pt := getPointInWorldSpace(@point);
+  pt := getPointInWorldSpace(point);
   addForceAtPoint(force, pt);
 End;
 

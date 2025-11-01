@@ -162,7 +162,7 @@ End;
 
 { RagdollDemo }
 
-Procedure RagdollDemo.generateContacts();
+Procedure RagdollDemo.generateContacts;
 Var
   plane: CollisionPlane;
   bone_, other: ^Bone;
@@ -446,8 +446,8 @@ Begin
   glBegin(GL_LINES);
   For i := 0 To NUM_JOINTS - 1 Do Begin
     _Joint := joints[i];
-    a_pos := _joint.body[0]^.getPointInWorldSpace(@_joint.position[0]);
-    b_pos := _joint.body[1]^.getPointInWorldSpace(@_joint.position[1]);
+    a_pos := _joint.body[0]^.getPointInWorldSpace(_joint.position[0]);
+    b_pos := _joint.body[1]^.getPointInWorldSpace(_joint.position[1]);
     _length := (b_pos - a_pos).magnitude();
 
     If (_length > _joint.error) Then

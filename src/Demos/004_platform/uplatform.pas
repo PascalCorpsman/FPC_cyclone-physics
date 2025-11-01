@@ -74,7 +74,7 @@ End;
 
 { PlatformDemo }
 
-Constructor PlatformDemo.Create();
+Constructor PlatformDemo.Create;
 Var
   i: Integer;
 Begin
@@ -157,7 +157,7 @@ Begin
   updateAdditionalMass();
 End;
 
-Destructor PlatformDemo.Destroy();
+Destructor PlatformDemo.Destroy;
 Var
   i: Integer;
 Begin
@@ -167,7 +167,7 @@ Begin
   Inherited Destroy();
 End;
 
-Procedure PlatformDemo.updateAdditionalMass();
+Procedure PlatformDemo.updateAdditionalMass;
 Var
   i: unsigned;
   xp, zp: Float;

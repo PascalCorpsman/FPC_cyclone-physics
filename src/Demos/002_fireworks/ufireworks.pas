@@ -290,7 +290,7 @@ Begin
   // ... and so on for other firework types ...
 End;
 
-Constructor FireworksDemo.Create();
+Constructor FireworksDemo.Create;
 Var
   firework: Integer;
 Begin

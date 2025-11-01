@@ -30,7 +30,15 @@ Type
     Constructor Create(amaxContacts: integer; iterations: integer = 0);
     Destructor Destroy; override;
     Function getParticles(): TParticles;
+    (**
+     * Returns the list of contact generators.
+     *)
     Function getContactGenerators(): TContactGenerators;
+
+    (**
+     * Returns the force registry.
+     *)
+    Function getForceRegistry(): ParticleForceRegistry;
 
     Procedure startFrame();
     Procedure runPhysics(duration: Float);
@@ -58,7 +66,7 @@ Begin
   End;
 End;
 
-Function ParticleWorld.generateContacts(): integer;
+Function ParticleWorld.generateContacts: integer;
 Var
   limit: integer;
   nextContact, i: integer;
@@ -109,6 +117,11 @@ End;
 Function ParticleWorld.getContactGenerators: TContactGenerators;
 Begin
   result := contactGenerators;
+End;
+
+Function ParticleWorld.getForceRegistry: ParticleForceRegistry;
+Begin
+  result := registry;
 End;
 
 Procedure ParticleWorld.startFrame;

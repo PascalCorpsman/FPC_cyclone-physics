@@ -84,8 +84,8 @@ Var
 Begin
   result := 0;
   // Calculate the position of each connection point in world coordinates
-  a_pos_world := body[0]^.getPointInWorldSpace(@position[0]);
-  b_pos_world := body[1]^.getPointInWorldSpace(@position[1]);
+  a_pos_world := body[0]^.getPointInWorldSpace(position[0]);
+  b_pos_world := body[1]^.getPointInWorldSpace(position[1]);
 
   // Calculate the length of the joint
   a_to_b := b_pos_world - a_pos_world;

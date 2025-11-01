@@ -78,7 +78,7 @@ End;
 
 { BridgeDemo }
 
-Procedure BridgeDemo.updateAdditionalMass();
+Procedure BridgeDemo.updateAdditionalMass;
 Var
   x, i, z: integer;
   zp, xp: float;

@@ -81,7 +81,7 @@ Type
     particleArray: Array Of Particle;
     groundContactGenerator: GroundContacts;
   public
-    Constructor Create(particleCount: integer); virtual; reintroduce;
+    Constructor Create(particleCount: integer; iterations: integer = 0); virtual; reintroduce;
     Destructor Destroy(); override;
 
     Procedure Update; override;
@@ -267,7 +267,7 @@ End;
 
 Function Application.GetWindowDimension: TPoint;
 Begin
-  result := point(640, 480);
+  result := point(640, 320);
 End;
 
 Function Application.GetTitle: String;
@@ -350,12 +350,12 @@ End;
 
 { MassAggregateApplication }
 
-Constructor MassAggregateApplication.Create(particleCount: integer);
+Constructor MassAggregateApplication.Create(particleCount: integer; iterations: integer = 0);
 Var
   i: Integer;
 Begin
   Inherited Create();
-  world := ParticleWorld.Create(particleCount * 10);
+  world := ParticleWorld.Create(particleCount * 10, iterations);
   setlength(particleArray, particleCount);
   For i := 0 To particleCount - 1 Do Begin
     world.getParticles().Push_back(@particleArray[i]);

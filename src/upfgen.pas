@@ -14,7 +14,6 @@ Type
     * particles.
     *)
   ParticleForceGenerator = Class
-
     Procedure updateForce(Var Particle: Particle; duration: float); virtual; abstract;
   End;
 

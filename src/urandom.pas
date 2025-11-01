@@ -112,16 +112,16 @@ Type
      *)
     Function randomVector(Const min, max: Vector3): Vector3; overload;
 
-    //   /**
-    //    * Returns a random vector where each component is binomially
-    //    * distributed in the range (-scale to scale) [mean = 0.0f],
-    //    * except the y coordinate which is zero.
-    //    */
-    //   Vector3 randomXZVector(real scale);
-    //
-       (**
-        * Returns a random orientation (i.e. normalized) quaternion.
-        *)
+    (**
+     * Returns a random vector where each component is binomially
+     * distributed in the range (-scale to scale) [mean = 0.0f],
+     * except the y coordinate which is zero.
+     *)
+    Function randomXZVector(scale: Float): Vector3;
+
+    (**
+     * Returns a random orientation (i.e. normalized) quaternion.
+     *)
     Function randomQuaternion(): Quaternion;
 
 
@@ -212,7 +212,16 @@ Begin
     );
 End;
 
-Function TRandom.randomQuaternion(): Quaternion;
+Function TRandom.randomXZVector(scale: Float): Vector3;
+Begin
+  result.create(
+    randomBinomial(scale),
+    0,
+    randomBinomial(scale)
+    );
+End;
+
+Function TRandom.randomQuaternion: Quaternion;
 Var
   q: Quaternion;
 Begin

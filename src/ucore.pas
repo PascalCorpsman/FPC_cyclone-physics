@@ -75,7 +75,12 @@ Type
     Function VectorProduct(Const v: Vector3): Vector3;
     Function Magnitude(): Float;
     Function squareMagnitude(): Float;
+    (** Limits the size of the vector to the given maximum. *)
+    Procedure trim(size: FLoat);
+    (** Turns a non-zero vector into a vector of unit length. *)
     Procedure Normalize;
+    (** Returns the normalised version of a vector. *)
+    Function _Unit: Vector3;
     Procedure Invert;
     Procedure Clear;
   End;
@@ -277,48 +282,33 @@ Type
     //         {
     //             setInverse(*this);
     //         }
-    //
-    //         /**
-    //          * Transform the given direction vector by this matrix.
-    //          *
-    //          * @note When a direction is converted between frames of
-    //          * reference, there is no translation required.
-    //          *
-    //          * @param vector The vector to transform.
-    //          */
-    //         Vector3 transformDirection(const Vector3 &vector) const
-    //         {
-    //             return Vector3(
-    //                 vector.x * data[0] +
-    //                 vector.y * data[1] +
-    //                 vector.z * data[2],
-    //
-    //                 vector.x * data[4] +
-    //                 vector.y * data[5] +
-    //                 vector.z * data[6],
-    //
-    //                 vector.x * data[8] +
-    //                 vector.y * data[9] +
-    //                 vector.z * data[10]
-    //             );
-    //         }
 
              (**
-              * Transform the given direction vector by the
-              * transformational inverse of this matrix.
-              *
-              * @note This function relies on the fact that the inverse of
-              * a pure rotation matrix is its transpose. It separates the
-              * translational and rotation components, transposes the
-              * rotation, and multiplies out. If the matrix is not a
-              * scale and shear free transform matrix, then this function
-              * will not give correct results.
+              * Transform the given direction vector by this matrix.
               *
               * @note When a direction is converted between frames of
               * reference, there is no translation required.
               *
               * @param vector The vector to transform.
               *)
+    Function transformDirection(Const vector: Vector3): vector3;
+
+    (**
+     * Transform the given direction vector by the
+     * transformational inverse of this matrix.
+     *
+     * @note This function relies on the fact that the inverse of
+     * a pure rotation matrix is its transpose. It separates the
+     * translational and rotation components, transposes the
+     * rotation, and multiplies out. If the matrix is not a
+     * scale and shear free transform matrix, then this function
+     * will not give correct results.
+     *
+     * @note When a direction is converted between frames of
+     * reference, there is no translation required.
+     *
+     * @param vector The vector to transform.
+     *)
     Function transformInverseDirection(Const vector: Vector3): Vector3;
 
     (**
@@ -367,35 +357,14 @@ Type
     //             data[10] = 1 - (2*q.i*q.i  + 2*q.j*q.j);
     //             data[11] = pos.z;
     //         }
-    //
-    //         /**
-    //          * Fills the given array with this transform matrix, so it is
-    //          * usable as an open-gl transform matrix. OpenGL uses a column
-    //          * major format, so that the values are transposed as they are
-    //          * written.
-    //          */
-    //         void fillGLArray(float array[16]) const
-    //         {
-    //             array[0] = (float)data[0];
-    //             array[1] = (float)data[4];
-    //             array[2] = (float)data[8];
-    //             array[3] = (float)0;
-    //
-    //             array[4] = (float)data[1];
-    //             array[5] = (float)data[5];
-    //             array[6] = (float)data[9];
-    //             array[7] = (float)0;
-    //
-    //             array[8] = (float)data[2];
-    //             array[9] = (float)data[6];
-    //             array[10] = (float)data[10];
-    //             array[11] = (float)0;
-    //
-    //             array[12] = (float)data[3];
-    //             array[13] = (float)data[7];
-    //             array[14] = (float)data[11];
-    //             array[15] = (float)1;
-    //         }
+
+             (**
+              * Fills the given array with this transform matrix, so it is
+              * usable as an open-gl transform matrix. OpenGL uses a column
+              * major format, so that the values are transposed as they are
+              * written.
+              *)
+    Procedure fillGLArray(Out _array: TOpenGLMatrix);
   End;
 
   PMatrix4 = ^Matrix4;
@@ -591,11 +560,6 @@ Type
     //            data[7] = 2*q.j*q.k - 2*q.i*q.r;
     //            data[8] = 1 - (2*q.i*q.i  + 2*q.j*q.j);
     //        }
-    //
-    //        /**
-    //         * Interpolates a couple of matrices.
-    //         */
-    //        static Matrix3 linearInterpolate(const Matrix3& a, const Matrix3& b, real prop);
   End;
 
 Operator * (v: Vector3; s: Float): Vector3;
@@ -630,16 +594,31 @@ Var
 Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 
 Function V3(x, y, z: float): Vector3;
+Function M3(a, b, c, d, e, f, g, h, i: float): Matrix3;
 
 Function ifthen(value: Boolean; truecase, falsecase: Float): Float; // ka warum math.pas includiert und alles knallt ..
 
 Procedure Nop;
+
+(**
+ * Interpolates a couple of matrices.
+ *)
+Function linearInterpolate(Const a, b: Matrix3; prop: float): Matrix3;
 
 Implementation
 
 Procedure Nop;
 Begin
 
+End;
+
+Function linearInterpolate(Const a, b: Matrix3; prop: float): Matrix3;
+Var
+  i: integer;
+Begin
+  For i := 0 To 8 Do Begin
+    result.data[i] := a.data[i] * (1 - prop) + b.data[i] * prop;
+  End;
 End;
 
 Function ifthen(value: Boolean; truecase, falsecase: Float): Float;
@@ -653,6 +632,19 @@ End;
 Function V3(x, y, z: float): Vector3;
 Begin
   result.create(x, y, z);
+End;
+
+Function M3(a, b, c, d, e, f, g, h, i: float): Matrix3;
+Begin
+  result.data[0] := a;
+  result.data[1] := b;
+  result.data[2] := c;
+  result.data[3] := d;
+  result.data[4] := e;
+  result.data[5] := f;
+  result.data[6] := g;
+  result.data[7] := h;
+  result.data[8] := i;
 End;
 
 Operator * (v: Vector3; s: Float): Vector3;
@@ -968,6 +960,16 @@ Begin
   result := sqr(x) + sqr(y) + sqr(z);
 End;
 
+Procedure Vector3.trim(size: FLoat);
+Begin
+  If (squareMagnitude() > size * size) Then Begin
+    Normalize();
+    x := x * size;
+    y := y * size;
+    z := z * size;
+  End;
+End;
+
 Procedure Vector3.Normalize;
 Var
   l: Float;
@@ -976,6 +978,12 @@ Begin
   If (l > 0) Then Begin
     self := self * (1 / l);
   End;
+End;
+
+Function Vector3._Unit: Vector3;
+Begin
+  result := self;
+  result.Normalize();
 End;
 
 Procedure Vector3.Invert;
@@ -1068,6 +1076,23 @@ Begin
   result := self * vector;
 End;
 
+Function Matrix4.transformDirection(Const vector: Vector3): vector3;
+Begin
+  result.create(
+    vector.x * data[0] +
+    vector.y * data[1] +
+    vector.z * data[2],
+
+    vector.x * data[4] +
+    vector.y * data[5] +
+    vector.z * data[6],
+
+    vector.x * data[8] +
+    vector.y * data[9] +
+    vector.z * data[10]
+    );
+End;
+
 Function Matrix4.transformInverseDirection(Const vector: Vector3): Vector3;
 Begin
   result.create(
@@ -1111,6 +1136,29 @@ End;
 Function Matrix4.getAxisVector(i: integer): Vector3;
 Begin
   result.create(data[i], data[i + 4], data[i + 8]);
+End;
+
+Procedure Matrix4.fillGLArray(Out _array: TOpenGLMatrix);
+Begin
+  _array[0] := data[0];
+  _array[1] := data[4];
+  _array[2] := data[8];
+  _array[3] := 0;
+
+  _array[4] := data[1];
+  _array[5] := data[5];
+  _array[6] := data[9];
+  _array[7] := 0;
+
+  _array[8] := data[2];
+  _array[9] := data[6];
+  _array[10] := data[10];
+  _array[11] := 0;
+
+  _array[12] := data[3];
+  _array[13] := data[7];
+  _array[14] := data[11];
+  _array[15] := 1;
 End;
 
 { Matrix3 }
