@@ -593,6 +593,7 @@ Var
 
 Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 
+Function Q(r, i, j, k: FLoat): Quaternion;
 Function V3(x, y, z: float): Vector3;
 Function M3(a, b, c, d, e, f, g, h, i: float): Matrix3;
 
@@ -627,6 +628,11 @@ Begin
     result := truecase
   Else
     result := falsecase;
+End;
+
+Function Q(r, i, j, k: FLoat): Quaternion;
+Begin
+  result.Create(r, i, j, k);
 End;
 
 Function V3(x, y, z: float): Vector3;
