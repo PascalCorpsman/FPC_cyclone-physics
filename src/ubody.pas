@@ -344,23 +344,23 @@ Type
      *)
     Function getInverseMass(): float;
 
-    //        /**
-    //         * Returns true if the mass of the body is not-infinite.
-    //         */
-    //        bool hasFiniteMass() const;
-    //
-            (**
-             * Sets the intertia tensor for the rigid body.
-             *
-             * @param inertiaTensor The inertia tensor for the rigid
-             * body. This must be a full rank matrix and must be
-             * invertible.
-             *
-             * @warning This invalidates internal data for the rigid body.
-             * Either an integration function, or the calculateInternals
-             * function should be called before trying to get any settings
-             * from the rigid body.
-             *)
+    (**
+     * Returns true if the mass of the body is not-infinite.
+     *)
+    Function hasFiniteMass(): boolean;
+
+    (**
+     * Sets the intertia tensor for the rigid body.
+     *
+     * @param inertiaTensor The inertia tensor for the rigid
+     * body. This must be a full rank matrix and must be
+     * invertible.
+     *
+     * @warning This invalidates internal data for the rigid body.
+     * Either an integration function, or the calculateInternals
+     * function should be called before trying to get any settings
+     * from the rigid body.
+     *)
     Procedure setInertiaTensor(Const inertiaTensor: Matrix3);
 
     //        /**
@@ -813,23 +813,20 @@ Type
      *)
     Procedure setAwake(awake: boolean = true);
 
-    //        /**
-    //         * Returns true if the body is allowed to go to sleep at
-    //         * any time.
-    //         */
-    //        bool getCanSleep() const
-    //        {
-    //            return canSleep;
-    //        }
+    (**
+     * Returns true if the body is allowed to go to sleep at
+     * any time.
+     *)
+    Function getCanSleep(): Boolean;
 
-            (**
-             * Sets whether the body is ever allowed to go to sleep. Bodies
-             * under the player's control, or for which the set of
-             * transient forces applied each frame are not predictable,
-             * should be kept awake.
-             *
-             * @param canSleep Whether the body can now be put to sleep.
-             *)
+    (**
+     * Sets whether the body is ever allowed to go to sleep. Bodies
+     * under the player's control, or for which the set of
+     * transient forces applied each frame are not predictable,
+     * should be kept awake.
+     *
+     * @param canSleep Whether the body can now be put to sleep.
+     *)
     Procedure setCanSleep(Const acanSleep: boolean);
 
     (*@}*)
@@ -1130,6 +1127,9 @@ Var
   angularAcceleration: Vector3;
   currentMotion, bias: float;
 Begin
+  If inverseMass = 0 Then Begin
+    setAwake(false);
+  End;
   If (Not isAwake) Then exit;
 
   // Calculate linear acceleration from force inputs.
@@ -1187,7 +1187,7 @@ Begin
   inverseMass := (1.0) / mass;
 End;
 
-Function RigidBody.getMass(): float;
+Function RigidBody.getMass: float;
 Begin
   If (inverseMass = 0) Then Begin
     result := REAL_MAX;
@@ -1205,6 +1205,11 @@ End;
 Function RigidBody.getInverseMass: float;
 Begin
   result := inverseMass;
+End;
+
+Function RigidBody.hasFiniteMass(): boolean;
+Begin
+  result := inverseMass >= 0.0;
 End;
 
 Procedure RigidBody.setInertiaTensor(Const inertiaTensor: Matrix3);
@@ -1427,6 +1432,11 @@ Begin
     velocity.clear();
     rotation.clear();
   End;
+End;
+
+Function RigidBody.getCanSleep: Boolean;
+Begin
+  result := canSleep;
 End;
 
 Procedure RigidBody.setCanSleep(Const acanSleep: boolean);

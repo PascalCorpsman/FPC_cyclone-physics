@@ -188,11 +188,7 @@ Type
      *)
     Procedure addScaledVector(Const vector: Vector3; scale: float);
 
-    //        void rotateByVector(const Vector3& vector)
-    //        {
-    //            Quaternion q(0, vector.x, vector.y, vector.z);
-    //            (*this) *= q;
-    //        }
+    Procedure rotateByVector(Const vector: Vector3);
   End;
 
   (**
@@ -594,6 +590,12 @@ Var
 Procedure makeOrthonormalBasis(Var a, b: Vector3; Out c: Vector3);
 
 Function Q(r, i, j, k: FLoat): Quaternion;
+(*
+ * Erzeugt eine "Drehung" um die Achsen des Vektors [x,y,z]
+ * es sollte jeweils nur eine Komponente <> 0 (=1) sein.
+ * r im Bogenmas
+ *)
+Function Q_by_Rotation(x, y, z: Float; r: Float): Quaternion;
 Function V3(x, y, z: float): Vector3;
 Function M3(a, b, c, d, e, f, g, h, i: float): Matrix3;
 
@@ -633,6 +635,15 @@ End;
 Function Q(r, i, j, k: FLoat): Quaternion;
 Begin
   result.Create(r, i, j, k);
+End;
+
+Function Q_by_Rotation(x, y, z: Float; r: Float): Quaternion;
+Var
+  s, c: float;
+Begin
+  s := real_sin(r / 2);
+  c := real_cos(r / 2);
+  result.create(x * s, y * s, z * s, c);
 End;
 
 Function V3(x, y, z: float): Vector3;
@@ -1057,6 +1068,14 @@ Begin
   _d.i := _d.i + q._d.i * 0.5;
   _d.j := _d.j + q._d.j * 0.5;
   _d.k := _d.k + q._d.k * 0.5;
+End;
+
+Procedure Quaternion.rotateByVector(Const vector: Vector3);
+Var
+  q: Quaternion;
+Begin
+  q.create(0, vector.x, vector.y, vector.z);
+  self := self * q;
 End;
 
 { Matrix4 }
