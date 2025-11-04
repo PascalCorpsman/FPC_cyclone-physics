@@ -20,7 +20,7 @@ There are eleven demo's available in total. The first seven demos are part of th
 | 004    | 152          | [platform](src/Demos/004_platform)
 | 005    | 153          | [blob](src/Demos/005_blob)
 | 006    | 241          | [flightsim](src/Demos/006_flightsim)
-| 007    | 247          | sailboat
+| 007    | 247          | [sailboat](src/Demos/007_sailboat)
 | 008    |  65          | bigballistic
 | 009    | 441          | [ragdoll](src/Demos/009_ragdoll)
 | 010    | 446          | fracture
@@ -49,3 +49,5 @@ Now you have everything to compile the engine.
 - 2025.11.01: demo 004 platform
 - 2025.11.02: demo 005 blob
 - 2025.11.03: demo 006 flightsim
+- 2025.11.04: demo 007 sailboat
+

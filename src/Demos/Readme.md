@@ -10,6 +10,7 @@ This is the folder that holds the source of the different demos.
 * [platform](004_platform) - Demonstrates a simulation of a seesaw
 * [blob](005_blob) - Demonstrates a simulation of a blob game
 * [flightsim](006_flightsim) - Demonstrates a simulation of a airplane
+* [sailboat](007_sailboat) - Demonstrates a simulation of a sailboat
 
 ### Rigid body demos
 
