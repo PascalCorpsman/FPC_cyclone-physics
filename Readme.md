@@ -38,6 +38,10 @@ Now you have everything to compile the engine.
 
 1. install LazOpenGLControl into the Lazarus IDE
 2. download [dglOpenGL.pas](https://github.com/SaschaWillems/dglOpenGL/blob/master/dglOpenGL.pas)
+3. download [uvectormath.pas](https://github.com/PascalCorpsman/Examples/blob/master/data_control/uvectormath.pas)
+4. download [uopengl_ascii_font.pas](https://github.com/PascalCorpsman/Examples/blob/master/OpenGL/uopengl_ascii_font.pas)
+5. download [uopengl_ascii_font.ressource](https://github.com/PascalCorpsman/Examples/blob/master/OpenGL/uopengl_ascii_font.ressource)
+6. download [uopengl_font_common.pas](https://github.com/PascalCorpsman/Examples/blob/master/OpenGL/uopengl_font_common.pas)
 
 ### Progress
 - 2025.05.23: created repository, readme.md and license.md
