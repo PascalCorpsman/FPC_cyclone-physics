@@ -16,6 +16,7 @@ This is the folder that holds the source of the different demos.
 
 * [bigballistic](008_bigballistic) - like 001 demo but with a boddy that can be hit
 * [ragdoll](009_ragdoll) - Demonstration of a ragdoll that is "punshed"
+* [fracture](010_fracture) - Demonstration of a rigidbody "splitting"
 * [explosion](011_explosion) - Demonstration of a simple scene
 
 ### What is needed to compile and run the code ?

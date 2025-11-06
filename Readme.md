@@ -23,7 +23,7 @@ There are eleven demo's available in total. The first seven demos are part of th
 | 007    | 247          | [sailboat](src/Demos/007_sailboat)
 | 008    |  65          | [bigballistic](src/Demos/008_bigballistic)
 | 009    | 441          | [ragdoll](src/Demos/009_ragdoll)
-| 010    | 446          | fracture
+| 010    | 446          | [fracture](src/Demos/010_fracture)
 | 011    | 457          | [explosion](src/Demos/011_explosion)
 
 If you do not wan't to wait up until i finished reading the book you can try look at the books github repository which is located [here](https://github.com/idmillington/cyclone-physics).
@@ -55,5 +55,6 @@ Now you have everything to compile the engine.
 - 2025.11.03: demo 006 flightsim
 - 2025.11.04: demo 007 sailboat
 - 2025.11.05: demo 008 bigballistic
+- 2025.11.06: demo 010 fracture
 
 
